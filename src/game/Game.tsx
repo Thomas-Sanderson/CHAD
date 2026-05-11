@@ -5,6 +5,7 @@ import { belarusSkin } from "../content/belarus";
 import { ethiopiaSkin } from "../content/ethiopia";
 import { checkInference, calculateLevelScore } from "./index";
 import type { LevelScore } from "./scoring";
+import { buildShoutWords } from "./shoutWords";
 import { SkinSelectScreen } from "./SkinSelectScreen";
 import { BriefingScreen } from "./BriefingScreen";
 import { RunPhase } from "./RunPhase";
@@ -77,22 +78,7 @@ export function Game() {
 
   const learnedWordsForSkin: VocabWord[] = useMemo(() => {
     const learnedIds = learnedVocab[currentSkin.id] ?? [];
-    const words: VocabWord[] = [];
-    for (const level of currentSkin.levels) {
-      for (const word of level.vocabPack.words) {
-        if (learnedIds.includes(word.id) && word.matchesItemId !== null) {
-          words.push(word);
-        }
-      }
-    }
-    // Include current level's vocab — player learned these in the briefing
-    const currentLevel = currentSkin.levels[currentLevelIndex]!;
-    for (const word of currentLevel.vocabPack.words) {
-      if (word.matchesItemId !== null && !words.some(w => w.id === word.id)) {
-        words.push(word);
-      }
-    }
-    return words;
+    return buildShoutWords(currentSkin, learnedIds, currentLevelIndex);
   }, [currentSkin, learnedVocab, currentLevelIndex]);
 
   useEffect(() => {
