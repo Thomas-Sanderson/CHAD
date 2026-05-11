@@ -113,6 +113,8 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     flexDirection: "column",
     gap: 8,
+    maxHeight: 300,
+    overflowY: "auto",
   },
   wordButton: {
     display: "flex",

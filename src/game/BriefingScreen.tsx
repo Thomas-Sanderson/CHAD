@@ -163,9 +163,10 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
 const styles: Record<string, React.CSSProperties> = {
   container: {
     display: "flex",
-    justifyContent: "center",
     alignItems: "center",
-    minHeight: "100vh",
+    height: "100vh",
+    overflowY: "auto",
+    padding: 32,
     background: "#1a1a2e",
     fontFamily: "'SF Pro', -apple-system, sans-serif",
   },
