@@ -14,8 +14,6 @@ describe("audio", () => {
       value: {
         speak: mockSpeak,
         cancel: mockCancel,
-        resume: vi.fn(),
-        speaking: false,
       },
       writable: true,
       configurable: true,
@@ -39,7 +37,8 @@ describe("audio", () => {
     vi.restoreAllMocks();
   });
 
-  it("pronounceWord calls speechSynthesis.speak with Russian lang", () => {
+  it("pronounceWord queues speech via setTimeout", async () => {
+    vi.useFakeTimers();
     const word: VocabWord = {
       id: "test",
       cyrillic: "ТЕСТ",
@@ -48,12 +47,16 @@ describe("audio", () => {
     };
 
     pronounceWord(word);
+    expect(mockCancel).toHaveBeenCalled();
+    expect(mockSpeak).not.toHaveBeenCalled(); // not yet — queued
 
+    vi.advanceTimersByTime(60);
     expect(mockSpeak).toHaveBeenCalledTimes(1);
     const utterance = mockSpeak.mock.calls[0]![0];
     expect(utterance.text).toBe("ТЕСТ");
     expect(utterance.lang).toBe("ru-RU");
     expect(utterance.rate).toBe(0.8);
+    vi.useRealTimers();
   });
 
   it("stopAll cancels speech synthesis", () => {
@@ -61,17 +64,17 @@ describe("audio", () => {
     expect(mockCancel).toHaveBeenCalled();
   });
 
-  it("pronounceWord speaks multiple words", () => {
-    const word: VocabWord = {
-      id: "w1",
-      cyrillic: "СЛОВО",
-      translation: "word",
-      matchesItemId: null,
-    };
+  it("rapid calls only speak the last word", () => {
+    vi.useFakeTimers();
+    const w1: VocabWord = { id: "w1", cyrillic: "СЛОВО", translation: "word", matchesItemId: null };
+    const w2: VocabWord = { id: "w2", cyrillic: "ТЕСТ", translation: "test", matchesItemId: null };
 
-    pronounceWord(word);
-    pronounceWord(word);
+    pronounceWord(w1);
+    pronounceWord(w2); // should replace w1
 
-    expect(mockSpeak).toHaveBeenCalledTimes(2);
+    vi.advanceTimersByTime(60);
+    expect(mockSpeak).toHaveBeenCalledTimes(1);
+    expect(mockSpeak.mock.calls[0]![0].text).toBe("ТЕСТ");
+    vi.useRealTimers();
   });
 });
