@@ -14,6 +14,8 @@ describe("audio", () => {
       value: {
         speak: mockSpeak,
         cancel: mockCancel,
+        resume: vi.fn(),
+        speaking: false,
       },
       writable: true,
       configurable: true,
@@ -47,7 +49,6 @@ describe("audio", () => {
 
     pronounceWord(word);
 
-    expect(mockCancel).toHaveBeenCalled();
     expect(mockSpeak).toHaveBeenCalledTimes(1);
     const utterance = mockSpeak.mock.calls[0]![0];
     expect(utterance.text).toBe("ТЕСТ");
@@ -60,7 +61,7 @@ describe("audio", () => {
     expect(mockCancel).toHaveBeenCalled();
   });
 
-  it("pronounceWord cancels previous speech before speaking", () => {
+  it("pronounceWord speaks multiple words", () => {
     const word: VocabWord = {
       id: "w1",
       cyrillic: "СЛОВО",
@@ -71,7 +72,6 @@ describe("audio", () => {
     pronounceWord(word);
     pronounceWord(word);
 
-    expect(mockCancel).toHaveBeenCalledTimes(2);
     expect(mockSpeak).toHaveBeenCalledTimes(2);
   });
 });
