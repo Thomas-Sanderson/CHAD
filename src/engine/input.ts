@@ -1,7 +1,7 @@
 import type { InputState } from "../types";
 
 export function createInputState(): InputState {
-  return { left: false, right: false, jump: false, interact: false };
+  return { left: false, right: false, jump: false, interact: false, shout: false };
 }
 
 export function setupKeyboardInput(state: InputState): () => void {
@@ -27,6 +27,10 @@ export function setupKeyboardInput(state: InputState): () => void {
         state.interact = true;
         e.preventDefault();
         break;
+      case "KeyP":
+        state.shout = true;
+        e.preventDefault();
+        break;
     }
   };
 
@@ -47,6 +51,9 @@ export function setupKeyboardInput(state: InputState): () => void {
         break;
       case "KeyE":
         state.interact = false;
+        break;
+      case "KeyP":
+        state.shout = false;
         break;
     }
   };

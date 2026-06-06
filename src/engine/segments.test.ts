@@ -191,7 +191,7 @@ describe("Segment-based game loop", () => {
     updateGameState(state, input, testLevel, [], emptyItemDefs, 0.016);
     expect(state.nearDoor).toBe("locked-door");
 
-    input.interact = true;
+    input.shout = true;
     updateGameState(state, input, testLevel, [], emptyItemDefs, 0.016);
     expect(state.shoutMenuOpen).toBe(true);
     expect(state.shoutTarget).toBe("locked-door");

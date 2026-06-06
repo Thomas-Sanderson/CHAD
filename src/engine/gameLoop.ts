@@ -5,7 +5,8 @@ import type {
   PlacedHazard,
   CollectedInfo,
 } from "../types";
-import type { CollectibleItem, LevelSegment, PlatformDef } from "../types/content";
+import type { CollectibleItem, LevelSegment, PlatformDef, LandmarkDef } from "../types/content";
+import { speakText } from "./audio";
 import {
   applyGravity,
   applyMovement,
@@ -342,16 +343,17 @@ export function updateGameState(
       }
     }
 
-    if (input.interact && state.nearDoor) {
+    if (state.nearDoor) {
       const door = currentSegment.doors.find(d => d.id === state.nearDoor);
       if (door) {
         const isLocked = door.locked && !state.unlockedDoors.includes(door.id);
-        if (isLocked) {
-          // Open shout menu for locked door
+        if (input.shout && isLocked) {
+          // P key — open shout menu for locked door
           state.shoutMenuOpen = true;
           state.shoutTarget = door.id;
-        } else {
-          // Start door transition
+          input.shout = false;
+        } else if (input.interact && !isLocked) {
+          // E key — enter unlocked door
           state.transition = {
             phase: "fadeOut",
             timer: TRANSITION_MS,
@@ -359,10 +361,25 @@ export function updateGameState(
             targetX: door.targetX,
             targetY: door.targetY,
           };
+          input.interact = false;
         }
       }
-      input.interact = false;
+      if (input.interact) input.interact = false;
+      if (input.shout) input.shout = false;
     }
+  }
+
+  // Landmark audio — E near a landmark speaks its label
+  if (input.interact && currentSegment?.type !== "interior") {
+    const landmarks: LandmarkDef[] = currentSegment?.landmarks ?? level.landmarks ?? [];
+    for (const lm of landmarks) {
+      const dist = Math.abs(state.player.position.x - lm.x);
+      if (dist < 60) {
+        speakText(lm.label);
+        break;
+      }
+    }
+    input.interact = false;
   }
 
   // Shout response decay

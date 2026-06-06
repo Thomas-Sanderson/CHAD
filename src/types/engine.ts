@@ -104,6 +104,7 @@ export interface GameRunState {
 export interface InputState {
   left: boolean;
   right: boolean;
+  shout: boolean; // P key — locked door shout menu
   jump: boolean;
   interact: boolean;
 }

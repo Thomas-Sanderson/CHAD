@@ -178,7 +178,7 @@ export function RunPhase({ level, itemDefs, environment, onGateReached, learnedW
         )}
       </div>
       <div style={styles.controls}>
-        <span>&larr; &rarr; or A/D to move | &uarr; or W or Space to jump | E to interact</span>
+        <span>&larr; &rarr; or A/D to move | &uarr; or W or Space to jump | E to enter/listen | P to shout</span>
       </div>
     </div>
   );
