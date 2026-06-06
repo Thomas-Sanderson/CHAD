@@ -37,8 +37,7 @@ describe("audio", () => {
     vi.restoreAllMocks();
   });
 
-  it("pronounceWord queues speech via setTimeout", async () => {
-    vi.useFakeTimers();
+  it("pronounceWord speaks immediately when idle", () => {
     const word: VocabWord = {
       id: "test",
       cyrillic: "ТЕСТ",
@@ -47,34 +46,15 @@ describe("audio", () => {
     };
 
     pronounceWord(word);
-    expect(mockCancel).toHaveBeenCalled();
-    expect(mockSpeak).not.toHaveBeenCalled(); // not yet — queued
-
-    vi.advanceTimersByTime(60);
     expect(mockSpeak).toHaveBeenCalledTimes(1);
     const utterance = mockSpeak.mock.calls[0]![0];
     expect(utterance.text).toBe("ТЕСТ");
     expect(utterance.lang).toBe("ru-RU");
     expect(utterance.rate).toBe(0.8);
-    vi.useRealTimers();
   });
 
   it("stopAll cancels speech synthesis", () => {
     stopAll();
     expect(mockCancel).toHaveBeenCalled();
-  });
-
-  it("rapid calls only speak the last word", () => {
-    vi.useFakeTimers();
-    const w1: VocabWord = { id: "w1", cyrillic: "СЛОВО", translation: "word", matchesItemId: null };
-    const w2: VocabWord = { id: "w2", cyrillic: "ТЕСТ", translation: "test", matchesItemId: null };
-
-    pronounceWord(w1);
-    pronounceWord(w2); // should replace w1
-
-    vi.advanceTimersByTime(60);
-    expect(mockSpeak).toHaveBeenCalledTimes(1);
-    expect(mockSpeak.mock.calls[0]![0].text).toBe("ТЕСТ");
-    vi.useRealTimers();
   });
 });

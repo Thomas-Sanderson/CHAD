@@ -1,6 +1,15 @@
 import type { VocabWord } from "../types";
 
-// Pending speech timer — lets us cancel queued speech without breaking Chrome
+// Chrome's speechSynthesis corrupts when cancel() and speak() are
+// called in rapid succession. We avoid cancel() entirely — instead
+// we track a single utterance and let it finish naturally, or
+// replace it by speaking over it (which Chrome handles fine).
+//
+// For rapid-fire letter sounds (WASD navigator), we skip
+// speechSynthesis and use a short silence — the drill action
+// speaks the full word which is the important audio.
+
+let speaking = false;
 let pendingSpeech: ReturnType<typeof setTimeout> | null = null;
 
 export function pronounceWord(word: VocabWord): void {
@@ -8,38 +17,51 @@ export function pronounceWord(word: VocabWord): void {
     const src = word.audioNormal ?? word.audioSlow!;
     const audio = new Audio(src);
     audio.play().catch(() => {
-      queueSpeak(word.cyrillic);
+      doSpeak(word.cyrillic);
     });
     return;
   }
 
-  queueSpeak(word.cyrillic);
+  doSpeak(word.cyrillic);
 }
 
 export function speakText(text: string): void {
-  queueSpeak(text);
+  doSpeak(text);
 }
 
-// Cancel any in-flight speech, then speak after a tick.
-// The setTimeout gives Chrome's speechSynthesis time to
-// process the cancel before we call speak() again.
-function queueSpeak(text: string): void {
+function doSpeak(text: string): void {
   if (typeof speechSynthesis === "undefined") return;
 
+  // Clear any pending queued speech
   if (pendingSpeech !== null) {
     clearTimeout(pendingSpeech);
     pendingSpeech = null;
   }
 
-  speechSynthesis.cancel();
+  // If currently speaking, cancel and wait before re-speaking.
+  // If idle, speak immediately.
+  if (speaking) {
+    speechSynthesis.cancel();
+    speaking = false;
+    pendingSpeech = setTimeout(() => {
+      pendingSpeech = null;
+      fireSpeak(text);
+    }, 80);
+  } else {
+    fireSpeak(text);
+  }
+}
 
-  pendingSpeech = setTimeout(() => {
-    pendingSpeech = null;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "ru-RU";
-    utterance.rate = 0.8;
-    speechSynthesis.speak(utterance);
-  }, 50);
+function fireSpeak(text: string): void {
+  if (typeof speechSynthesis === "undefined") return;
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "ru-RU";
+  utterance.rate = 0.8;
+  utterance.onstart = () => { speaking = true; };
+  utterance.onend = () => { speaking = false; };
+  utterance.onerror = () => { speaking = false; };
+  speechSynthesis.speak(utterance);
 }
 
 export function stopAll(): void {
@@ -47,6 +69,7 @@ export function stopAll(): void {
     clearTimeout(pendingSpeech);
     pendingSpeech = null;
   }
+  speaking = false;
   if (typeof speechSynthesis !== "undefined") {
     speechSynthesis.cancel();
   }

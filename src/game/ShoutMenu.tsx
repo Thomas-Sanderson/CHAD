@@ -160,7 +160,6 @@ function WASDNavigator({ learnedWords, onSelect, onCancel }: Props) {
           e.preventDefault();
           if (wGroup) {
             setHighlightKey("w");
-            speakText(wGroup.letter);
             if (wGroup.words.length === 1) {
               handleWordClick(wGroup.words[0]!);
             } else {
@@ -173,7 +172,6 @@ function WASDNavigator({ learnedWords, onSelect, onCancel }: Props) {
           e.preventDefault();
           if (aGroup) {
             setHighlightKey("a");
-            speakText(aGroup.letter);
             if (aGroup.words.length === 1) {
               handleWordClick(aGroup.words[0]!);
             } else {
@@ -186,7 +184,6 @@ function WASDNavigator({ learnedWords, onSelect, onCancel }: Props) {
           e.preventDefault();
           if (dGroup) {
             setHighlightKey("d");
-            speakText(dGroup.letter);
             if (dGroup.words.length === 1) {
               handleWordClick(dGroup.words[0]!);
             } else {
