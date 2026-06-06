@@ -13,11 +13,11 @@ const vocabPack: VocabPack = {
 };
 
 const itemDefs = new Map<string, CollectibleItem>([
-  ["smetana_tub", { id: "smetana_tub", name: "White Tub", description: "", isDecoy: false, color: "#fff" }],
-  ["kefir_bottle", { id: "kefir_bottle", name: "Tall Bottle", description: "", isDecoy: false, color: "#fff" }],
-  ["kolbasa_link", { id: "kolbasa_link", name: "Sausage", description: "", isDecoy: false, color: "#fff" }],
-  ["pickle_jar", { id: "pickle_jar", name: "Pickle Jar", description: "", isDecoy: true, color: "#fff" }],
-  ["bread_loaf", { id: "bread_loaf", name: "Bread", description: "", isDecoy: true, color: "#fff" }],
+  ["smetana_tub", { id: "smetana_tub", name: "White Tub", cyrillic: "СМЕТАНА", description: "", isDecoy: false, color: "#fff" }],
+  ["kefir_bottle", { id: "kefir_bottle", name: "Tall Bottle", cyrillic: "КЕФИР", description: "", isDecoy: false, color: "#fff" }],
+  ["kolbasa_link", { id: "kolbasa_link", name: "Sausage", cyrillic: "КОЛБАСА", description: "", isDecoy: false, color: "#fff" }],
+  ["pickle_jar", { id: "pickle_jar", name: "Pickle Jar", cyrillic: "ОГУРЦЫ", description: "", isDecoy: true, color: "#fff" }],
+  ["bread_loaf", { id: "bread_loaf", name: "Bread", cyrillic: "БАТОН", description: "", isDecoy: true, color: "#fff" }],
 ]);
 
 describe("checkInference", () => {

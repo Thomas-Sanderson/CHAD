@@ -55,4 +55,11 @@ export const level3Data: LevelData = {
   startPosition: { x: 50, y: GROUND_Y - 48 },
   gatePosition: { x: 3450, y: GROUND_Y - 80 },
   bounds: { width: LEVEL_WIDTH, height: 450 },
+  landmarks: [
+    { label: "АПТЕКА", x: 320 },
+    { label: "БАНК", x: 950 },
+    { label: "АВТОБУС", x: 1700 },
+    { label: "ПАРК", x: 2350 },
+    { label: "ШКОЛА", x: 2900 },
+  ],
 };

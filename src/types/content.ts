@@ -4,6 +4,7 @@ export interface VocabWord {
   translation: string;
   matchesItemId: string | null; // null for meta-words like "produkty"
   pronunciation?: string; // phonetic hint, e.g. "smeh-TAH-nah"
+  ipa?: string; // IPA transcription, e.g. "/smʲɪˈtanə/"
   audioSlow?: string; // path to slow audio file (future)
   audioNormal?: string; // path to normal-speed audio file (future)
 }
@@ -36,6 +37,7 @@ export interface RevealLine {
 export interface CollectibleItem {
   id: string;
   name: string;
+  cyrillic: string; // Russian name, spoken on collection
   description: string;
   isDecoy: boolean;
   color: string; // placeholder color for rectangle rendering
@@ -89,6 +91,12 @@ export interface ShopKeeperDef {
   netResponses: string[];
 }
 
+export interface LandmarkDef {
+  label: string;
+  x: number;
+  y?: number; // defaults to ground-level sign placement
+}
+
 export interface LevelSegment {
   id: string;
   type: "street" | "interior";
@@ -100,6 +108,7 @@ export interface LevelSegment {
   bounds: { width: number; height: number };
   shopkeeper?: ShopKeeperDef;
   shelfType?: "wood" | "metal";
+  landmarks?: LandmarkDef[];
 }
 
 export interface LevelData {
@@ -113,4 +122,5 @@ export interface LevelData {
   gatePosition: { x: number; y: number };
   bounds: { width: number; height: number };
   segments?: LevelSegment[];
+  landmarks?: LandmarkDef[];
 }

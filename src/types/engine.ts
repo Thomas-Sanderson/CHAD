@@ -97,6 +97,8 @@ export interface GameRunState {
   shoutMenuOpen: boolean;
   shoutTarget: string | null; // door ID for locked doors
   shoutResponse: ShoutResponse | null;
+  // Flag animation
+  flagProgress: number; // 0→1, rises when gate reached
 }
 
 export interface InputState {

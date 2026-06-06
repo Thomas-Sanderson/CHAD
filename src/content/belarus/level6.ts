@@ -97,6 +97,13 @@ export const level6Data: LevelData = {
         },
       ],
       bounds: { width: LEVEL_WIDTH, height: 450 },
+      landmarks: [
+        { label: "КАФЕ", x: 450 },
+        { label: "МАГАЗИН", x: 1050 },
+        { label: "БИБЛИОТЕКА", x: 1900 },
+        { label: "БАНК", x: 2400 },
+        { label: "ПАРК", x: 3000 },
+      ],
     },
 
     // === DAIRY SHOP INTERIOR ===

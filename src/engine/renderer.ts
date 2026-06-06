@@ -14,13 +14,14 @@ import {
   chadJump,
   shopExteriorSprite,
   shopkeeperBabushkaSprite,
-  doorFrontSprite,
   doorBackSprite,
   doorLockedOverlay,
   exitSignSprite,
   shelfWoodSprite,
   shelfMetalSprite,
   counterSprite,
+  landmarkSprites,
+  shopFacadeSprites,
 } from "./sprites";
 
 const CANVAS_WIDTH = 800;
@@ -193,6 +194,32 @@ export function renderFrame(
     }
   }
 
+  // --- Landmarks (background Cyrillic signs on buildings) ---
+  const landmarks = currentSegment?.landmarks ?? level.landmarks;
+  if (landmarks && !isInterior) {
+    const groundY = activePlatforms[0]?.y ?? CANVAS_HEIGHT - 40;
+    for (const lm of landmarks) {
+      const lx = lm.x - cam;
+      if (lx < -120 || lx > CANVAS_WIDTH + 120) continue;
+      const sprite = landmarkSprites[lm.label];
+      if (sprite) {
+        const scale = 4;
+        const sprW = (sprite[0]?.length ?? 20) * scale;
+        const sprH = sprite.length * scale;
+        const ly = lm.y ?? groundY - sprH;
+        drawSprite(ctx, sprite, lx - sprW / 2, ly, scale);
+        // Sign text on building — large enough to read at a glance
+        ctx.fillStyle = "#eee";
+        ctx.font = "bold 13px monospace";
+        ctx.textAlign = "center";
+        ctx.shadowColor = "#000";
+        ctx.shadowBlur = 3;
+        ctx.fillText(lm.label, lx, ly + 32);
+        ctx.shadowBlur = 0;
+      }
+    }
+  }
+
   // --- Collectibles ---
   for (const item of activeCollectibles) {
     const sx = item.x - cam;
@@ -291,15 +318,33 @@ export function renderFrame(
   // --- Gate building (street / non-segment only) ---
   if (!isInterior) {
     const gx = level.gatePosition.x - cam;
-    const gy = level.gatePosition.y;
+    const groundY = activePlatforms[0]?.y ?? CANVAS_HEIGHT - 40;
+    const sprH = env.gateSprite.length * 2;
+    const gy = groundY - sprH; // anchor to ground
     drawSprite(ctx, env.gateSprite, gx, gy, 2);
     ctx.fillStyle = "#FFF";
     ctx.font = "bold 10px monospace";
     ctx.textAlign = "center";
     ctx.shadowColor = "#000";
     ctx.shadowBlur = 3;
-    ctx.fillText(env.gateLabel, gx + 32, gy - 6);
+    ctx.fillText(env.gateLabel, gx + 28, gy - 4);
     ctx.shadowBlur = 0;
+
+    // Flag animation — rises on flagpole when Chad approaches
+    if (state.flagProgress > 0) {
+      const poleX = gx + 58; // right side of building, matching flagpole column
+      const poleTop = gy + 4;
+      const poleBottom = gy + sprH - 12;
+      const flagHeight = 12;
+      const flagWidth = 16;
+      // Flag descends from top as progress rises (1 = fully raised)
+      const flagY = poleBottom - (poleBottom - poleTop) * state.flagProgress;
+      // Belarus flag: red top half, green bottom half
+      ctx.fillStyle = "#cc2222";
+      ctx.fillRect(poleX + 1, flagY, flagWidth, flagHeight / 2);
+      ctx.fillStyle = "#33aa55";
+      ctx.fillRect(poleX + 1, flagY + flagHeight / 2, flagWidth, flagHeight / 2);
+    }
   }
 
   // --- Player (Chad) ---
@@ -393,24 +438,21 @@ function renderDoor(
   const dx = door.x - cam;
 
   if (segmentType === "street") {
-    // Building facade behind door
-    const facade = env.shopFrontStallSprite ?? env.shopExteriorSprite ?? shopExteriorSprite;
-    drawSprite(ctx, facade, dx - 16, door.y - 24, 2);
+    // Building facade behind door — distinct per shop type
+    const labelFacade = door.label ? shopFacadeSprites[door.label] : undefined;
+    const facade = labelFacade ?? env.shopFrontStallSprite ?? env.shopExteriorSprite ?? shopExteriorSprite;
+    const facadeW = (facade[0]?.length ?? 24) * 2;
+    const facadeH = facade.length * 2;
+    drawSprite(ctx, facade, dx + door.width / 2 - facadeW / 2, door.y + door.height - facadeH, 2);
 
-    // Door sprite overlaid on facade
-    const doorSpr = env.doorFrontSprite ?? doorFrontSprite;
-    const sprH = doorSpr.length * 2;
-    const sprW = (doorSpr[0]?.length ?? 16) * 2;
-    drawSprite(ctx, doorSpr, dx + door.width / 2 - sprW / 2, door.y + door.height - sprH, 2);
-
-    // Sign text
+    // Sign text above facade
     if (door.label) {
       ctx.fillStyle = "#FFD54F";
       ctx.font = "bold 11px monospace";
       ctx.textAlign = "center";
       ctx.shadowColor = "#000";
       ctx.shadowBlur = 3;
-      ctx.fillText(door.label, dx + door.width / 2, door.y - 8);
+      ctx.fillText(door.label, dx + door.width / 2, door.y + door.height - facadeH - 4);
       ctx.shadowBlur = 0;
     }
 

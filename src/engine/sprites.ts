@@ -64,10 +64,23 @@ const SL = "#aa7744"; // Shelf Light (bracket)
 const KT = "#bbaa88"; // Counter Top
 const MS = "#8899aa"; // Metal Shelf
 const ML = "#99aabb"; // Metal Shelf Light
-const EG = "#33aa44"; // Exit Green
-const ED = "#228833"; // Exit Green Dark
+const EG = "#2d8c3c"; // Exit Green (ГОСТ standard)
+const ED = "#1f6b2e"; // Exit Green Dark (ГОСТ border)
 const LR = "#cc4444"; // Lock Red
 const LD = "#aa3333"; // Lock Dark
+
+// --- Landmark palette ---
+const LS = "#c8b8a0"; // Landmark Stone
+const LW = "#d4c4ac"; // Landmark Wall Light
+const PG = "#33aa55"; // Pharmacy Green
+const BV = "#2a4a6a"; // Bank Navy
+const PO = "#3355aa"; // Post Blue
+const SO = "#dd6622"; // Shop Orange
+const CF = "#553322"; // Café Sign
+const LM = "#442233"; // Library Maroon
+const WN = "#88aabb"; // Window
+const WG = "#aaccdd"; // Window Glass
+const LK = "#cc9966"; // Landmark Brick
 const AW = "#ddddd0"; // Apron White
 const RG2 = "#777766"; // Register Gray
 const RS = "#99aa88"; // Register Screen
@@ -319,38 +332,138 @@ export const platformTile: SpriteData = [
   [BT, BT, BT, BT, BT, BT, BT, BT, BT, BT, BT, BT, BT, BT, BT, BT],
 ];
 
-// Apartment gate (32×24 logical, drawn at 2x = 64×48)
+// Apartment gate (32×40 logical, drawn at 2x = 64×80)
+// Taller sprite to reach ground level. Includes flagpole on right side.
 export const apartmentSprite: SpriteData = [
-  // Roof edge
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
+  // Flagpole top (right side)
+  [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,DG,_,_],
+  [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,DG,_,_],
+  [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,DG,_,_],
+  [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,DG,_,_],
+  // Roof
+  [BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
   // Windows row 1
-  [AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT, AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT],
-  [AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT, AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT],
-  [AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT, AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT],
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
+  [AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
   // Windows row 2
-  [AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT, AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT],
-  [AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT, AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT],
-  [AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT, AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT, AT, AT, WB, WB, WB, WB, AT, AT, AT, AT],
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
+  [AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  // Windows row 3
+  [AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
   // Light above door
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, YL, YL, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,YL,YL,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
   // Door area
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, DB, DB, DB, DB, DB, DB, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, DB, DB, DB, DB, DB, DB, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, DB, DB, DB, YL, DB, DB, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, DB, DB, DB, DB, DB, DB, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, DB, DB, DB, DB, DB, DB, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, DB, DB, DB, DB, DB, DB, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, DB, DB, DB, DB, DB, DB, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
-  [AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT, AT],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,YL,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  // Base
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,_,DG,_,_],
+  // Steps
+  [_,_,_,_,_,_,_,_,_,BL,BL,BL,BL,BL,BL,BL,BL,BL,BL,_,_,_,_,_,_,_,_,_,_,DG,_,_],
+  [_,_,_,_,_,_,_,_,BL,BL,BL,BL,BL,BL,BL,BL,BL,BL,BL,BL,_,_,_,_,_,_,_,_,_,DG,_,_],
+  // Flagpole base
+  [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,DG,DG,DG,_],
+  [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,DG,DG,DG,_],
+  [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+  [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
 ];
+
+// --- Distinct shop exterior sprites (24×24 logical, drawn at 2x = 48×48) ---
+// Each mapped by door label for visual identification.
+
+// МОЛОЧНАЯ — Dairy (blue awning, glass display, clean plaster)
+export const shopDairySprite: SpriteData = buildLandmark(24, 24, [
+  [0, 2, 24, 2, "#4488cc"],   // sign plate
+  [0, 2, 4, 2, "#3377bb"],    // sign dark stripe
+  [8, 2, 4, 2, "#3377bb"],
+  [16, 2, 4, 2, "#3377bb"],
+  [0, 4, 24, 20, "#e8e0d4"],  // building body
+  [0, 4, 24, 1, "#ddd8cc"],   // cornice
+  [0, 6, 24, 3, "#4488cc"],   // awning
+  [0, 6, 4, 3, "#3377bb"],    // awning dark
+  [8, 6, 4, 3, "#3377bb"],
+  [16, 6, 4, 3, "#3377bb"],
+  [2, 10, 9, 7, "#c8dde8"],   // display window
+  [3, 11, 7, 5, "#ddeef4"],   // glass
+  [6, 10, 1, 7, "#bbccdd"],   // window divider
+  [4, 13, 2, 2, WH],          // milk carton in window
+  [7, 13, 2, 2, "#ffcc44"],   // cheese in window
+  [15, 11, 6, 13, "#3377bb"], // door
+  [16, 12, 4, 11, "#2266aa"], // door inner
+  [19, 16, 1, 1, WH],         // handle
+  [16, 13, 3, 3, "#c8dde8"],  // door window
+]);
+
+// РЫБНАЯ — Fish market (weathered wood, tin roof, open counter)
+export const shopFishSprite: SpriteData = buildLandmark(24, 24, [
+  [0, 3, 24, 1, "#8899aa"],   // tin roof
+  [0, 4, 24, 1, "#7788aa"],   // tin dark
+  [0, 5, 24, 19, "#8b7a66"],  // wood body
+  [0, 5, 24, 4, "#2a7a7a"],   // teal sign plate
+  [1, 6, 22, 2, "#338888"],   // sign inner
+  [0, 9, 24, 1, "#7a6a56"],   // plank line
+  [0, 15, 24, 1, "#7a6a56"],  // plank line
+  [2, 10, 10, 6, "#6a5a46"],  // open front
+  [2, 15, 10, 2, "#9b8a76"],  // counter
+  [3, 14, 8, 1, "#aaccdd"],   // ice display
+  [4, 11, 3, 1, "#7799bb"],   // raw fish
+  [8, 11, 3, 1, "#cc8844"],   // smoked fish
+  [15, 10, 6, 14, "#5a4a36"], // door
+  [16, 11, 4, 12, "#4a3a26"], // door inner
+  [18, 11, 1, 12, "#3a2a16"], // door plank
+  [19, 16, 1, 1, "#887766"],  // handle
+]);
+
+// ОВОЩИ-ФРУКТЫ — Produce (green awning, crates)
+export const shopProduceSprite: SpriteData = buildLandmark(24, 24, [
+  [0, 2, 24, 2, "#448833"],   // sign plate
+  [1, 2, 22, 1, "#337722"],   // sign inner
+  [0, 4, 24, 20, "#ccbb99"],  // building body
+  [0, 4, 24, 1, "#ddccaa"],   // cornice
+  [0, 5, 24, 3, "#448833"],   // awning
+  [0, 5, 3, 3, "#337722"],    // awning dark
+  [6, 5, 3, 3, "#337722"],
+  [12, 5, 3, 3, "#337722"],
+  [18, 5, 3, 3, "#337722"],
+  [2, 10, 10, 8, "#bbaa88"],  // open area
+  [2, 14, 5, 4, "#886644"],   // crate 1
+  [3, 12, 2, 2, "#cc2222"],   // tomatoes
+  [5, 12, 2, 2, "#ee7722"],   // carrots
+  [8, 14, 4, 4, "#886644"],   // crate 2
+  [9, 12, 2, 2, "#44882a"],   // greens
+  [11, 12, 1, 2, "#ffcc33"],  // lemon
+  [0, 18, 4, 3, "#775533"],   // spillover crate
+  [1, 17, 2, 1, "#44882a"],   // spilling greens
+  [15, 10, 6, 14, "#664422"], // door
+  [16, 11, 4, 12, "#553311"], // door inner
+  [19, 16, 1, 1, "#ccaa55"],  // handle
+]);
+
+// Shop facade lookup by door label
+export const shopFacadeSprites: Record<string, SpriteData> = {
+  "МОЛОЧНАЯ": shopDairySprite,
+  "РЫБНАЯ": shopFishSprite,
+  "ОВОЩИ-ФРУКТЫ": shopProduceSprite,
+};
 
 // --- ITEM SPRITES (all 16×13 logical, drawn at 2x = 32×26) ---
 
@@ -897,18 +1010,207 @@ export const doorLockedOverlay: SpriteData = [
   [_,_,LR,LR,LR,LR,LR,LR,_,_],
 ];
 
-// Exit sign — ВЫХОД (20×8 logical, drawn at 2x = 40×16)
-// Soviet green with white pixel text
+// Exit sign — ВЫХОД (24×8 logical, drawn at 2x = 48×16)
+// Soviet green with white pixel text + running man icon
 export const exitSignSprite: SpriteData = [
-  [ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED],
-  [ED,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,ED],
-  [ED,EG,WH,_,WH,EG,WH,WH,_,EG,WH,_,WH,EG,WH,_,WH,EG,WH,ED],
-  [ED,EG,WH,_,WH,EG,WH,EG,WH,EG,_,WH,_,EG,WH,_,WH,EG,WH,ED],
-  [ED,EG,_,WH,_,EG,WH,WH,_,EG,_,WH,_,EG,WH,_,WH,EG,WH,ED],
-  [ED,EG,WH,_,WH,EG,WH,EG,WH,EG,_,WH,_,EG,WH,_,WH,EG,EG,ED],
-  [ED,EG,WH,_,WH,EG,WH,WH,_,EG,WH,_,WH,EG,_,WH,_,EG,WH,ED],
-  [ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED],
+  [ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED],
+  [ED,EG,EG,WH,EG,EG,EG,EG,WH,_,WH,EG,WH,WH,_,EG,WH,_,WH,EG,WH,_,WH,ED],
+  [ED,EG,WH,EG,WH,EG,EG,EG,WH,_,WH,EG,WH,EG,WH,EG,_,WH,_,EG,WH,_,WH,ED],
+  [ED,EG,WH,WH,WH,EG,EG,EG,_,WH,_,EG,WH,WH,_,EG,_,WH,_,EG,WH,_,WH,ED],
+  [ED,EG,WH,EG,EG,WH,EG,EG,WH,_,WH,EG,WH,EG,WH,EG,_,WH,_,EG,WH,_,WH,ED],
+  [ED,EG,WH,EG,EG,WH,WH,EG,WH,_,WH,EG,WH,WH,_,EG,WH,_,WH,EG,_,WH,_,ED],
+  [ED,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,ED],
+  [ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED],
 ];
+
+// --- LANDMARK SPRITES ---
+// Background buildings for street levels — passive Cyrillic vocabulary exposure.
+// Each is ~20×22 logical, drawn at 2x = 40×44 display.
+
+function buildLandmark(w: number, h: number, ops: [number, number, number, number, string][]): SpriteData {
+  const data: (string | null)[][] = Array.from({length: h}, () => Array(w).fill(null));
+  for (const [x, y, bw, bh, c] of ops) {
+    for (let dy = 0; dy < bh; dy++) {
+      for (let dx = 0; dx < bw; dx++) {
+        if (y + dy < h && x + dx < w) data[y + dy]![x + dx] = c;
+      }
+    }
+  }
+  return data;
+}
+
+// АПТЕКА — Pharmacy (green cross on white sign)
+export const landmarkApteka: SpriteData = buildLandmark(20, 22, [
+  [0, 5, 20, 15, LS],   // building body
+  [1, 4, 18, 2, LW],    // cornice
+  [2, 6, 16, 5, WH],    // sign bg (white)
+  [2, 6, 16, 1, PG],    // sign top trim
+  [2, 10, 16, 1, PG],   // sign bottom trim
+  [3, 7, 2, 3, PG],     // cross vertical
+  [2, 8, 4, 1, PG],     // cross horizontal
+  [4, 13, 4, 4, WN],    // window
+  [5, 14, 2, 2, WG],    // glass
+  [11, 13, 5, 7, DB],   // door
+  [12, 14, 3, 5, CF],   // door inner
+  [14, 16, 1, 1, YL],   // handle
+  [0, 20, 20, 2, GG],   // ground
+]);
+
+// БАНК — Bank (columns, navy sign)
+export const landmarkBank: SpriteData = buildLandmark(22, 22, [
+  [0, 4, 22, 16, BL],   // building body
+  [1, 3, 20, 2, AT],    // cornice
+  [2, 3, 2, 16, LW],    // column 1
+  [7, 3, 2, 16, LW],    // column 2
+  [13, 3, 2, 16, LW],   // column 3
+  [18, 3, 2, 16, LW],   // column 4
+  [4, 6, 14, 4, BV],    // sign bg (navy)
+  [8, 12, 6, 8, DB],    // door
+  [9, 13, 4, 6, CF],    // door inner
+  [12, 16, 1, 1, YL],   // handle
+  [0, 20, 22, 2, GG],   // ground
+]);
+
+// АВТОБУС — Bus stop (shelter with blue sign)
+export const landmarkAvtobus: SpriteData = buildLandmark(14, 22, [
+  [0, 1, 14, 1, LG],    // shelter roof
+  [0, 1, 1, 20, DG],    // shelter post
+  [6, 5, 2, 15, DG],    // sign post
+  [1, 2, 12, 7, PO],    // sign plate (blue)
+  [2, 3, 10, 5, PO],    // sign inner
+  [4, 5, 5, 2, YL],     // bus icon body
+  [5, 4, 3, 1, YL],     // bus icon roof
+  [5, 7, 1, 1, BK],     // wheel 1
+  [7, 7, 1, 1, BK],     // wheel 2
+  [2, 18, 10, 1, SH],   // bench
+  [3, 19, 2, 2, SH],    // bench leg 1
+  [9, 19, 2, 2, SH],    // bench leg 2
+  [0, 20, 14, 2, GG],   // ground
+]);
+
+// ПАРК — Park (gate with fence and tree peeking over)
+export const landmarkPark: SpriteData = buildLandmark(20, 22, [
+  [0, 8, 3, 12, AT],    // left pillar
+  [17, 8, 3, 12, AT],   // right pillar
+  [0, 6, 20, 3, BL],    // arch
+  [5, 7, 10, 2, DK],    // sign on arch
+  [3, 11, 1, 9, DG],    // fence bar 1
+  [6, 11, 1, 9, DG],    // fence bar 2
+  [9, 11, 1, 9, DG],    // fence bar 3
+  [12, 11, 1, 9, DG],   // fence bar 4
+  [15, 11, 1, 9, DG],   // fence bar 5
+  [3, 12, 14, 1, DG],   // fence rail
+  [7, 3, 6, 6, GN],     // tree canopy
+  [6, 4, 8, 4, GN],     // tree canopy wider
+  [9, 9, 2, 3, SH],     // trunk
+  [0, 20, 20, 2, GG],   // ground
+]);
+
+// ШКОЛА — School (bell icon on brown sign)
+export const landmarkShkola: SpriteData = buildLandmark(24, 22, [
+  [0, 5, 24, 15, LK],   // building body
+  [1, 4, 22, 2, LW],    // cornice
+  [3, 6, 18, 4, SD],    // sign bg (brown)
+  [4, 7, 3, 1, YL],     // bell top
+  [5, 6, 1, 1, YL],     // bell handle
+  [3, 8, 5, 1, YL],     // bell rim
+  [2, 12, 3, 3, WN],    // window 1
+  [7, 12, 3, 3, WN],    // window 2
+  [14, 12, 3, 3, WN],   // window 3
+  [19, 12, 3, 3, WN],   // window 4
+  [10, 14, 4, 6, DB],   // door
+  [11, 15, 2, 4, CF],   // door inner
+  [9, 18, 6, 1, BL],    // steps
+  [0, 20, 24, 2, GG],   // ground
+]);
+
+// ПОЧТА — Post office (blue sign, envelope icon)
+export const landmarkPochta: SpriteData = buildLandmark(18, 22, [
+  [0, 5, 18, 15, BL],   // building body
+  [1, 4, 16, 2, AT],    // cornice
+  [2, 6, 14, 5, PO],    // sign bg (blue)
+  [3, 7, 4, 3, WH],     // envelope body
+  [3, 7, 1, 1, PO],     // envelope flap L
+  [6, 7, 1, 1, PO],     // envelope flap R
+  [4, 8, 2, 1, WE],     // envelope fold
+  [3, 12, 4, 4, WN],    // window
+  [4, 13, 2, 2, WG],    // glass
+  [9, 13, 4, 7, DB],    // door
+  [10, 14, 2, 5, CF],   // door inner
+  [11, 16, 1, 1, YL],   // handle
+  [14, 14, 3, 2, PO],   // mail slot
+  [0, 20, 18, 2, GG],   // ground
+]);
+
+// КАФЕ — Café (red striped awning)
+export const landmarkKafe: SpriteData = buildLandmark(20, 22, [
+  [0, 6, 18, 14, LK],   // building body
+  [1, 5, 16, 2, LW],    // cornice
+  [0, 7, 18, 2, RD],    // awning stripe 1
+  [0, 7, 3, 2, DR],     // awning dark 1
+  [6, 7, 3, 2, DR],     // awning dark 2
+  [12, 7, 3, 2, DR],    // awning dark 3
+  [3, 5, 12, 2, CF],    // sign bg
+  [2, 10, 6, 5, WN],    // big window
+  [3, 11, 4, 3, WG],    // glass
+  [11, 11, 4, 9, DB],   // door
+  [12, 12, 2, 7, CF],   // door inner
+  [13, 15, 1, 1, YL],   // handle
+  [16, 17, 2, 2, SH],   // outdoor table
+  [0, 20, 20, 2, GG],   // ground
+]);
+
+// МАГАЗИН — Shop (orange sign, display window)
+export const landmarkMagazin: SpriteData = buildLandmark(22, 22, [
+  [0, 5, 22, 15, BL],   // building body
+  [1, 4, 20, 2, AT],    // cornice
+  [1, 6, 20, 4, SO],    // sign bg (orange)
+  [2, 12, 8, 5, WN],    // display window
+  [3, 13, 6, 3, WG],    // glass
+  [4, 14, 2, 1, RD],    // item 1 (red)
+  [6, 14, 2, 1, YL],    // item 2 (yellow)
+  [13, 12, 5, 8, DB],   // door
+  [14, 13, 3, 6, CF],   // door inner
+  [16, 16, 1, 1, YL],   // handle
+  [14, 13, 3, 2, GN],   // ОТКРЫТО sign
+  [0, 20, 22, 2, GG],   // ground
+]);
+
+// БИБЛИОТЕКА — Library (maroon sign, book icons)
+export const landmarkBiblioteka: SpriteData = buildLandmark(24, 22, [
+  [0, 2, 24, 18, BL],   // building body
+  [1, 1, 22, 2, AT],    // cornice
+  [1, 3, 22, 5, LM],    // sign bg (maroon)
+  [2, 4, 4, 1, SO],     // book 1 (orange)
+  [2, 5, 4, 1, PO],     // book 2 (blue)
+  [2, 6, 4, 1, GN],     // book 3 (green)
+  [2, 4, 1, 3, WH],     // book spine
+  [2, 10, 3, 3, WN],    // window 1
+  [7, 10, 3, 3, WN],    // window 2
+  [14, 10, 3, 3, WN],   // window 3
+  [19, 10, 3, 3, WN],   // window 4
+  [2, 14, 3, 3, WN],    // window 5
+  [7, 14, 3, 3, WN],    // window 6
+  [14, 14, 3, 3, WN],   // window 7
+  [19, 14, 3, 3, WN],   // window 8
+  [10, 14, 4, 6, DB],   // door
+  [11, 15, 2, 4, CF],   // door inner
+  [8, 19, 8, 1, BL],    // steps
+  [0, 20, 24, 2, GG],   // ground
+]);
+
+// Landmark sprite lookup map
+export const landmarkSprites: Record<string, SpriteData> = {
+  "АПТЕКА": landmarkApteka,
+  "БАНК": landmarkBank,
+  "АВТОБУС": landmarkAvtobus,
+  "ПАРК": landmarkPark,
+  "ШКОЛА": landmarkShkola,
+  "ПОЧТА": landmarkPochta,
+  "КАФЕ": landmarkKafe,
+  "МАГАЗИН": landmarkMagazin,
+  "БИБЛИОТЕКА": landmarkBiblioteka,
+};
 
 // Wood shelf (32×8 logical, drawn at 2x = 64×16)
 // Brown planks with L-brackets at edges. For dairy/bakery shops.

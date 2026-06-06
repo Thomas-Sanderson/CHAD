@@ -11,6 +11,7 @@ import {
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
 } from "../engine";
+import { pronounceWord, speakText } from "../engine/audio";
 import { ShoutMenu } from "./ShoutMenu";
 
 interface Props {
@@ -19,14 +20,19 @@ interface Props {
   environment: SkinEnvironment;
   onGateReached: (state: GameRunState) => void;
   learnedWords?: VocabWord[];
+  vocabWords?: VocabWord[];
 }
 
-export function RunPhase({ level, itemDefs, environment, onGateReached, learnedWords = [] }: Props) {
+export function RunPhase({ level, itemDefs, environment, onGateReached, learnedWords = [], vocabWords = [] }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<GameRunState | null>(null);
   const inputRef = useRef<InputState | null>(null);
   const onGateReachedRef = useRef(onGateReached);
   onGateReachedRef.current = onGateReached;
+  const vocabWordsRef = useRef(vocabWords);
+  vocabWordsRef.current = vocabWords;
+  const learnedWordsRef = useRef(learnedWords);
+  learnedWordsRef.current = learnedWords;
   const [shoutMenuOpen, setShoutMenuOpen] = useState(false);
   const pausedRef = useRef(false);
 
@@ -59,7 +65,21 @@ export function RunPhase({ level, itemDefs, environment, onGateReached, learnedW
       const dt = Math.min((now - lastTime) / 1000, 0.05);
       lastTime = now;
 
+      const prevCollectedCount = gameState.collectedItems.length;
       updateGameState(gameState, input, level, level.hazards, itemDefs, dt);
+
+      // Pronounce Russian word when item is collected
+      if (gameState.collectedItems.length > prevCollectedCount) {
+        const newItemId = gameState.collectedItems[gameState.collectedItems.length - 1];
+        const allWords = [...vocabWordsRef.current, ...learnedWordsRef.current];
+        const matchingWord = allWords.find(w => w.matchesItemId === newItemId);
+        if (matchingWord) {
+          pronounceWord(matchingWord);
+        } else {
+          const itemDef = itemDefs.get(newItemId!);
+          if (itemDef?.cyrillic) speakText(itemDef.cyrillic);
+        }
+      }
 
       // Check if game state wants to open shout menu
       if (gameState.shoutMenuOpen && !pausedRef.current) {

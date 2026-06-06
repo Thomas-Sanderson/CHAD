@@ -89,7 +89,11 @@ export function RevealScreen({
           return (
             <div key={word.id} style={styles.revealCard}>
               <div style={styles.wordRow}>
-                <span style={styles.cyrillicWord}>{word.cyrillic}</span>
+                <div style={styles.wordStack}>
+                  <span style={styles.cyrillicWord}>{word.cyrillic}</span>
+                  {word.pronunciation && <span style={styles.pronunciation}>{word.pronunciation}</span>}
+                  {word.ipa && <span style={styles.ipa}>{word.ipa}</span>}
+                </div>
                 <span style={styles.arrow}>&rarr;</span>
                 <span style={styles.translation}>{word.translation}</span>
               </div>
@@ -199,11 +203,26 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 12,
     fontSize: 20,
   },
+  wordStack: {
+    display: "flex",
+    flexDirection: "column" as const,
+    gap: 2,
+  },
   cyrillicWord: {
     fontWeight: "bold",
     color: "#FFD54F",
     fontSize: 24,
     letterSpacing: 1,
+  },
+  pronunciation: {
+    color: "#FFD54F",
+    fontSize: 13,
+    opacity: 0.8,
+  },
+  ipa: {
+    color: "#888",
+    fontSize: 12,
+    fontFamily: "monospace",
   },
   arrow: {
     color: "#555",

@@ -6,6 +6,7 @@ export const level1Items: CollectibleItem[] = [
   {
     id: "buna_bag",
     name: "Coffee Bag",
+    cyrillic: "ቡና",
     description: "A burlap sack of dark coffee beans.",
     isDecoy: false,
     color: "#8b6633",
@@ -13,6 +14,7 @@ export const level1Items: CollectibleItem[] = [
   {
     id: "wetet_jug",
     name: "Milk Jug",
+    cyrillic: "ወተት",
     description: "A terracotta jug of fresh milk.",
     isDecoy: false,
     color: "#c4724a",
@@ -20,6 +22,7 @@ export const level1Items: CollectibleItem[] = [
   {
     id: "dabo_round",
     name: "Round Bread",
+    cyrillic: "ዳቦ",
     description: "A golden round loaf with a cracked top.",
     isDecoy: false,
     color: "#ddaa44",
@@ -27,6 +30,7 @@ export const level1Items: CollectibleItem[] = [
   {
     id: "sukwar_bag_eth",
     name: "Sugar Bag",
+    cyrillic: "ስኳር",
     description: "A white bag with a red label. Granulated sugar.",
     isDecoy: false,
     color: "#eeeeee",
@@ -35,6 +39,7 @@ export const level1Items: CollectibleItem[] = [
   {
     id: "berbere_tin",
     name: "Red Tin",
+    cyrillic: "በርበሬ",
     description: "A small tin of something red and spicy.",
     isDecoy: true,
     color: "#cc3311",
@@ -42,6 +47,7 @@ export const level1Items: CollectibleItem[] = [
   {
     id: "mango",
     name: "Mango",
+    cyrillic: "ማንጎ",
     description: "A plump yellow-orange mango.",
     isDecoy: true,
     color: "#ffaa22",
@@ -49,6 +55,7 @@ export const level1Items: CollectibleItem[] = [
   {
     id: "bottled_water",
     name: "Water Bottle",
+    cyrillic: "ውሃ",
     description: "A plastic bottle of mineral water.",
     isDecoy: true,
     color: "#eeeeee",
@@ -61,6 +68,7 @@ export const level2Items: CollectibleItem[] = [
   {
     id: "shiro_bag",
     name: "Golden Bag",
+    cyrillic: "ሽሮ",
     description: "A bag of fine golden chickpea flour.",
     isDecoy: false,
     color: "#ddcc88",
@@ -68,6 +76,7 @@ export const level2Items: CollectibleItem[] = [
   {
     id: "berbere_tin",
     name: "Red Tin",
+    cyrillic: "በርበሬ",
     description: "A small tin of fiery red spice blend.",
     isDecoy: false,
     color: "#cc3311",
@@ -75,6 +84,7 @@ export const level2Items: CollectibleItem[] = [
   {
     id: "qibe_jar",
     name: "Butter Jar",
+    cyrillic: "ቅቤ",
     description: "A clay jar of golden spiced butter.",
     isDecoy: false,
     color: "#c4724a",
@@ -82,6 +92,7 @@ export const level2Items: CollectibleItem[] = [
   {
     id: "timatim_tomato",
     name: "Tomato",
+    cyrillic: "ቲማቲም",
     description: "A ripe red tomato with a green stem.",
     isDecoy: false,
     color: "#cc2222",
@@ -90,6 +101,7 @@ export const level2Items: CollectibleItem[] = [
   {
     id: "injera_roll",
     name: "Rolled Flatbread",
+    cyrillic: "እንጀራ",
     description: "A pale rolled-up spongy flatbread.",
     isDecoy: true,
     color: "#c4b8a4",
@@ -97,6 +109,7 @@ export const level2Items: CollectibleItem[] = [
   {
     id: "honey_jar",
     name: "Honey Jar",
+    cyrillic: "ማር",
     description: "A glass jar of golden honey.",
     isDecoy: true,
     color: "#ddaa44",
@@ -104,6 +117,7 @@ export const level2Items: CollectibleItem[] = [
   {
     id: "avocado",
     name: "Avocado",
+    cyrillic: "አቮካዶ",
     description: "A dark green avocado. Surprisingly large.",
     isDecoy: true,
     color: "#2a5522",
@@ -116,6 +130,7 @@ export const level3Items: CollectibleItem[] = [
   {
     id: "injera_roll",
     name: "Rolled Flatbread",
+    cyrillic: "እንጀራ",
     description: "A pale spongy flatbread, rolled up tight.",
     isDecoy: false,
     color: "#c4b8a4",
@@ -123,6 +138,7 @@ export const level3Items: CollectibleItem[] = [
   {
     id: "miser_bag",
     name: "Lentil Bag",
+    cyrillic: "ምስር",
     description: "A bag of small red-orange lentils.",
     isDecoy: false,
     color: "#cc6633",
@@ -130,6 +146,7 @@ export const level3Items: CollectibleItem[] = [
   {
     id: "qey_sir_beet",
     name: "Beetroot",
+    cyrillic: "ቀይ ስር",
     description: "A deep purple beetroot with green tops.",
     isDecoy: false,
     color: "#882244",
@@ -137,6 +154,7 @@ export const level3Items: CollectibleItem[] = [
   {
     id: "karya_pepper",
     name: "Green Pepper",
+    cyrillic: "ቃሪያ",
     description: "A curved green pepper. Not hot, just green.",
     isDecoy: false,
     color: "#44882a",
@@ -145,6 +163,7 @@ export const level3Items: CollectibleItem[] = [
   {
     id: "teff_sack",
     name: "Grain Sack",
+    cyrillic: "ጤፍ",
     description: "A sack of tiny pale grains.",
     isDecoy: true,
     color: "#c4b8a4",
@@ -152,6 +171,7 @@ export const level3Items: CollectibleItem[] = [
   {
     id: "egg",
     name: "Egg",
+    cyrillic: "እንቁላል",
     description: "A plain brown egg.",
     isDecoy: true,
     color: "#e8d5b5",
@@ -159,6 +179,7 @@ export const level3Items: CollectibleItem[] = [
   {
     id: "timatim_tomato",
     name: "Tomato",
+    cyrillic: "ቲማቲም",
     description: "A ripe red tomato. Not on the list this time.",
     isDecoy: true,
     color: "#cc2222",
@@ -166,6 +187,7 @@ export const level3Items: CollectibleItem[] = [
   {
     id: "berbere_tin",
     name: "Red Tin",
+    cyrillic: "በርበሬ",
     description: "A tin of spice blend. Already got that.",
     isDecoy: true,
     color: "#cc3311",
@@ -178,6 +200,7 @@ export const level4Items: CollectibleItem[] = [
   {
     id: "jebena_pot",
     name: "Clay Coffee Pot",
+    cyrillic: "ጀበና",
     description: "A round-bellied clay pot with a narrow spout.",
     isDecoy: false,
     color: "#3a2211",
@@ -185,6 +208,7 @@ export const level4Items: CollectibleItem[] = [
   {
     id: "rekbot_cup",
     name: "Small Cup",
+    cyrillic: "ሲኒ",
     description: "A tiny handleless ceramic cup.",
     isDecoy: false,
     color: "#c4724a",
@@ -192,6 +216,7 @@ export const level4Items: CollectibleItem[] = [
   {
     id: "itan_incense",
     name: "Incense",
+    cyrillic: "እጣን",
     description: "Amber chunks of frankincense in a clay dish.",
     isDecoy: false,
     color: "#ddc088",
@@ -199,6 +224,7 @@ export const level4Items: CollectibleItem[] = [
   {
     id: "kolo_bowl",
     name: "Snack Bowl",
+    cyrillic: "ቆሎ",
     description: "A bowl of roasted barley kernels.",
     isDecoy: false,
     color: "#ddaa44",
@@ -207,6 +233,7 @@ export const level4Items: CollectibleItem[] = [
   {
     id: "buna_bag",
     name: "Coffee Bag",
+    cyrillic: "ቡና",
     description: "A burlap sack of coffee beans. Not what she asked for this time.",
     isDecoy: true,
     color: "#8b6633",
@@ -214,6 +241,7 @@ export const level4Items: CollectibleItem[] = [
   {
     id: "tea_cup",
     name: "Tea Cup",
+    cyrillic: "ሻይ",
     description: "A white cup with a handle. Wrong ceremony.",
     isDecoy: true,
     color: "#ddddee",
@@ -221,6 +249,7 @@ export const level4Items: CollectibleItem[] = [
   {
     id: "mango",
     name: "Mango",
+    cyrillic: "ማንጎ",
     description: "A plump yellow-orange mango. Not for the ceremony.",
     isDecoy: true,
     color: "#ffaa22",
@@ -228,6 +257,7 @@ export const level4Items: CollectibleItem[] = [
   {
     id: "honey_jar",
     name: "Honey Jar",
+    cyrillic: "ማር",
     description: "A glass jar of golden honey.",
     isDecoy: true,
     color: "#ddaa44",

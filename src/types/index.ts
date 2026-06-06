@@ -13,6 +13,7 @@ export type {
   DoorDef,
   ShopKeeperDef,
   LevelSegment,
+  LandmarkDef,
 } from "./content";
 
 export type {

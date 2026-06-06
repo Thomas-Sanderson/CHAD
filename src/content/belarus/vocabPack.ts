@@ -9,6 +9,7 @@ export const level1VocabPack: VocabPack = {
       translation: "sour cream",
       matchesItemId: "smetana_tub",
       pronunciation: "smeh-TAH-nah",
+      ipa: "/smʲɪˈtanə/",
     },
     {
       id: "kefir",
@@ -16,6 +17,7 @@ export const level1VocabPack: VocabPack = {
       translation: "fermented milk drink",
       matchesItemId: "kefir_bottle",
       pronunciation: "keh-FEER",
+      ipa: "/kʲɪˈfʲir/",
     },
     {
       id: "kolbasa",
@@ -23,6 +25,7 @@ export const level1VocabPack: VocabPack = {
       translation: "sausage/salami",
       matchesItemId: "kolbasa_link",
       pronunciation: "kahl-bah-SAH",
+      ipa: "/kəlbɐˈsa/",
     },
     {
       id: "produkty",
@@ -30,6 +33,7 @@ export const level1VocabPack: VocabPack = {
       translation: "groceries",
       matchesItemId: null,
       pronunciation: "prah-DOOK-tih",
+      ipa: "/prɐˈduktɨ/",
     },
   ],
 };
@@ -43,6 +47,7 @@ export const level2VocabPack: VocabPack = {
       translation: "tea",
       matchesItemId: "chai_box",
       pronunciation: "CHAY",
+      ipa: "/tɕaj/",
     },
     {
       id: "moloko",
@@ -50,6 +55,7 @@ export const level2VocabPack: VocabPack = {
       translation: "milk",
       matchesItemId: "moloko_carton",
       pronunciation: "mah-lah-KOH",
+      ipa: "/məlɐˈko/",
     },
     {
       id: "sakhar",
@@ -57,6 +63,7 @@ export const level2VocabPack: VocabPack = {
       translation: "sugar",
       matchesItemId: "sakhar_bag",
       pronunciation: "SAH-khar",
+      ipa: "/ˈsaxər/",
     },
   ],
 };
@@ -70,6 +77,7 @@ export const level3VocabPack: VocabPack = {
       translation: "fish",
       matchesItemId: "ryba_fish",
       pronunciation: "RIH-bah",
+      ipa: "/ˈrɨbə/",
     },
     {
       id: "maslo",
@@ -77,6 +85,7 @@ export const level3VocabPack: VocabPack = {
       translation: "butter",
       matchesItemId: "maslo_butter",
       pronunciation: "MAHS-lah",
+      ipa: "/ˈmaslə/",
     },
     {
       id: "kartoshka",
@@ -84,6 +93,7 @@ export const level3VocabPack: VocabPack = {
       translation: "potato",
       matchesItemId: "kartoshka",
       pronunciation: "kar-TOSH-kah",
+      ipa: "/kɐrˈtoʂkə/",
     },
     {
       id: "hleb",
@@ -91,6 +101,7 @@ export const level3VocabPack: VocabPack = {
       translation: "bread",
       matchesItemId: "hleb_rye",
       pronunciation: "KHLYEB",
+      ipa: "/xlʲep/",
     },
   ],
 };
@@ -104,6 +115,7 @@ export const level4VocabPack: VocabPack = {
       translation: "candy/chocolate",
       matchesItemId: "konfeta_candy",
       pronunciation: "kahn-FYEH-tah",
+      ipa: "/kɐnˈfʲetə/",
     },
     {
       id: "syr",
@@ -111,6 +123,7 @@ export const level4VocabPack: VocabPack = {
       translation: "cheese",
       matchesItemId: "syr_cheese",
       pronunciation: "SIHR",
+      ipa: "/sɨr/",
     },
     {
       id: "yabloko",
@@ -118,6 +131,7 @@ export const level4VocabPack: VocabPack = {
       translation: "apple",
       matchesItemId: "yabloko_apple",
       pronunciation: "YAH-blah-kah",
+      ipa: "/ˈjabləkə/",
     },
   ],
 };
@@ -132,6 +146,7 @@ export const level5VocabPack: VocabPack = {
       translation: "plate",
       matchesItemId: "tarelka_plate",
       pronunciation: "tah-RYEL-kah",
+      ipa: "/tɐˈrʲelkə/",
     },
     {
       id: "lozhka",
@@ -139,6 +154,7 @@ export const level5VocabPack: VocabPack = {
       translation: "spoon",
       matchesItemId: "lozhka_spoon",
       pronunciation: "LOSH-kah",
+      ipa: "/ˈloʂkə/",
     },
     {
       id: "chashka",
@@ -146,6 +162,7 @@ export const level5VocabPack: VocabPack = {
       translation: "cup",
       matchesItemId: "chashka_cup",
       pronunciation: "CHASH-kah",
+      ipa: "/ˈtɕaʂkə/",
     },
     {
       id: "zavtrak",
@@ -153,6 +170,7 @@ export const level5VocabPack: VocabPack = {
       translation: "breakfast",
       matchesItemId: null,
       pronunciation: "ZAHF-trahk",
+      ipa: "/ˈzaftrək/",
     },
   ],
 };
@@ -167,6 +185,7 @@ export const level6VocabPack: VocabPack = {
       translation: "cheese",
       matchesItemId: "syr_wheel",
       pronunciation: "SIHR",
+      ipa: "/sɨr/",
     },
     {
       id: "ryba_market",
@@ -174,6 +193,7 @@ export const level6VocabPack: VocabPack = {
       translation: "fish",
       matchesItemId: "ryba_smoked",
       pronunciation: "RIH-bah",
+      ipa: "/ˈrɨbə/",
     },
     {
       id: "slivki",
@@ -181,6 +201,7 @@ export const level6VocabPack: VocabPack = {
       translation: "cream",
       matchesItemId: "slivki_jar",
       pronunciation: "SLEEF-kee",
+      ipa: "/ˈslʲifkʲi/",
     },
     {
       id: "grib",
@@ -188,6 +209,7 @@ export const level6VocabPack: VocabPack = {
       translation: "mushroom",
       matchesItemId: "grib_basket",
       pronunciation: "GREEB",
+      ipa: "/grʲip/",
     },
   ],
 };

@@ -48,7 +48,11 @@ export function ShoutMenu({ learnedWords, onSelect, onCancel }: Props) {
               style={styles.wordButton}
               onClick={() => handleSelect(word)}
             >
-              <span style={styles.wordCyrillic}>{word.cyrillic}</span>
+              <div style={styles.wordStack}>
+                <span style={styles.wordCyrillic}>{word.cyrillic}</span>
+                {word.pronunciation && <span style={styles.wordPronunciation}>{word.pronunciation}</span>}
+                {word.ipa && <span style={styles.wordIpa}>{word.ipa}</span>}
+              </div>
               <span style={styles.wordTranslation}>{word.translation}</span>
             </button>
           ))}
@@ -127,11 +131,28 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
     transition: "background 0.15s",
   },
+  wordStack: {
+    display: "flex",
+    flexDirection: "column" as const,
+    alignItems: "flex-start",
+    gap: 1,
+  },
   wordCyrillic: {
     color: "#FFD54F",
     fontWeight: "bold",
     fontSize: 18,
     letterSpacing: 1,
+    fontFamily: "monospace",
+  },
+  wordPronunciation: {
+    color: "#FFD54F",
+    fontSize: 12,
+    opacity: 0.7,
+    fontFamily: "monospace",
+  },
+  wordIpa: {
+    color: "#888",
+    fontSize: 11,
     fontFamily: "monospace",
   },
   wordTranslation: {

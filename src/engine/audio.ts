@@ -26,6 +26,11 @@ function speakCyrillic(text: string): void {
   speechSynthesis.speak(utterance);
 }
 
+export function speakText(text: string): void {
+  stopAll();
+  speakCyrillic(text);
+}
+
 export function stopAll(): void {
   if (typeof speechSynthesis !== "undefined") {
     speechSynthesis.cancel();

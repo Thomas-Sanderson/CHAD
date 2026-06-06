@@ -45,12 +45,12 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
 
   const allShown = visibleCount >= briefing.messages.length && !typing;
 
-  const [phoneticHint, setPhoneticHint] = useState<{ word: string; until: number } | null>(null);
+  const [phoneticHint, setPhoneticHint] = useState<{ word: string; pronunciation?: string; ipa?: string; until: number } | null>(null);
 
-  // Clear phonetic hint after 2s
+  // Clear phonetic hint after 3s
   useEffect(() => {
     if (!phoneticHint) return;
-    const timer = setTimeout(() => setPhoneticHint(null), 2000);
+    const timer = setTimeout(() => setPhoneticHint(null), 3000);
     return () => clearTimeout(timer);
   }, [phoneticHint]);
 
@@ -59,8 +59,8 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
 
   function handleCyrillicClick(word: VocabWord) {
     pronounceWord(word);
-    if (word.pronunciation) {
-      setPhoneticHint({ word: word.pronunciation, until: Date.now() + 2000 });
+    if (word.pronunciation || word.ipa) {
+      setPhoneticHint({ word: word.cyrillic, pronunciation: word.pronunciation, ipa: word.ipa, until: Date.now() + 3000 });
     }
   }
 
@@ -141,7 +141,11 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
         </div>
 
         {phoneticHint && (
-          <div style={styles.phoneticHint}>{phoneticHint.word}</div>
+          <div style={styles.phoneticHint}>
+            <div style={styles.hintCyrillic}>{phoneticHint.word}</div>
+            {phoneticHint.pronunciation && <div style={styles.hintPronunciation}>{phoneticHint.pronunciation}</div>}
+            {phoneticHint.ipa && <div style={styles.hintIpa}>{phoneticHint.ipa}</div>}
+          </div>
         )}
 
         <div style={styles.phoneFooter}>
@@ -164,8 +168,8 @@ const styles: Record<string, React.CSSProperties> = {
   container: {
     display: "flex",
     alignItems: "center",
+    justifyContent: "center",
     height: "100vh",
-    overflowY: "auto",
     padding: 32,
     background: "#1a1a2e",
     fontFamily: "'SF Pro', -apple-system, sans-serif",
@@ -226,7 +230,7 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "column",
     gap: 10,
     overflowY: "auto",
-    minHeight: 280,
+    minHeight: 0,
   },
   messageBubble: {
     padding: "10px 14px",
@@ -259,11 +263,28 @@ const styles: Record<string, React.CSSProperties> = {
   },
   phoneticHint: {
     textAlign: "center" as const,
+    padding: "8px 16px",
+    display: "flex",
+    flexDirection: "column" as const,
+    alignItems: "center",
+    gap: 2,
+  },
+  hintCyrillic: {
+    color: "#FFD54F",
+    fontSize: 16,
+    fontWeight: "bold",
+    letterSpacing: 1,
+  },
+  hintPronunciation: {
     color: "#FFD54F",
     fontSize: 14,
-    fontStyle: "italic",
-    padding: "6px 16px",
     opacity: 0.8,
+  },
+  hintIpa: {
+    color: "#aaa",
+    fontSize: 12,
+    fontFamily: "monospace",
+    opacity: 0.7,
   },
   typingDots: {
     letterSpacing: 3,

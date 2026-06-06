@@ -253,6 +253,7 @@ export function Game() {
           environment={currentSkin.environment}
           onGateReached={handleGateReached}
           learnedWords={learnedWordsForSkin}
+          vocabWords={currentLevel.vocabPack.words}
         />
       );
     case "GATE":

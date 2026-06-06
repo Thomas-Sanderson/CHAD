@@ -124,6 +124,8 @@ export function createGameRunState(level: LevelData, scoldings?: string[]): Game
     shoutMenuOpen: false,
     shoutTarget: null,
     shoutResponse: null,
+    // Flag animation
+    flagProgress: 0,
   };
 }
 
@@ -376,17 +378,27 @@ export function updateGameState(
       width: 60,
       height: 80,
     };
+    // Flag rises as Chad approaches (within 120px)
+    const distToGate = Math.abs(state.player.position.x - level.gatePosition.x);
+    if (distToGate < 120 && state.flagProgress < 1) {
+      state.flagProgress = Math.min(1, state.flagProgress + dt * 1.5);
+    }
     if (aabbOverlap(pBox, gateBox)) {
+      state.flagProgress = 1;
       state.reachedGate = true;
     }
   }
 
-  // Camera
-  const targetCamX = state.player.position.x - CANVAS_WIDTH / 3;
-  state.camera.x = Math.max(
+  // Camera — lerp for consistent feel in both street and interior
+  const targetCamX = Math.max(
     0,
-    Math.min(targetCamX, activeBounds.width - CANVAS_WIDTH)
+    Math.min(
+      state.player.position.x - CANVAS_WIDTH / 3,
+      activeBounds.width - CANVAS_WIDTH
+    )
   );
+  const camLerp = 1 - Math.pow(0.001, dt); // ~0.92 at 60fps — smooth but responsive
+  state.camera.x += (targetCamX - state.camera.x) * camLerp;
 }
 
 function respawnPlayer(state: GameRunState): void {
