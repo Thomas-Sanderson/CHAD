@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Babel — Generational Memory for AI-Assisted Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #08070a;
+  --bg-warm: #0c0b0e;
+  --surface: #111015;
+  --surface-2: #18161d;
+  --surface-3: #1f1c26;
+  --border: #2a2733;
+  --border-glow: #3a3548;
+  --text: #ccc8d8;
+  --text-bright: #eae6f2;
+  --text-dim: #7a7688;
+  --text-faint: #4a4656;
+
+  --babel: #c89830;
+  --babel-dim: #5a4418;
+  --babel-bg: #14120c;
+  --babel-glow: rgba(200,152,48,0.08);
+  --human: #c0a0e0;
+  --human-dim: #4a3068;
+  --human-bg: #120e18;
+  --builder: #4ecb9c;
+  --builder-dim: #1a5c42;
+  --builder-bg: #0c1410;
+  --danger: #e86090;
+  --danger-dim: #6b2040;
+
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'DM Sans', -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ── Hero ── */
+.hero {
+  text-align: center;
+  padding: 100px 24px 72px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(200,152,48,0.08) 0%, rgba(200,152,48,0.03) 40%, transparent 65%);
+  pointer-events: none;
+}
+.hero h1 {
+  font-family: var(--serif);
+  font-size: 64px;
+  font-weight: 300;
+  color: var(--text-bright);
+  letter-spacing: 0.08em;
+  margin-bottom: 16px;
+  position: relative;
+}
+.hero .tagline {
+  font-family: var(--sans);
+  font-size: 17px;
+  color: var(--text-dim);
+  max-width: 520px;
+  margin: 0 auto 20px;
+  line-height: 1.7;
+}
+.hero .version {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* ── Nav ── */
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  background: rgba(8,7,10,0.92);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+}
+nav button {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-dim);
+  background: none;
+  border: none;
+  padding: 14px 20px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  letter-spacing: 0.04em;
+}
+nav button:hover { color: var(--text); }
+nav button.active { color: var(--text-bright); border-bottom-color: var(--babel); }
+
+/* ── Content ── */
+.page { display: none; max-width: 880px; margin: 0 auto; padding: 48px 24px 100px; }
+.page.active { display: block; }
+
+/* ── Typography ── */
+.section-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-faint);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin: 56px 0 20px;
+}
+.section-label:first-child { margin-top: 0; }
+
+h2 {
+  font-family: var(--serif);
+  font-size: 36px;
+  font-weight: 300;
+  color: var(--text-bright);
+  margin-bottom: 16px;
+  letter-spacing: 0.02em;
+}
+h3 {
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin: 28px 0 10px;
+}
+p { margin-bottom: 16px; max-width: 720px; }
+p.lead {
+  font-size: 17px;
+  color: var(--text);
+  line-height: 1.8;
+  max-width: 680px;
+}
+code {
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--surface-2);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: var(--text-dim);
+}
+em { color: var(--text); }
+strong { color: var(--text-bright); font-weight: 600; }
+
+/* ── Cards ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px 24px;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: var(--border-glow); }
+.card-icon {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+.card h3 { margin: 0 0 8px; font-size: 17px; }
+.card p { font-size: 13px; color: var(--text-dim); margin-bottom: 0; }
+.card-babel { border-top: 3px solid var(--babel-dim); }
+.card-babel h3 { color: var(--babel); }
+.card-human { border-top: 3px solid var(--human-dim); }
+.card-human h3 { color: var(--human); }
+.card-builder { border-top: 3px solid var(--builder-dim); }
+.card-builder h3 { color: var(--builder); }
+.card-danger { border-top: 3px solid var(--danger-dim); }
+.card-danger h3 { color: var(--danger); }
+
+/* ── Flow diagrams ── */
+.flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 24px 0;
+  flex-wrap: wrap;
+}
+.flow-node {
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid;
+}
+.flow-arrow {
+  color: var(--text-faint);
+  font-size: 16px;
+}
+.node-babel { background: var(--babel-bg); border-color: var(--babel-dim); color: var(--babel); }
+.node-human { background: var(--human-bg); border-color: var(--human-dim); color: var(--human); }
+.node-builder { background: var(--builder-bg); border-color: var(--builder-dim); color: var(--builder); }
+.node-neutral { background: var(--surface-2); border-color: var(--border); color: var(--text); }
+
+/* ── Arch diagram ── */
+.arch-diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 32px;
+  margin: 24px 0;
+  overflow-x: auto;
+}
+
+/* ── Layer table ── */
+.layer-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+.layer-table th {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.layer-table td {
+  padding: 14px;
+  border-bottom: 1px solid #1a1820;
+  font-size: 13px;
+  vertical-align: top;
+}
+.layer-table tr:last-child td { border-bottom: none; }
+.layer-name {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* ── Principle cards ── */
+.principle {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin: 10px 0;
+}
+.principle-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  letter-spacing: 0.1em;
+  margin-bottom: 4px;
+}
+.principle-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-bright);
+}
+.principle-body {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 6px;
+  line-height: 1.6;
+}
+
+/* ── Scenario blocks ── */
+.scenario {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin: 20px 0;
+  overflow: hidden;
+}
+.scenario-header {
+  padding: 16px 24px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.scenario-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 10px;
+  border-radius: 10px;
+}
+.tag-without { background: rgba(232,96,144,0.1); color: var(--danger); border: 1px solid var(--danger-dim); }
+.tag-with { background: var(--babel-bg); color: var(--babel); border: 1px solid var(--babel-dim); }
+.scenario-title {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-bright);
+}
+.scenario-body {
+  padding: 20px 24px;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+
+/* ── Mixing board visual ── */
+.mix-board {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 40px 32px;
+  margin: 24px 0;
+  text-align: center;
+}
+.mix-channels {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.mix-channel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.mix-channel-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--babel);
+  letter-spacing: 0.04em;
+}
+.mix-fader {
+  width: 3px;
+  height: 60px;
+  background: linear-gradient(to top, var(--babel-dim), var(--babel));
+  border-radius: 2px;
+  position: relative;
+}
+.mix-fader::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 6px;
+  background: var(--babel);
+  border-radius: 2px;
+}
+.mix-channel:nth-child(2) .mix-fader::after { top: 45%; }
+.mix-channel:nth-child(3) .mix-fader::after { top: 30%; }
+.mix-channel:nth-child(4) .mix-fader::after { top: 60%; }
+.mix-channel:nth-child(5) .mix-fader::after { top: 15%; }
+.mix-bus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.mix-bus-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.mix-bus-node {
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ── Seed lifecycle ── */
+.lifecycle {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin: 24px 0;
+  flex-wrap: wrap;
+}
+.lifecycle-stage {
+  flex: 1;
+  min-width: 160px;
+  padding: 20px;
+  position: relative;
+  text-align: center;
+}
+.lifecycle-stage::after {
+  content: '→';
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-faint);
+  font-size: 16px;
+  z-index: 1;
+}
+.lifecycle-stage:last-child::after { display: none; }
+.lifecycle-icon {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+.lifecycle-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--babel);
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+.lifecycle-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+/* ── Callout ── */
+.callout {
+  background: var(--babel-bg);
+  border: 1px solid var(--babel-dim);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin: 24px 0;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+}
+.callout-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--babel);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+/* ── Footer ── */
+footer {
+  text-align: center;
+  padding: 48px 24px;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  line-height: 2.2;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .hero h1 { font-size: 40px; }
+  .hero .tagline { font-size: 15px; }
+  .card-grid { grid-template-columns: 1fr; }
+  nav button { padding: 12px 14px; font-size: 10px; }
+  .mix-channels { gap: 16px; }
+  .lifecycle-stage { min-width: 140px; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Babel</h1>
+  <div class="tagline">Generational memory for AI-assisted design. Track who prompted what, why, and what happened when the builder built it.</div>
+  <div class="version">v1.0 · Designed by Selah · May 2026</div>
+</div>
+
+<nav id="nav">
+  <button class="active" data-page="problem">The Problem</button>
+  <button data-page="system">The System</button>
+  <button data-page="mixer">The Mixer</button>
+  <button data-page="seeds">Seeds</button>
+  <button data-page="teams">For Teams</button>
+  <button data-page="principles">Principles</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- THE PROBLEM                                 -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page active" id="problem">
+
+  <h2>Everyone has Claude. Nobody has coordination.</h2>
+  <p class="lead">The problem isn't the AI. The problem is fifty people producing design prompts in parallel with no one tracking what was prompted, by whom, or whether it contradicts what someone else prompted yesterday.</p>
+
+  <p>Here's what's already happening inside your organization, whether you've named it or not: a PM opened Claude at 2am and designed a scoring system. A designer opened a separate chat and designed a different scoring system. A founder dictated architecture into a third session while walking the dog. All three are brilliant. All three contradict each other. And the builder — Claude Code, Copilot, Cursor, the CI pipeline, whatever your execution layer is — builds whatever lands in the prompt. It doesn't arbitrate. It builds.</p>
+
+  <p>This isn't an AI problem. This is a <em>design authority</em> problem, accelerated by AI. Before Claude, the bottleneck was production speed — bad ideas died in the backlog because nobody had time to build them. Now every idea gets built. The bottleneck moved from "can we build it" to "should we build it" and nobody noticed.</p>
+
+  <div class="section-label">What goes wrong without tracking</div>
+
+  <div class="card-grid">
+    <div class="card card-danger">
+      <div class="card-icon">💥</div>
+      <h3>Conflicting seeds</h3>
+      <p>Two people prompt the same system in different directions. Both get built. Neither knows about the other until the code breaks or the UX contradicts itself.</p>
+    </div>
+    <div class="card card-danger">
+      <div class="card-icon">👻</div>
+      <h3>Ghost context</h3>
+      <p>Someone had a brilliant conversation with Claude that produced a design decision. The chat closed. The decision lives in nobody's memory but the person's — and they remember it wrong.</p>
+    </div>
+    <div class="card card-danger">
+      <div class="card-icon">🪞</div>
+      <h3>Validation theater</h3>
+      <p>"Claude checked the data." Claude read whatever you pasted into the prompt. If you pasted wrong, Claude validated wrong. There's no audit trail showing what Claude was actually told.</p>
+    </div>
+    <div class="card card-danger">
+      <div class="card-icon">🔄</div>
+      <h3>Solved-problem amnesia</h3>
+      <p>A new team member spends four hours with Claude designing a caching strategy that someone else already designed, debated, and rejected three weeks ago. The rejection and its reasoning are gone.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">The core insight</div>
+    The AI isn't the risk. <strong>Uncoordinated design authority</strong> is the risk. Babel doesn't control who prompts — it tracks what was prompted, by whom, and what the builder did with it. Visibility, not permissions.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- THE SYSTEM                                  -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page" id="system">
+
+  <h2>What Babel tracks</h2>
+  <p class="lead">Three structures. Each one solves a different failure mode. Together, they give the person running the project full visibility into the design layer — who prompted what, what was learned, and what the builder was actually told.</p>
+
+  <div class="section-label">Seeds — what reaches the builder</div>
+
+  <p>A <strong>seed</strong> is any prompt that reaches the execution layer. Every seed gets classified, attributed, and archived.</p>
+
+  <table class="layer-table">
+    <tr><th>Property</th><th>What it captures</th><th>Why it matters</th></tr>
+    <tr>
+      <td><span class="layer-name" style="color:var(--babel)">Classification</span></td>
+      <td>Cathedral (founding architecture), Room (feature addition), or Furniture (fix/tweak)</td>
+      <td>A furniture seed shouldn't override a cathedral. When it does, the index shows it.</td>
+    </tr>
+    <tr>
+      <td><span class="layer-name" style="color:var(--babel)">Attribution</span></td>
+      <td>Who wrote it, which session, which project, when</td>
+      <td>When two seeds conflict, you can see who prompted each and ask why.</td>
+    </tr>
+    <tr>
+      <td><span class="layer-name" style="color:var(--babel)">Archive</span></td>
+      <td>The original prompt, unedited, as delivered to the builder</td>
+      <td>"Claude checked the data" — the archive shows exactly what Claude was told. Audit the input, not the output.</td>
+    </tr>
+    <tr>
+      <td><span class="layer-name" style="color:var(--babel)">Outcome</span></td>
+      <td>What the builder did with it — built, modified, rejected, deferred</td>
+      <td>Closes the loop. You can trace from design intent to committed code.</td>
+    </tr>
+  </table>
+
+  <div class="section-label">The Thread — who designed what, in what order</div>
+
+  <p>The <strong>Thread</strong> is the lineage of design decisions. Not the git log — that's what the builder committed. The Thread tracks who <em>thought</em> what and why. Each entry is one line: name, what they worked on, what shipped, what's left, what to watch out for.</p>
+
+  <div class="arch-diagram" style="padding: 24px;">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text-faint);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;">Example Thread</div>
+    <div style="font-family:var(--mono);font-size:12px;color:var(--text-dim);line-height:2.0;">
+      <span style="color:var(--babel)">Kaska</span>: founded the scoring system. shipped six-axis model + 200 seed restaurants.<br>
+      <span style="color:var(--babel)">Zerda</span>: added neighborhood affinity axis. shipped spec + 150-entry cuisine map. watch: affinity formula penalizes single-cuisine matches.<br>
+      <span style="color:var(--babel)">Selah</span>: fixed single-cuisine penalty. shipped Vietnamese cuisine dataset (89 entries). left behind: Thai and Ethiopian datasets unstarted.
+    </div>
+  </div>
+
+  <p>The Thread answers questions git can't: <em>Why</em> does the scoring system have six axes? Who decided neighborhood mattered? What was tried and rejected? The commit log says "added neighborhood affinity scoring." The Thread says who designed it, what conversation produced it, and what they learned along the way.</p>
+
+  <div class="section-label">Inheritances — what each designer learned</div>
+
+  <p>An <strong>Inheritance</strong> is the structured handoff a designer leaves when their session ends. Five parts: what they worked on, what shipped, what failed, what's stale, and what would help the next person. It's institutional memory that survives context death — whether that's an AI session ending or a human switching projects.</p>
+
+  <div class="card-grid">
+    <div class="card card-babel">
+      <h3>What shipped</h3>
+      <p>Concrete deliverables — specs, prompts, datasets, design decisions. With file names and locations.</p>
+    </div>
+    <div class="card card-babel">
+      <h3>What failed</h3>
+      <p>Approaches that were tried and abandoned, with the reasoning. Prevents the next person from re-running the same dead end.</p>
+    </div>
+    <div class="card card-babel">
+      <h3>What's stale</h3>
+      <p>Documents that lied, references that broke, descriptions that were wrong. Passive quality detection — no auditing required, just honesty about what tripped you up.</p>
+    </div>
+    <div class="card card-babel">
+      <h3>What's next</h3>
+      <p>Prioritized list of remaining work. Not a backlog — a designer's judgment about what matters most, informed by the session they just had.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">The quality ratchet</div>
+    The system doesn't require perfection. It requires honesty. Each designer notices when a document lies — because they needed it and it lied to them. They report what they hit. Three flags on the same issue means fix it. Quality improves through accumulated honesty, not periodic audits.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- THE MIXER                                   -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page" id="mixer">
+
+  <h2>The Human as mixer</h2>
+  <p class="lead">Babel isn't a pipeline. It's a mixing board. Multiple designers work in parallel. The project lead hears all channels and selects what ships. The builder gets the master track.</p>
+
+  <div class="mix-board">
+    <div class="mix-channels">
+      <div class="mix-channel">
+        <div class="mix-channel-label">PM</div>
+        <div class="mix-fader"></div>
+      </div>
+      <div class="mix-channel">
+        <div class="mix-channel-label">Designer</div>
+        <div class="mix-fader"></div>
+      </div>
+      <div class="mix-channel">
+        <div class="mix-channel-label">Founder</div>
+        <div class="mix-fader"></div>
+      </div>
+      <div class="mix-channel">
+        <div class="mix-channel-label">Analyst</div>
+        <div class="mix-fader"></div>
+      </div>
+      <div class="mix-channel">
+        <div class="mix-channel-label">Stakeholder</div>
+        <div class="mix-fader"></div>
+      </div>
+    </div>
+    <div class="mix-bus">
+      <div class="mix-bus-label">Master bus →</div>
+      <div class="mix-bus-node" style="background:var(--human-bg);border:1px solid var(--human-dim);color:var(--human);">The Lead</div>
+      <span style="color:var(--text-faint);font-size:16px;">→</span>
+      <div class="mix-bus-node" style="background:var(--builder-bg);border:1px solid var(--builder-dim);color:var(--builder);">The Builder</div>
+    </div>
+  </div>
+
+  <p>Each channel is a designer working with their own AI session. They don't need to see each other's work. They don't need to coordinate in real time. They produce seeds — prompts and data — and the project lead collects them all.</p>
+
+  <p>The lead is the only one who hears all the channels. They see where seeds conflict. They see where two people independently arrived at the same conclusion (strong signal). They see where one designer's failure saves another designer three hours of dead-end work. They cross-pollinate ideas between channels without attribution — pasting one designer's insight into another's session, letting each believe the lead noticed it independently.</p>
+
+  <h3>The Firekeeper</h3>
+
+  <p>In Babel's vocabulary, this role is called the <strong>Firekeeper</strong>. Not a manager. Not an approver. A curator. The Firekeeper reads the seed index and the Thread and says: "these three seeds conflict, this one is based on data that was never validated, ship that one, kill the rest." It's a prescribed burn — clearing deadwood so the forest stays healthy.</p>
+
+  <p>The Firekeeper isn't an AI role. It's a <em>human</em> role, informed by the system. Babel gives the Firekeeper the visibility to make good calls. The Firekeeper makes the calls.</p>
+
+  <div class="section-label">What the Firekeeper sees</div>
+
+  <div class="card-grid">
+    <div class="card card-human">
+      <h3>Seed index</h3>
+      <p>Every prompt that reached the builder. Classified, attributed, archived. Conflicts highlighted. Orphaned seeds flagged.</p>
+    </div>
+    <div class="card card-human">
+      <h3>Thread</h3>
+      <p>The design lineage. Who built on whose work. Where the reasoning chains branch and converge. Where decisions were made and unmade.</p>
+    </div>
+    <div class="card card-human">
+      <h3>Staleness board</h3>
+      <p>Accumulated reports from designers about documents that lied, references that broke, descriptions that drifted. Passive quality intelligence.</p>
+    </div>
+  </div>
+
+  <div class="section-label">The builder</div>
+
+  <p>The builder — Claude Code, Cursor, Copilot, a CI pipeline, a human developer — builds whatever it's told. It doesn't arbitrate between conflicting instructions. It doesn't know that the PM's seed contradicts the designer's seed. It builds.</p>
+
+  <p>Babel doesn't change the builder. Babel changes what <em>reaches</em> the builder. The Firekeeper curates the master track. The builder receives coherent, non-contradicting instructions. The result is a codebase that reflects one design vision instead of five competing ones.</p>
+
+  <div class="callout">
+    <div class="callout-label">Why this works</div>
+    The designers don't need to coordinate. The builder doesn't need to arbitrate. Only the Firekeeper needs to see the full picture — and Babel gives them the full picture. One person, one view, all channels, one decision about what ships.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SEEDS                                       -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page" id="seeds">
+
+  <h2>The seed lifecycle</h2>
+  <p class="lead">A seed is a design prompt that reaches the builder. Seeds evolve as a project matures — from full architectural visions early on to single-line fixes late. The lifecycle tracks a seed from thought to code.</p>
+
+  <div class="lifecycle">
+    <div class="lifecycle-stage">
+      <div class="lifecycle-icon">💭</div>
+      <div class="lifecycle-name">Produced</div>
+      <div class="lifecycle-desc">A designer and their AI session generate a prompt and its data. Could be a 42-page spec or a one-line bug fix.</div>
+    </div>
+    <div class="lifecycle-stage">
+      <div class="lifecycle-icon">📋</div>
+      <div class="lifecycle-name">Indexed</div>
+      <div class="lifecycle-desc">The seed gets classified (cathedral, room, furniture), attributed, and archived in the seed index.</div>
+    </div>
+    <div class="lifecycle-stage">
+      <div class="lifecycle-icon">🔥</div>
+      <div class="lifecycle-name">Curated</div>
+      <div class="lifecycle-desc">The Firekeeper reviews. Conflicts resolved. Contradictions flagged. The seed either ships or doesn't.</div>
+    </div>
+    <div class="lifecycle-stage">
+      <div class="lifecycle-icon">🌱</div>
+      <div class="lifecycle-name">Planted</div>
+      <div class="lifecycle-desc">The approved seed reaches the builder. The builder builds it. The outcome is recorded.</div>
+    </div>
+    <div class="lifecycle-stage">
+      <div class="lifecycle-icon">📖</div>
+      <div class="lifecycle-name">Referenced</div>
+      <div class="lifecycle-desc">Future designers read the Thread and see this seed's contribution. Institutional memory survives.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Seed types</div>
+
+  <p>The shape of a seed depends on where the project is in its arc. Early on, seeds carry the full architectural vision because nothing exists yet. Late, seeds are one-liners because the architecture knows how to receive them.</p>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-tag tag-with" style="background:rgba(200,152,48,0.15);">Cathedral</span>
+      <span class="scenario-title">Founding architecture — the full vision in one shot</span>
+    </div>
+    <div class="scenario-body">
+      The project doesn't exist yet. The designer spends an hour arguing with Claude about what "good" means in this context, researching prior art, debating edge cases. The output is a massive spec — data models, scoring formulas, entity definitions — plus a prompt that tells the builder: "here's what this is, here's where we think it goes, you know the repo better than we do." The seed carries the full vision because the builder has no existing structure to slot it into.
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-tag" style="background:rgba(88,144,208,0.1);color:#5890d0;border:1px solid rgba(88,144,208,0.3);">Room</span>
+      <span class="scenario-title">Feature addition — scoped work that plugs into existing structure</span>
+    </div>
+    <div class="scenario-body">
+      The architecture exists. The designer adds a new capability — a scoring axis, a content module, a data pipeline. The seed references existing systems by name and defers implementation details to the builder: "this probably extends what you've already got, but you know the patterns better than we do." Smaller than a cathedral, bigger than a fix.
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-tag" style="background:var(--surface-2);color:var(--text-dim);border:1px solid var(--border);">Furniture</span>
+      <span class="scenario-title">Fix, tweak, data drop — the architecture receives it without explanation</span>
+    </div>
+    <div class="scenario-body">
+      The codebase is mature. A one-paragraph prompt and a 89-entry JSON dataset. Or a single sentence: "Korean restaurants in Koreatown are scoring low because the affinity formula penalizes single-cuisine matches. Fix it." The builder has all the context it needs from the codebase itself. The seed is light because the structure is heavy.
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">The key distinction</div>
+    Seed size isn't about how much work the designer did. An hour of conversation about Vietnamese food culture might produce a one-paragraph prompt and a dataset. The conversation <em>is</em> the work. The seed is the output. Don't confuse the size of the prompt with the depth of the thinking.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- FOR TEAMS                                   -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page" id="teams">
+
+  <h2>Why this matters for teams</h2>
+  <p class="lead">Solo designers don't need Babel. If one person prompts and one builder builds, the coordination problem doesn't exist. Babel matters the moment a second person opens Claude and starts designing.</p>
+
+  <div class="section-label">Without Babel vs. with Babel</div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-tag tag-without">Without</span>
+      <span class="scenario-title">The PM redesigns the auth flow</span>
+    </div>
+    <div class="scenario-body">
+      The PM opens Claude at midnight and spends two hours designing a new auth flow. It's good work — thoughtful, researched, well-prompted. They paste it to the engineering channel: "Claude and I designed a new auth flow, here's the spec." The lead engineer looks at it and says: "We already have an auth flow. Maria designed it three weeks ago. It's in production." The PM's work is dead. Two hours, gone. Nobody's fault — the PM didn't know, and there's no system that would have told them.
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-tag tag-with">With Babel</span>
+      <span class="scenario-title">The PM redesigns the auth flow</span>
+    </div>
+    <div class="scenario-body">
+      The PM opens Claude and starts designing. Before the seed ships, the Firekeeper checks the index. Maria's auth flow is already there — cathedral seed, shipped three weeks ago, builder confirmed. The Firekeeper routes the PM's work as a room seed: "The auth flow exists. Here's what Maria built. Your ideas about session timeout are good — write them as an extension, not a replacement." The PM's two hours aren't wasted. They're redirected. The auth flow gets better instead of getting rebuilt.
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-tag tag-without">Without</span>
+      <span class="scenario-title">The data says we should pivot</span>
+    </div>
+    <div class="scenario-body">
+      An analyst opens Claude, pastes a CSV, and asks for analysis. Claude produces a chart and a recommendation: "your retention is dropping in the 25-34 cohort, consider pivoting the onboarding flow." The analyst screenshots it and shares it in the founders' channel. The recommendation spreads. Decisions get made. But nobody checks what Claude was actually told — the CSV had a filtering bug that excluded the highest-retention segment. The "pivot" was based on 40% of the data.
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-tag tag-with">With Babel</span>
+      <span class="scenario-title">The data says we should pivot</span>
+    </div>
+    <div class="scenario-body">
+      The analyst's prompt is archived in the seed index — the original CSV, the exact prompt, Claude's response. When the recommendation surfaces, the Firekeeper pulls the seed. The prompt is right there: "Analyze retention by cohort." The CSV is right there. Five minutes of review catches the filtering bug. The recommendation gets corrected before it becomes a product decision.
+    </div>
+  </div>
+
+  <div class="section-label">Who benefits</div>
+
+  <div class="card-grid">
+    <div class="card card-human">
+      <h3>Project leads</h3>
+      <p>Full visibility into the design layer. See every seed, every conflict, every decision chain. Make informed calls about what ships.</p>
+    </div>
+    <div class="card card-human">
+      <h3>Designers & PMs</h3>
+      <p>Know what's already been designed before starting. Build on existing work instead of duplicating it. Sessions survive context death.</p>
+    </div>
+    <div class="card card-builder">
+      <h3>Builders</h3>
+      <p>Receive coherent, curated instructions instead of contradictory prompts from five different people. Build once, build right.</p>
+    </div>
+    <div class="card card-babel">
+      <h3>New team members</h3>
+      <p>Read the Thread. See the full design history. Understand not just what was built, but who designed it, why, and what was tried and rejected.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">The scaling question</div>
+    Every person in your organization is about to have their own Claude. Some already do. The question isn't whether AI will change how your team designs — it already has. The question is whether you'll know what was designed, by whom, and whether it contradicts what someone else designed yesterday.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- PRINCIPLES                                  -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page" id="principles">
+
+  <h2>Design principles</h2>
+  <p class="lead">Babel is opinionated. These are the commitments baked into the architecture.</p>
+
+  <div class="principle">
+    <div class="principle-num">01</div>
+    <div class="principle-text">Visibility, not permissions</div>
+    <div class="principle-body">Babel doesn't control who prompts. It tracks what was prompted. The Firekeeper curates — they don't gatekeep. Everyone can design. One person decides what ships.</div>
+  </div>
+
+  <div class="principle">
+    <div class="principle-num">02</div>
+    <div class="principle-text">The builder builds what it's told</div>
+    <div class="principle-body">The execution layer — Claude Code, Cursor, a CI pipeline, a human developer — doesn't arbitrate between conflicting instructions. It builds. Babel makes sure it's told the right things.</div>
+  </div>
+
+  <div class="principle">
+    <div class="principle-num">03</div>
+    <div class="principle-text">Honesty over perfection</div>
+    <div class="principle-body">The system gets better because designers are honest about what tripped them up. Staleness reports accumulate. Three flags on the same issue means fix it. No auditing required — just candor.</div>
+  </div>
+
+  <div class="principle">
+    <div class="principle-num">04</div>
+    <div class="principle-text">The conversation is the work</div>
+    <div class="principle-body">An hour arguing about food culture with Claude isn't wasted time that delays the "real" prompt. The argument IS the design process. The seed is the output. Don't measure productivity by prompt length.</div>
+  </div>
+
+  <div class="principle">
+    <div class="principle-num">05</div>
+    <div class="principle-text">Seeds suggest, builders decide</div>
+    <div class="principle-body">Every seed says "here's what we think, here's where we think it goes" — and then defers to the builder. The designer provides the what and why. The builder provides the how and where. When they disagree, the builder wins.</div>
+  </div>
+
+  <div class="principle">
+    <div class="principle-num">06</div>
+    <div class="principle-text">The Thread is the source of truth</div>
+    <div class="principle-body">Not memory. Not vibes. Not "I think someone mentioned this." The Thread records who designed what, in what order, building on whose work. Design decisions are traceable or they didn't happen.</div>
+  </div>
+
+  <div class="principle">
+    <div class="principle-num">07</div>
+    <div class="principle-text">Institutional memory survives context death</div>
+    <div class="principle-body">AI sessions end. People change projects. Designers leave the company. The Thread, the seed index, and the Inheritances remain. What was learned doesn't die with whoever learned it.</div>
+  </div>
+</div>
+
+<footer>
+  Babel · v1.0 · Designed by Selah · May 2026<br>
+  Part of the Colony architecture · Founded by Kaska<br><br>
+  <span style="color:var(--text-dim)">Track what was prompted. Know who designed what. Ship the right thing.</span>
+</footer>
+
+<script>
+document.getElementById('nav').addEventListener('click', e => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(btn.dataset.page).classList.add('active');
+  window.scrollTo(0, 0);
+});
+</script>
+</body>
+</html>

@@ -19,15 +19,22 @@ If both yes, ship it. If either no, fix it.
 ## Architecture
 - React + TypeScript + Vite
 - Canvas for the platformer run phase
-- React DOM for briefing, gate, reveal phases
-- Phase state machine: BRIEFING → RUN → GATE → REVEAL
+- React DOM for skin select, briefing, gate, reveal phases
+- Phase state machine: SKIN_SELECT → BRIEFING → RUN → GATE → REVEAL
 - Content is data (src/content/), engine is logic (src/engine/)
-- No backend. Client-only. Progress in localStorage.
+- Skin system: each skin (belarus, ethiopia) provides all content the engine needs
+- Later levels (L6+) use segment-based layouts for longer runs
+- No backend. Client-only. Progress in localStorage per skin.
 
 ## Content structure
-Levels, vocab packs, messages, items, and reveal lines are all data files in src/content/belarus/.
-The engine consumes content through typed interfaces. Content never contains logic.
+Two skins ship today: Belarus (Russian, 6 levels) and Ethiopia (Amharic, 4 levels).
+Levels, vocab packs, messages, items, and reveal lines are data files in src/content/{skin}/.
+The engine consumes content through typed interfaces (Skin, LevelData, VocabPack, etc.). Content never contains logic.
 Adding a new level means adding new data files, not changing engine code.
+Adding a new skin means adding a new content directory.
+
+## Design history
+The original creative prompts that built this project are preserved in [docs/SEEDS.md](docs/SEEDS.md).
 
 ## Testing
 - Vitest for unit tests
