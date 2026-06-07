@@ -252,7 +252,7 @@ const styles: Record<string, React.CSSProperties> = {
     alignSelf: "flex-end",
     borderBottomRightRadius: 4,
   },
-  cyrillic: {
+  script: {
     fontWeight: "bold",
     color: "#FFD54F",
     letterSpacing: 1,
