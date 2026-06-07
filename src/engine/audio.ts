@@ -52,11 +52,17 @@ function doSpeak(text: string): void {
   }
 }
 
+function detectLang(text: string): string {
+  // Ge'ez script (Amharic/Ethiopic): U+1200–U+137F
+  if (/[\u1200-\u137F]/.test(text)) return "am-ET";
+  return "ru-RU";
+}
+
 function fireSpeak(text: string): void {
   if (typeof speechSynthesis === "undefined") return;
 
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "ru-RU";
+  utterance.lang = detectLang(text);
   utterance.rate = 0.8;
   utterance.onstart = () => { speaking = true; };
   utterance.onend = () => { speaking = false; };
