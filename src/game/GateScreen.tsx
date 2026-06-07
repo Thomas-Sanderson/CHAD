@@ -81,7 +81,7 @@ export function GateScreen({ result, vocabPack, gateFailText, gateFailQuiet, onR
             const word = vocabPack.words.find((w) => w.id === m.vocabWordId);
             return (
               <div key={m.vocabWordId} style={styles.missingItem}>
-                &#10007; {word?.cyrillic ?? m.vocabWordId}
+                &#10007; {word?.script ?? m.vocabWordId}
               </div>
             );
           })}

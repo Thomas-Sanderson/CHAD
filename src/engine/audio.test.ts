@@ -40,7 +40,7 @@ describe("audio", () => {
   it("pronounceWord speaks immediately when idle", () => {
     const word: VocabWord = {
       id: "test",
-      cyrillic: "ТЕСТ",
+      script: "ТЕСТ",
       translation: "test",
       matchesItemId: null,
     };

@@ -5,7 +5,7 @@ export const level1VocabPack: VocabPack = {
   words: [
     {
       id: "smetana",
-      cyrillic: "СМЕТАНА",
+      script: "СМЕТАНА",
       translation: "sour cream",
       matchesItemId: "smetana_tub",
       pronunciation: "smeh-TAH-nah",
@@ -13,7 +13,7 @@ export const level1VocabPack: VocabPack = {
     },
     {
       id: "kefir",
-      cyrillic: "КЕФИР",
+      script: "КЕФИР",
       translation: "fermented milk drink",
       matchesItemId: "kefir_bottle",
       pronunciation: "keh-FEER",
@@ -21,7 +21,7 @@ export const level1VocabPack: VocabPack = {
     },
     {
       id: "kolbasa",
-      cyrillic: "КОЛБАСА",
+      script: "КОЛБАСА",
       translation: "sausage/salami",
       matchesItemId: "kolbasa_link",
       pronunciation: "kahl-bah-SAH",
@@ -29,7 +29,7 @@ export const level1VocabPack: VocabPack = {
     },
     {
       id: "produkty",
-      cyrillic: "ПРОДУКТЫ",
+      script: "ПРОДУКТЫ",
       translation: "groceries",
       matchesItemId: null,
       pronunciation: "prah-DOOK-tih",
@@ -43,7 +43,7 @@ export const level2VocabPack: VocabPack = {
   words: [
     {
       id: "chai",
-      cyrillic: "ЧАЙ",
+      script: "ЧАЙ",
       translation: "tea",
       matchesItemId: "chai_box",
       pronunciation: "CHAY",
@@ -51,7 +51,7 @@ export const level2VocabPack: VocabPack = {
     },
     {
       id: "moloko",
-      cyrillic: "МОЛОКО",
+      script: "МОЛОКО",
       translation: "milk",
       matchesItemId: "moloko_carton",
       pronunciation: "mah-lah-KOH",
@@ -59,7 +59,7 @@ export const level2VocabPack: VocabPack = {
     },
     {
       id: "sakhar",
-      cyrillic: "САХАР",
+      script: "САХАР",
       translation: "sugar",
       matchesItemId: "sakhar_bag",
       pronunciation: "SAH-khar",
@@ -73,7 +73,7 @@ export const level3VocabPack: VocabPack = {
   words: [
     {
       id: "ryba",
-      cyrillic: "РЫБА",
+      script: "РЫБА",
       translation: "fish",
       matchesItemId: "ryba_fish",
       pronunciation: "RIH-bah",
@@ -81,7 +81,7 @@ export const level3VocabPack: VocabPack = {
     },
     {
       id: "maslo",
-      cyrillic: "МАСЛО",
+      script: "МАСЛО",
       translation: "butter",
       matchesItemId: "maslo_butter",
       pronunciation: "MAHS-lah",
@@ -89,7 +89,7 @@ export const level3VocabPack: VocabPack = {
     },
     {
       id: "kartoshka",
-      cyrillic: "КАРТОШКА",
+      script: "КАРТОШКА",
       translation: "potato",
       matchesItemId: "kartoshka",
       pronunciation: "kar-TOSH-kah",
@@ -97,7 +97,7 @@ export const level3VocabPack: VocabPack = {
     },
     {
       id: "hleb",
-      cyrillic: "ХЛЕБ",
+      script: "ХЛЕБ",
       translation: "bread",
       matchesItemId: "hleb_rye",
       pronunciation: "KHLYEB",
@@ -111,7 +111,7 @@ export const level4VocabPack: VocabPack = {
   words: [
     {
       id: "konfeta",
-      cyrillic: "КОНФЕТА",
+      script: "КОНФЕТА",
       translation: "candy/chocolate",
       matchesItemId: "konfeta_candy",
       pronunciation: "kahn-FYEH-tah",
@@ -119,7 +119,7 @@ export const level4VocabPack: VocabPack = {
     },
     {
       id: "syr",
-      cyrillic: "СЫР",
+      script: "СЫР",
       translation: "cheese",
       matchesItemId: "syr_cheese",
       pronunciation: "SIHR",
@@ -127,7 +127,7 @@ export const level4VocabPack: VocabPack = {
     },
     {
       id: "yabloko",
-      cyrillic: "ЯБЛОКО",
+      script: "ЯБЛОКО",
       translation: "apple",
       matchesItemId: "yabloko_apple",
       pronunciation: "YAH-blah-kah",
@@ -142,7 +142,7 @@ export const level5VocabPack: VocabPack = {
   words: [
     {
       id: "tarelka",
-      cyrillic: "ТАРЕЛКА",
+      script: "ТАРЕЛКА",
       translation: "plate",
       matchesItemId: "tarelka_plate",
       pronunciation: "tah-RYEL-kah",
@@ -150,7 +150,7 @@ export const level5VocabPack: VocabPack = {
     },
     {
       id: "lozhka",
-      cyrillic: "ЛОЖКА",
+      script: "ЛОЖКА",
       translation: "spoon",
       matchesItemId: "lozhka_spoon",
       pronunciation: "LOSH-kah",
@@ -158,7 +158,7 @@ export const level5VocabPack: VocabPack = {
     },
     {
       id: "chashka",
-      cyrillic: "ЧАШКА",
+      script: "ЧАШКА",
       translation: "cup",
       matchesItemId: "chashka_cup",
       pronunciation: "CHASH-kah",
@@ -166,7 +166,7 @@ export const level5VocabPack: VocabPack = {
     },
     {
       id: "zavtrak",
-      cyrillic: "ЗАВТРАК",
+      script: "ЗАВТРАК",
       translation: "breakfast",
       matchesItemId: null,
       pronunciation: "ZAHF-trahk",
@@ -181,7 +181,7 @@ export const level6VocabPack: VocabPack = {
   words: [
     {
       id: "syr_market",
-      cyrillic: "СЫР",
+      script: "СЫР",
       translation: "cheese",
       matchesItemId: "syr_wheel",
       pronunciation: "SIHR",
@@ -189,7 +189,7 @@ export const level6VocabPack: VocabPack = {
     },
     {
       id: "ryba_market",
-      cyrillic: "РЫБА",
+      script: "РЫБА",
       translation: "fish",
       matchesItemId: "ryba_smoked",
       pronunciation: "RIH-bah",
@@ -197,7 +197,7 @@ export const level6VocabPack: VocabPack = {
     },
     {
       id: "slivki",
-      cyrillic: "СЛИВКИ",
+      script: "СЛИВКИ",
       translation: "cream",
       matchesItemId: "slivki_jar",
       pronunciation: "SLEEF-kee",
@@ -205,7 +205,7 @@ export const level6VocabPack: VocabPack = {
     },
     {
       id: "grib",
-      cyrillic: "ГРИБ",
+      script: "ГРИБ",
       translation: "mushroom",
       matchesItemId: "grib_basket",
       pronunciation: "GREEB",

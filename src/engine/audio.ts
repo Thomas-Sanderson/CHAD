@@ -17,19 +17,19 @@ export function pronounceWord(word: VocabWord): void {
     const src = word.audioNormal ?? word.audioSlow!;
     const audio = new Audio(src);
     audio.play().catch(() => {
-      doSpeak(word.cyrillic);
+      doSpeak(word.script, word.pronunciation);
     });
     return;
   }
 
-  doSpeak(word.cyrillic);
+  doSpeak(word.script, word.pronunciation);
 }
 
 export function speakText(text: string): void {
   doSpeak(text);
 }
 
-function doSpeak(text: string): void {
+function doSpeak(text: string, pronunciation?: string): void {
   if (typeof speechSynthesis === "undefined") return;
 
   // Clear any pending queued speech
@@ -40,15 +40,20 @@ function doSpeak(text: string): void {
 
   // If currently speaking, cancel and wait before re-speaking.
   // If idle, speak immediately.
+  // For scripts without browser TTS support (Amharic), use pronunciation (Latin) with English voice
+  const lang = detectLang(text);
+  const speakable = (lang !== "ru-RU" && pronunciation) ? pronunciation : text;
+  const speakLang = (lang !== "ru-RU" && pronunciation) ? "en-US" : lang;
+
   if (speaking) {
     speechSynthesis.cancel();
     speaking = false;
     pendingSpeech = setTimeout(() => {
       pendingSpeech = null;
-      fireSpeak(text);
+      fireSpeak(speakable, speakLang);
     }, 80);
   } else {
-    fireSpeak(text);
+    fireSpeak(speakable, speakLang);
   }
 }
 
@@ -58,11 +63,11 @@ function detectLang(text: string): string {
   return "ru-RU";
 }
 
-function fireSpeak(text: string): void {
+function fireSpeak(text: string, lang?: string): void {
   if (typeof speechSynthesis === "undefined") return;
 
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = detectLang(text);
+  utterance.lang = lang ?? detectLang(text);
   utterance.rate = 0.8;
   utterance.onstart = () => { speaking = true; };
   utterance.onend = () => { speaking = false; };

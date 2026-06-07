@@ -46,7 +46,7 @@ function FlatMenu({ learnedWords, onSelect, onCancel }: Props) {
         <div style={S.flatList}>
           {learnedWords.map((word) => (
             <button key={word.id} style={S.flatWord} onClick={() => handleSelect(word)}>
-              <span style={S.wordCyr}>{word.cyrillic}</span>
+              <span style={S.wordCyr}>{word.script}</span>
               <span style={S.wordTrans}>{word.translation}</span>
             </button>
           ))}
@@ -66,7 +66,7 @@ interface LetterGroup {
 function groupByChar(words: VocabWord[], charIndex: number): LetterGroup[] {
   const map = new Map<string, VocabWord[]>();
   for (const w of words) {
-    const ch = w.cyrillic.charAt(charIndex) || "?";
+    const ch = w.script.charAt(charIndex) || "?";
     const list = map.get(ch) ?? [];
     list.push(w);
     map.set(ch, list);
@@ -86,7 +86,7 @@ function WASDNavigator({ learnedWords, onSelect, onCancel }: Props) {
   const activeWords = useMemo(() => {
     return learnedWords.filter((w) => {
       for (let i = 0; i < path.length; i++) {
-        if (w.cyrillic.charAt(i) !== path[i]) return false;
+        if (w.script.charAt(i) !== path[i]) return false;
       }
       return true;
     });
@@ -310,7 +310,7 @@ function LetterColumn({
       <div style={S.wordCol}>
         {group.words.slice(0, 4).map((w) => (
           <button key={w.id} style={S.wordItem} onClick={() => onWordClick(w)}>
-            <span style={S.wordCyr}>{w.cyrillic}</span>
+            <span style={S.wordCyr}>{w.script}</span>
             <span style={S.wordTrans}>{w.translation}</span>
           </button>
         ))}

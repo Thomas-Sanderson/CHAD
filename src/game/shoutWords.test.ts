@@ -20,7 +20,7 @@ describe("buildShoutWords", () => {
     const words = buildShoutWords(belarusSkin, learnedFromL1L2, 5);
     const grib = words.find(w => w.id === "grib");
     expect(grib).toBeDefined();
-    expect(grib!.cyrillic).toBe("ГРИБ");
+    expect(grib!.script).toBe("ГРИБ");
     expect(grib!.matchesItemId).toBe("grib_basket");
   });
 

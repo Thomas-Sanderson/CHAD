@@ -1,6 +1,6 @@
 export interface VocabWord {
   id: string;
-  cyrillic: string;
+  script: string;
   translation: string;
   matchesItemId: string | null; // null for meta-words like "produkty"
   pronunciation?: string; // phonetic hint, e.g. "smeh-TAH-nah"
@@ -37,7 +37,7 @@ export interface RevealLine {
 export interface CollectibleItem {
   id: string;
   name: string;
-  cyrillic: string; // Russian name, spoken on collection
+  script: string; // native script name, spoken on collection
   description: string;
   isDecoy: boolean;
   color: string; // placeholder color for rectangle rendering

@@ -90,7 +90,7 @@ export function RevealScreen({
             <div key={word.id} style={styles.revealCard}>
               <div style={styles.wordRow}>
                 <div style={styles.wordStack}>
-                  <span style={styles.cyrillicWord}>{word.cyrillic}</span>
+                  <span style={styles.scriptWord}>{word.script}</span>
                   {word.pronunciation && <span style={styles.pronunciation}>{word.pronunciation}</span>}
                   {word.ipa && <span style={styles.ipa}>{word.ipa}</span>}
                 </div>

@@ -5,19 +5,19 @@ import type { VocabPack, CollectibleItem } from "../types";
 const vocabPack: VocabPack = {
   levelId: "test",
   words: [
-    { id: "smetana", cyrillic: "СМЕТАНА", translation: "sour cream", matchesItemId: "smetana_tub" },
-    { id: "kefir", cyrillic: "КЕФИР", translation: "kefir", matchesItemId: "kefir_bottle" },
-    { id: "kolbasa", cyrillic: "КОЛБАСА", translation: "sausage", matchesItemId: "kolbasa_link" },
-    { id: "produkty", cyrillic: "ПРОДУКТЫ", translation: "groceries", matchesItemId: null },
+    { id: "smetana", script: "СМЕТАНА", translation: "sour cream", matchesItemId: "smetana_tub" },
+    { id: "kefir", script: "КЕФИР", translation: "kefir", matchesItemId: "kefir_bottle" },
+    { id: "kolbasa", script: "КОЛБАСА", translation: "sausage", matchesItemId: "kolbasa_link" },
+    { id: "produkty", script: "ПРОДУКТЫ", translation: "groceries", matchesItemId: null },
   ],
 };
 
 const itemDefs = new Map<string, CollectibleItem>([
-  ["smetana_tub", { id: "smetana_tub", name: "White Tub", cyrillic: "СМЕТАНА", description: "", isDecoy: false, color: "#fff" }],
-  ["kefir_bottle", { id: "kefir_bottle", name: "Tall Bottle", cyrillic: "КЕФИР", description: "", isDecoy: false, color: "#fff" }],
-  ["kolbasa_link", { id: "kolbasa_link", name: "Sausage", cyrillic: "КОЛБАСА", description: "", isDecoy: false, color: "#fff" }],
-  ["pickle_jar", { id: "pickle_jar", name: "Pickle Jar", cyrillic: "ОГУРЦЫ", description: "", isDecoy: true, color: "#fff" }],
-  ["bread_loaf", { id: "bread_loaf", name: "Bread", cyrillic: "БАТОН", description: "", isDecoy: true, color: "#fff" }],
+  ["smetana_tub", { id: "smetana_tub", name: "White Tub", script: "СМЕТАНА", description: "", isDecoy: false, color: "#fff" }],
+  ["kefir_bottle", { id: "kefir_bottle", name: "Tall Bottle", script: "КЕФИР", description: "", isDecoy: false, color: "#fff" }],
+  ["kolbasa_link", { id: "kolbasa_link", name: "Sausage", script: "КОЛБАСА", description: "", isDecoy: false, color: "#fff" }],
+  ["pickle_jar", { id: "pickle_jar", name: "Pickle Jar", script: "ОГУРЦЫ", description: "", isDecoy: true, color: "#fff" }],
+  ["bread_loaf", { id: "bread_loaf", name: "Bread", script: "БАТОН", description: "", isDecoy: true, color: "#fff" }],
 ]);
 
 describe("checkInference", () => {

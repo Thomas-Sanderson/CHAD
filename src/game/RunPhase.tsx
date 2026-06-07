@@ -77,7 +77,7 @@ export function RunPhase({ level, itemDefs, environment, onGateReached, learnedW
           pronounceWord(matchingWord);
         } else {
           const itemDef = itemDefs.get(newItemId!);
-          if (itemDef?.cyrillic) speakText(itemDef.cyrillic);
+          if (itemDef?.script) speakText(itemDef.script);
         }
       }
 

@@ -55,12 +55,12 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
   }, [phoneticHint]);
 
   // Build a map of cyrillic words for highlighting
-  const cyrillicWordMap = new Map(vocabPack.words.map((w) => [w.cyrillic, w]));
+  const cyrillicWordMap = new Map(vocabPack.words.map((w) => [w.script, w]));
 
   function handleCyrillicClick(word: VocabWord) {
     pronounceWord(word);
     if (word.pronunciation || word.ipa) {
-      setPhoneticHint({ word: word.cyrillic, pronunciation: word.pronunciation, ipa: word.ipa, until: Date.now() + 3000 });
+      setPhoneticHint({ word: word.script, pronunciation: word.pronunciation, ipa: word.ipa, until: Date.now() + 3000 });
     }
   }
 
@@ -79,7 +79,7 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
             result.push(
               <span
                 key={`cyr-${key++}`}
-                style={styles.cyrillic}
+                style={styles.script}
                 onClick={(e) => { e.stopPropagation(); handleCyrillicClick(word); }}
               >
                 {cyr}

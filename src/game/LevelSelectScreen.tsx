@@ -58,7 +58,7 @@ export function LevelSelectScreen({ levels, progress, onSelectLevel, skinName, o
                 <div style={styles.levelWords}>
                   {level.vocabPack.words
                     .filter(w => w.matchesItemId !== null)
-                    .map(w => w.cyrillic)
+                    .map(w => w.script)
                     .join("  ")}
                 </div>
                 {completed && prog && (

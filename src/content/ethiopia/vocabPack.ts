@@ -5,7 +5,7 @@ export const level1VocabPack: VocabPack = {
   words: [
     {
       id: "buna",
-      cyrillic: "ቡና",
+      script: "ቡና",
       translation: "coffee",
       matchesItemId: "buna_bag",
       pronunciation: "BOO-nah",
@@ -13,7 +13,7 @@ export const level1VocabPack: VocabPack = {
     },
     {
       id: "wetet",
-      cyrillic: "ወተት",
+      script: "ወተት",
       translation: "milk",
       matchesItemId: "wetet_jug",
       pronunciation: "wuh-TET",
@@ -21,7 +21,7 @@ export const level1VocabPack: VocabPack = {
     },
     {
       id: "dabo",
-      cyrillic: "ዳቦ",
+      script: "ዳቦ",
       translation: "bread",
       matchesItemId: "dabo_round",
       pronunciation: "DAH-bo",
@@ -29,7 +29,7 @@ export const level1VocabPack: VocabPack = {
     },
     {
       id: "sukwar",
-      cyrillic: "ስኳር",
+      script: "ስኳር",
       translation: "sugar",
       matchesItemId: "sukwar_bag_eth",
       pronunciation: "suh-KWAR",
@@ -43,7 +43,7 @@ export const level2VocabPack: VocabPack = {
   words: [
     {
       id: "shiro",
-      cyrillic: "ሽሮ",
+      script: "ሽሮ",
       translation: "chickpea flour",
       matchesItemId: "shiro_bag",
       pronunciation: "SHEE-ro",
@@ -51,7 +51,7 @@ export const level2VocabPack: VocabPack = {
     },
     {
       id: "berbere",
-      cyrillic: "በርበሬ",
+      script: "በርበሬ",
       translation: "spice blend",
       matchesItemId: "berbere_tin",
       pronunciation: "ber-beh-RAY",
@@ -59,7 +59,7 @@ export const level2VocabPack: VocabPack = {
     },
     {
       id: "qibe",
-      cyrillic: "ቅቤ",
+      script: "ቅቤ",
       translation: "clarified butter",
       matchesItemId: "qibe_jar",
       pronunciation: "kuh-BAY",
@@ -67,7 +67,7 @@ export const level2VocabPack: VocabPack = {
     },
     {
       id: "timatim",
-      cyrillic: "ቲማቲም",
+      script: "ቲማቲም",
       translation: "tomato",
       matchesItemId: "timatim_tomato",
       pronunciation: "tee-mah-TEEM",
@@ -81,7 +81,7 @@ export const level3VocabPack: VocabPack = {
   words: [
     {
       id: "injera",
-      cyrillic: "እንጀራ",
+      script: "እንጀራ",
       translation: "flatbread",
       matchesItemId: "injera_roll",
       pronunciation: "in-JEH-rah",
@@ -89,7 +89,7 @@ export const level3VocabPack: VocabPack = {
     },
     {
       id: "miser",
-      cyrillic: "ምስር",
+      script: "ምስር",
       translation: "lentils",
       matchesItemId: "miser_bag",
       pronunciation: "muh-SIR",
@@ -97,7 +97,7 @@ export const level3VocabPack: VocabPack = {
     },
     {
       id: "qey_sir",
-      cyrillic: "ቀይ ስር",
+      script: "ቀይ ስር",
       translation: "beetroot",
       matchesItemId: "qey_sir_beet",
       pronunciation: "KAY sir",
@@ -105,7 +105,7 @@ export const level3VocabPack: VocabPack = {
     },
     {
       id: "karya",
-      cyrillic: "ቃሪያ",
+      script: "ቃሪያ",
       translation: "green pepper",
       matchesItemId: "karya_pepper",
       pronunciation: "KAH-ree-yah",
@@ -119,7 +119,7 @@ export const level4VocabPack: VocabPack = {
   words: [
     {
       id: "jebena",
-      cyrillic: "ጀበና",
+      script: "ጀበና",
       translation: "coffee pot",
       matchesItemId: "jebena_pot",
       pronunciation: "jeh-BEH-nah",
@@ -127,7 +127,7 @@ export const level4VocabPack: VocabPack = {
     },
     {
       id: "rekbot",
-      cyrillic: "ርኩብ",
+      script: "ርኩብ",
       translation: "small cup",
       matchesItemId: "rekbot_cup",
       pronunciation: "ruh-KOOB",
@@ -135,7 +135,7 @@ export const level4VocabPack: VocabPack = {
     },
     {
       id: "itan",
-      cyrillic: "ዕጣን",
+      script: "ዕጣን",
       translation: "incense",
       matchesItemId: "itan_incense",
       pronunciation: "uh-TAHN",
@@ -143,7 +143,7 @@ export const level4VocabPack: VocabPack = {
     },
     {
       id: "kolo",
-      cyrillic: "ቆሎ",
+      script: "ቆሎ",
       translation: "roasted barley snack",
       matchesItemId: "kolo_bowl",
       pronunciation: "KO-lo",
