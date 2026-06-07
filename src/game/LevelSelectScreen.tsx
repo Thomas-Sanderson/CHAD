@@ -18,7 +18,7 @@ export function LevelSelectScreen({ levels, progress, onSelectLevel, skinName, o
     <div style={styles.container}>
       {onBackToSkins && (
         <button style={styles.backButton} onClick={onBackToSkins}>
-          &larr; Change skin
+          &larr; Change country
         </button>
       )}
       <div style={styles.header}>

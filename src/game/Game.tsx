@@ -7,6 +7,7 @@ import { checkInference, calculateLevelScore } from "./index";
 import type { LevelScore } from "./scoring";
 import { buildShoutWords } from "./shoutWords";
 import { SkinSelectScreen } from "./SkinSelectScreen";
+import { BootScreen } from "./BootScreen";
 import { BriefingScreen } from "./BriefingScreen";
 import { RunPhase } from "./RunPhase";
 import { GateScreen } from "./GateScreen";
@@ -16,7 +17,7 @@ import { WinScreen } from "./WinScreen";
 
 const ALL_SKINS: SkinConfig[] = [belarusSkin, ethiopiaSkin];
 
-type GameScreen = "SKIN_SELECT" | "LEVEL_SELECT" | Phase | "WIN";
+type GameScreen = "BOOT" | "COUNTRY_SELECT" | "LEVEL_SELECT" | Phase | "WIN";
 
 interface LevelProgress {
   completed: boolean;
@@ -53,7 +54,7 @@ function progressKey(skinId: string, levelId: string): string {
 }
 
 export function Game() {
-  const [screen, setScreen] = useState<GameScreen>("SKIN_SELECT");
+  const [screen, setScreen] = useState<GameScreen>("BOOT");
   const [currentSkin, setCurrentSkin] = useState<SkinConfig>(belarusSkin);
   const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
   const [progress, setProgress] = useState(() => loadProgress());
@@ -200,7 +201,7 @@ export function Game() {
   }, []);
 
   const handleBackToSkins = useCallback(() => {
-    setScreen("SKIN_SELECT");
+    setScreen("COUNTRY_SELECT");
   }, []);
 
   const totalScore = useMemo(() => {
@@ -216,7 +217,9 @@ export function Game() {
   const hasNextLevel = currentLevelIndex < currentSkin.levels.length - 1;
 
   switch (screen) {
-    case "SKIN_SELECT":
+    case "BOOT":
+      return <BootScreen onComplete={() => setScreen("COUNTRY_SELECT")} />;
+    case "COUNTRY_SELECT":
       return (
         <SkinSelectScreen
           skins={ALL_SKINS}
