@@ -20,7 +20,7 @@ export function SkinSelectScreen({ skins, onSelectSkin }: Props) {
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>CHAD RESCUES NOBODY</h1>
-      <div style={styles.subtitle}>Choose your adventure</div>
+      <div style={styles.subtitle}>Different language. Same cargo shorts.</div>
 
       <div style={styles.skinGrid}>
         {skins.map((skin) => {
