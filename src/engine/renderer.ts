@@ -331,19 +331,19 @@ export function renderFrame(
     ctx.shadowBlur = 0;
 
     // Flag animation — rises on flagpole when Chad approaches
-    if (state.flagProgress > 0) {
-      const poleX = gx + 58; // right side of building, matching flagpole column
+    if (state.flagProgress > 0 && env.flagColors.length > 0) {
+      const poleX = gx + 58;
       const poleTop = gy + 4;
       const poleBottom = gy + sprH - 12;
-      const flagHeight = 12;
+      const stripeCount = env.flagColors.length;
+      const flagHeight = stripeCount * 4;
       const flagWidth = 16;
-      // Flag descends from top as progress rises (1 = fully raised)
       const flagY = poleBottom - (poleBottom - poleTop) * state.flagProgress;
-      // Belarus flag: red top half, green bottom half
-      ctx.fillStyle = "#cc2222";
-      ctx.fillRect(poleX + 1, flagY, flagWidth, flagHeight / 2);
-      ctx.fillStyle = "#33aa55";
-      ctx.fillRect(poleX + 1, flagY + flagHeight / 2, flagWidth, flagHeight / 2);
+      const stripeH = flagHeight / stripeCount;
+      for (let i = 0; i < stripeCount; i++) {
+        ctx.fillStyle = env.flagColors[i]!;
+        ctx.fillRect(poleX + 1, flagY + i * stripeH, flagWidth, stripeH);
+      }
     }
   }
 

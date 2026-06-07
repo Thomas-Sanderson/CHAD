@@ -266,6 +266,7 @@ export function Game() {
           vocabPack={currentLevel.vocabPack}
           gateFailText={currentLevel.gateFailText}
           gateFailQuiet={currentLevel.gateFailQuiet}
+          mentorName={currentSkin.mentorName}
           onRestart={handleRestart}
           onReveal={handleReveal}
         />

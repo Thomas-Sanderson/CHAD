@@ -23,6 +23,7 @@ export const ethiopiaSkin: SkinConfig = {
 
   environment: {
     skyColor: "#4a90c4",
+    flagColors: ["#33aa55", "#ffcc33", "#cc2222"],
     showStars: false,
     groundTile: cobblestoneGround,
     platformTile: woodTinPlatform,

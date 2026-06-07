@@ -16,6 +16,7 @@ export interface LevelConfig {
 export interface SkinEnvironment {
   skyColor: string;
   showStars: boolean;
+  flagColors: string[]; // horizontal stripes top→bottom
   groundTile: SpriteData;
   platformTile: SpriteData;
   gateSprite: SpriteData;

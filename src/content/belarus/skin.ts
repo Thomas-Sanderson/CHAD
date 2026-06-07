@@ -36,6 +36,7 @@ export const belarusSkin: SkinConfig = {
   environment: {
     skyColor: "#1a1a2e",
     showStars: true,
+    flagColors: ["#cc2222", "#33aa55"],
     groundTile,
     platformTile,
     gateSprite: apartmentSprite,

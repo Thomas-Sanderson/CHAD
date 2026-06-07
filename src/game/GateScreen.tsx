@@ -6,11 +6,12 @@ interface Props {
   vocabPack: VocabPack;
   gateFailText: string;
   gateFailQuiet: boolean;
+  mentorName?: string;
   onRestart: () => void;
   onReveal: () => void;
 }
 
-export function GateScreen({ result, vocabPack, gateFailText, gateFailQuiet, onRestart, onReveal }: Props) {
+export function GateScreen({ result, vocabPack, gateFailText, gateFailQuiet, mentorName = "Anya", onRestart, onReveal }: Props) {
   const [phase, setPhase] = useState<"checking" | "result">("checking");
   const [shakeClass, setShakeClass] = useState(false);
 
@@ -50,7 +51,7 @@ export function GateScreen({ result, vocabPack, gateFailText, gateFailQuiet, onR
           Chad somehow got the right groceries.
         </div>
         <button style={styles.continueButton} onClick={onReveal}>
-          See what Anya thinks &rarr;
+          See what {mentorName} thinks &rarr;
         </button>
       </div>
     );
