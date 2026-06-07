@@ -14,14 +14,13 @@ const ATTEMPTS = [
 
 // Human-like typing: variable speed, occasional pauses
 function humanDelay(): number {
-  const base = 45 + Math.random() * 55;
-  // Occasional longer pause (thinking)
-  if (Math.random() < 0.08) return base + 150 + Math.random() * 200;
+  const base = 30 + Math.random() * 35;
+  if (Math.random() < 0.06) return base + 80 + Math.random() * 100;
   return base;
 }
 
-function backspaceDelay(): number {
-  return 25 + Math.random() * 25;
+function wordBackspaceDelay(): number {
+  return 40 + Math.random() * 30;
 }
 
 export function BootScreen({ onComplete }: Props) {
@@ -80,7 +79,7 @@ export function BootScreen({ onComplete }: Props) {
 
           // Hesitate before finishing some attempts
           if (attempt.hesitate > 0 && i === attempt.hesitate) {
-            await sleep(400 + Math.random() * 300);
+            await sleep(200 + Math.random() * 200);
           }
         }
 
@@ -91,21 +90,20 @@ export function BootScreen({ onComplete }: Props) {
         }
 
         // Pause before backspacing (realizing it's wrong)
-        await sleep(600 + Math.random() * 500);
+        await sleep(300 + Math.random() * 300);
 
-        // Backspace — sometimes delete in chunks
+        // Backspace by whole words
         let remaining = attempt.text;
         while (remaining.length > 0) {
           if (!active || cancelled.current) return;
-          // Sometimes delete 2-3 chars at once (holding backspace)
-          const chunk = Math.random() < 0.3 ? Math.min(2 + Math.floor(Math.random() * 2), remaining.length) : 1;
-          remaining = remaining.slice(0, -chunk);
+          const lastSpace = remaining.lastIndexOf(" ");
+          remaining = lastSpace > 0 ? remaining.slice(0, lastSpace) : "";
           setDisplay(remaining);
-          await sleep(backspaceDelay());
+          await sleep(wordBackspaceDelay());
         }
 
         // Brief pause before next attempt
-        await sleep(300 + Math.random() * 200);
+        await sleep(150 + Math.random() * 150);
       }
     }
 
@@ -147,7 +145,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   prompt: {
     fontFamily: "monospace",
-    fontSize: 22,
+    fontSize: 15,
     lineHeight: 1.6,
   },
   prefix: {
