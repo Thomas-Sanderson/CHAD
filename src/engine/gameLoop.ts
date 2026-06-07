@@ -348,7 +348,8 @@ export function updateGameState(
       if (door) {
         const isLocked = door.locked && !state.unlockedDoors.includes(door.id);
         if (input.shout && isLocked) {
-          // P key — open shout menu for locked door
+          // P key — say "please" then open shout menu
+          speakText("пожалуйста");
           state.shoutMenuOpen = true;
           state.shoutTarget = door.id;
           input.shout = false;

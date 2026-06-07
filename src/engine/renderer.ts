@@ -397,7 +397,7 @@ export function renderFrame(
       ctx.font = "bold 13px monospace";
       ctx.textAlign = "center";
       ctx.fillText(
-        isLocked ? "[E] Shout" : (isInterior ? "[E] Exit" : "[E] Enter"),
+        isLocked ? "[P] Please" : (isInterior ? "[E] Exit" : "[E] Enter"),
         CANVAS_WIDTH / 2,
         CANVAS_HEIGHT - 36
       );
