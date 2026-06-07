@@ -63,7 +63,7 @@ export function SkinSelectScreen({ skins, onSelectSkin }: Props) {
       </div>
 
       <div style={styles.footer}>
-        Same Chad. Different groceries. Different language. Same cargo shorts.
+        Same Chad. Different groceries.
       </div>
     </div>
   );
