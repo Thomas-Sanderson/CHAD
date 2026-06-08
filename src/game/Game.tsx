@@ -8,6 +8,7 @@ import type { LevelScore } from "./scoring";
 import { buildShoutWords } from "./shoutWords";
 import { SkinSelectScreen } from "./SkinSelectScreen";
 import { BootScreen } from "./BootScreen";
+import { TitleScreen } from "./TitleScreen";
 import { BriefingScreen } from "./BriefingScreen";
 import { RunPhase } from "./RunPhase";
 import { GateScreen } from "./GateScreen";
@@ -17,7 +18,7 @@ import { WinScreen } from "./WinScreen";
 
 const ALL_SKINS: SkinConfig[] = [belarusSkin, ethiopiaSkin];
 
-type GameScreen = "BOOT" | "COUNTRY_SELECT" | "LEVEL_SELECT" | Phase | "WIN";
+type GameScreen = "BOOT" | "TITLE" | "COUNTRY_SELECT" | "LEVEL_SELECT" | Phase | "WIN";
 
 interface LevelProgress {
   completed: boolean;
@@ -218,7 +219,9 @@ export function Game() {
 
   switch (screen) {
     case "BOOT":
-      return <BootScreen onComplete={() => setScreen("COUNTRY_SELECT")} />;
+      return <BootScreen onComplete={() => setScreen("TITLE")} />;
+    case "TITLE":
+      return <TitleScreen onStart={() => setScreen("COUNTRY_SELECT")} />;
     case "COUNTRY_SELECT":
       return (
         <SkinSelectScreen
