@@ -291,15 +291,19 @@ export function renderFrame(
     const keeperSpr = env.shopkeeperBabushkaSprite ?? shopkeeperBabushkaSprite;
     drawSprite(ctx, keeperSpr, sk.x - cam, sk.y, 2);
 
-    // Speech bubble above shopkeeper when shout response is active
-    if (state.shoutResponse) {
-      const isDa = state.shoutResponse.type === "da";
+    // Speech bubble above shopkeeper — shout response OR shop conversation
+    const bubbleText = state.shoutResponse?.text ?? state.shopBubble?.text ?? null;
+    if (bubbleText) {
+      const isDa = state.shoutResponse?.type === "da";
+      const isNet = state.shoutResponse?.type === "net";
       const sprW = (keeperSpr[0]?.length ?? 24) * 2;
       const skCenterX = sk.x - cam + sprW / 2;
       ctx.font = "bold 14px monospace";
-      const textW = ctx.measureText(state.shoutResponse.text).width + 16;
+      const textW = ctx.measureText(bubbleText).width + 16;
       const bubbleY = sk.y - 30;
-      ctx.fillStyle = isDa ? "rgba(76, 175, 80, 0.9)" : "rgba(244, 67, 54, 0.9)";
+      ctx.fillStyle = isDa ? "rgba(76, 175, 80, 0.9)"
+        : isNet ? "rgba(244, 67, 54, 0.9)"
+        : "rgba(40, 40, 70, 0.9)";
       ctx.fillRect(skCenterX - textW / 2, bubbleY, textW, 24);
       ctx.beginPath();
       ctx.moveTo(skCenterX - 6, bubbleY + 24);
@@ -308,7 +312,85 @@ export function renderFrame(
       ctx.fill();
       ctx.fillStyle = "#fff";
       ctx.textAlign = "center";
-      ctx.fillText(state.shoutResponse.text, skCenterX, bubbleY + 17);
+      ctx.fillText(bubbleText, skCenterX, bubbleY + 17);
+    }
+
+    // --- Whiteboard: shopkeeper response with pronunciation + translation ---
+    if (state.shopBubble) {
+      const boardW = 260;
+      const boardH = 110;
+      const boardX = CANVAS_WIDTH - boardW - 30;
+      const boardY = 35;
+      const pad = 12;
+      const innerW = boardW - pad * 2;
+
+      // Board background — off-white with subtle border
+      ctx.fillStyle = "#f0ece0";
+      ctx.fillRect(boardX, boardY, boardW, boardH);
+      ctx.strokeStyle = "#8B7355";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(boardX, boardY, boardW, boardH);
+      ctx.strokeStyle = "#c4b89a";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(boardX + 3, boardY + 3, boardW - 6, boardH - 6);
+
+      const cx = boardX + boardW / 2;
+      let ty = boardY + pad + 14;
+
+      // Script — large, dark, allow two lines for long phrases
+      ctx.fillStyle = "#2a2a3e";
+      ctx.font = "bold 14px monospace";
+      ctx.textAlign = "center";
+      const scriptText = state.shopBubble.text;
+      const scriptW = ctx.measureText(scriptText).width;
+      if (scriptW > innerW) {
+        // Word-wrap into two lines
+        const words = scriptText.split(" ");
+        let line1 = "";
+        let line2 = "";
+        for (const w of words) {
+          const test = line1 ? line1 + " " + w : w;
+          if (ctx.measureText(test).width <= innerW) {
+            line1 = test;
+          } else {
+            line2 += (line2 ? " " : "") + w;
+          }
+        }
+        ctx.fillText(line1, cx, ty);
+        if (line2) { ty += 16; ctx.fillText(line2, cx, ty); }
+      } else {
+        ctx.fillText(scriptText, cx, ty);
+      }
+      ty += 18;
+
+      // Pronunciation — muted brown
+      if (state.shopBubble.pronunciation) {
+        ctx.fillStyle = "#8B6914";
+        ctx.font = "12px monospace";
+        ctx.fillText(state.shopBubble.pronunciation, cx, ty, innerW);
+        ty += 16;
+      }
+
+      // Translation — gray italic
+      if (state.shopBubble.translation) {
+        ctx.fillStyle = "#666";
+        ctx.font = "italic 12px monospace";
+        ctx.fillText(state.shopBubble.translation, cx, ty, innerW);
+      }
+    }
+
+    // --- [E] Talk prompt when near shopkeeper ---
+    if (state.nearShopkeeper && !state.shopConvoMenuOpen) {
+      const keeperW = (keeperSpr[0]?.length ?? 24) * 2;
+      const promptX = sk.x - cam + keeperW / 2;
+      const promptY = sk.y - 40;
+      ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+      const tw = ctx.measureText("[E] Talk").width + 16;
+      ctx.fillRect(promptX - tw / 2, promptY - 6, tw, 22);
+      ctx.fillStyle = "#FFD54F";
+      ctx.font = "bold 12px monospace";
+      ctx.textAlign = "center";
+      ctx.fillText("[E] Talk", promptX, promptY + 11);
     }
   }
 
@@ -490,17 +572,18 @@ function renderDoor(
   const dx = door.x - cam;
 
   if (segmentType === "street") {
-    // Building facade behind door — distinct per shop type
+    // Building facade behind door — scale 4 to match landmark buildings
+    const facadeScale = 4;
     const labelFacade = door.label ? shopFacadeSprites[door.label] : undefined;
     const facade = labelFacade ?? env.shopFrontStallSprite ?? env.shopExteriorSprite ?? shopExteriorSprite;
-    const facadeW = (facade[0]?.length ?? 24) * 2;
-    const facadeH = facade.length * 2;
-    drawSprite(ctx, facade, dx + door.width / 2 - facadeW / 2, door.y + door.height - facadeH, 2);
+    const facadeW = (facade[0]?.length ?? 24) * facadeScale;
+    const facadeH = facade.length * facadeScale;
+    drawSprite(ctx, facade, dx + door.width / 2 - facadeW / 2, door.y + door.height - facadeH, facadeScale);
 
     // Sign text above facade
     if (door.label) {
       ctx.fillStyle = "#FFD54F";
-      ctx.font = "bold 11px monospace";
+      ctx.font = "bold 13px monospace";
       ctx.textAlign = "center";
       ctx.shadowColor = "#000";
       ctx.shadowBlur = 3;
@@ -512,9 +595,9 @@ function renderDoor(
     const isLocked = door.locked && !state.unlockedDoors.includes(door.id);
     if (isLocked) {
       const lockSpr = env.doorLockedOverlay ?? doorLockedOverlay;
-      const lockW = (lockSpr[0]?.length ?? 10) * 2;
-      const lockH = lockSpr.length * 2;
-      drawSprite(ctx, lockSpr, dx + door.width / 2 - lockW / 2, door.y + door.height / 2 - lockH / 2, 2);
+      const lockW = (lockSpr[0]?.length ?? 10) * facadeScale;
+      const lockH = lockSpr.length * facadeScale;
+      drawSprite(ctx, lockSpr, dx + door.width / 2 - lockW / 2, door.y + door.height / 2 - lockH / 2, facadeScale);
     }
   } else {
     // Interior door — back door sprite
@@ -531,3 +614,4 @@ function renderDoor(
     drawSprite(ctx, signSpr, dx + door.width / 2 - signW / 2, sprY - signH - 4, 2);
   }
 }
+

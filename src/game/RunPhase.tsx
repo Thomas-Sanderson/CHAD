@@ -1,6 +1,6 @@
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useCallback, useState, useMemo } from "react";
 import type { LevelData, GameRunState, InputState, SkinEnvironment, VocabWord } from "../types";
-import type { CollectibleItem } from "../types/content";
+import type { CollectibleItem, ConvoPhrase } from "../types/content";
 import {
   createGameRunState,
   updateGameState,
@@ -12,7 +12,7 @@ import {
   CANVAS_HEIGHT,
 } from "../engine";
 import type { HudData } from "../engine";
-import { pronounceWord, speakText } from "../engine/audio";
+import { pronounceWord, speakText, speakQueued } from "../engine/audio";
 import { sfxJump, sfxCollect, sfxHeartLost, sfxDoorEnter, sfxShout, sfxGateSuccess, isMuted, setMuted } from "../engine/sfx";
 import { setMusicVolume } from "../engine/music";
 import { ShoutMenu } from "./ShoutMenu";
@@ -54,7 +54,9 @@ export function RunPhase({
   const maxHeartsRef = useRef(maxHearts);
   maxHeartsRef.current = maxHearts;
   const [shoutMenuOpen, setShoutMenuOpen] = useState(false);
+  const [shopConvoOpen, setShopConvoOpen] = useState(false);
   const [inventoryOpen, setInventoryOpen] = useState(false);
+  const [currentSegmentId, setCurrentSegmentId] = useState<string | null>(null);
   const pausedRef = useRef(false);
   const prevHitCountRef = useRef(0);
   const prevOnGroundRef = useRef(true);
@@ -158,6 +160,16 @@ export function RunPhase({
         sfxDoorEnter();
       }
       prevTransitionRef.current = !!gameState.transition;
+
+      // Track segment for conversation phrase derivation
+      setCurrentSegmentId(gameState.currentSegmentId);
+
+      // Check if game state wants to open shop convo menu
+      if (gameState.shopConvoMenuOpen && !pausedRef.current) {
+        gameState.shopConvoMenuOpen = false;
+        pausedRef.current = true;
+        setShopConvoOpen(true);
+      }
 
       // Check if game state wants to open shout menu
       if (gameState.shoutMenuOpen && !pausedRef.current) {
@@ -279,6 +291,110 @@ export function RunPhase({
     pausedRef.current = false;
   }, []);
 
+  // --- Shop conversation via WASD trie picker ---
+  const convoPhrases = useMemo((): ConvoPhrase[] => {
+    if (!level.segments || !currentSegmentId) return [];
+    const seg = level.segments.find(s => s.id === currentSegmentId);
+    if (!seg?.shopkeeper?.conversation) return [];
+    const phrases = seg.shopkeeper.conversation.playerPhrases;
+    const state = stateRef.current;
+    const hasNearItem = state?.nearItem !== null;
+    // Filter out ask/price if player isn't near a shelf item
+    return hasNearItem ? phrases : phrases.filter(p => p.action !== "ask" && p.action !== "price");
+  }, [level.segments, currentSegmentId]);
+
+  const handleShopConvoSelect = useCallback(
+    (word: VocabWord) => {
+      const state = stateRef.current;
+      if (!state || !level.segments) return;
+      const seg = level.segments.find(s => s.id === state.currentSegmentId);
+      if (!seg?.shopkeeper?.conversation) return;
+      const convo = seg.shopkeeper.conversation;
+      const phrase = word as ConvoPhrase;
+      // ShoutMenu already calls pronounceWord(word) — don't duplicate
+
+      // Init conversation tracking if needed
+      if (!state.shopConvo) {
+        state.shopConvo = { greetIndex: 0, farewellIndex: 0, askedItems: [] };
+      }
+
+      // Determine shopkeeper response based on action
+      let responseText: string;
+      let responsePron: string | undefined;
+      let responseTrans: string | undefined;
+      switch (phrase.action) {
+        case "greet": {
+          const greeting = convo.greetings[state.shopConvo.greetIndex % convo.greetings.length]!;
+          state.shopConvo.greetIndex++;
+          responseText = greeting.script;
+          responsePron = greeting.pronunciation;
+          responseTrans = greeting.translation;
+          break;
+        }
+        case "ask": {
+          if (!state.nearItem) { responseText = "..."; break; }
+          const itemDef = itemDefs.get(state.nearItem);
+          if (!itemDef) { responseText = "..."; break; }
+          const isKnown = state.shopConvo.askedItems.includes(state.nearItem);
+          if (isKnown) {
+            responseText = `${itemDef.script}. ${convo.askKnown.script}`;
+            responsePron = convo.askKnown.pronunciation;
+            responseTrans = `${itemDef.name}. ${convo.askKnown.translation ?? "You know."}`;
+          } else {
+            state.shopConvo.askedItems.push(state.nearItem);
+            responseText = `${convo.askPrefix}${itemDef.script}.`;
+            responseTrans = `This is ${itemDef.name}.`;
+          }
+          break;
+        }
+        case "price": {
+          if (!state.nearItem) { responseText = "..."; break; }
+          const price = convo.prices[state.nearItem];
+          responseText = price?.script ?? "...";
+          responsePron = price?.pronunciation;
+          responseTrans = price?.translation;
+          break;
+        }
+        case "bye": {
+          const hasItems = state.collectedItems.length > 0;
+          if (hasItems) {
+            const farewell = convo.farewells[state.shopConvo.farewellIndex % convo.farewells.length]!;
+            state.shopConvo.farewellIndex++;
+            responseText = farewell.script;
+            responsePron = farewell.pronunciation;
+            responseTrans = farewell.translation;
+          } else {
+            responseText = convo.farewellEmpty.script;
+            responsePron = convo.farewellEmpty.pronunciation;
+            responseTrans = convo.farewellEmpty.translation;
+          }
+          break;
+        }
+      }
+
+      // Show shopkeeper speech bubble + whiteboard data
+      state.shopBubble = {
+        text: responseText,
+        pronunciation: responsePron,
+        translation: responseTrans,
+        until: state.elapsed + 3500,
+      };
+
+      // Queue shopkeeper response — babushka voice, plays after Chad finishes
+      speakQueued(responseText, { pitch: 1.3, rate: 0.75 });
+
+      // Close menu, unpause
+      setShopConvoOpen(false);
+      pausedRef.current = false;
+    },
+    [level, itemDefs]
+  );
+
+  const handleShopConvoCancel = useCallback(() => {
+    setShopConvoOpen(false);
+    pausedRef.current = false;
+  }, []);
+
   const handleInventoryDrop = useCallback((itemId: string) => {
     const state = stateRef.current;
     if (!state) return;
@@ -309,6 +425,18 @@ export function RunPhase({
             learnedWords={learnedWords}
             onSelect={handleShoutSelect}
             onCancel={handleShoutCancel}
+            chadVoice
+          />
+        )}
+        {shopConvoOpen && (
+          <ShoutMenu
+            learnedWords={convoPhrases}
+            onSelect={handleShopConvoSelect}
+            onCancel={handleShopConvoCancel}
+            forceWASD
+            chadVoice
+            title="TALK TO SHOPKEEPER"
+            subtitle="Spell a phrase with W/A/D, cycle with S"
           />
         )}
         {inventoryOpen && stateRef.current && (
@@ -321,7 +449,9 @@ export function RunPhase({
         )}
       </div>
       <div style={styles.controls}>
-        <span>&larr; &rarr; or A/D to move | &uarr; or W or Space to jump | E to enter/listen | P to shout | I for inventory</span>
+        <span>
+          &larr; &rarr; or A/D to move | &uarr; or W or Space to jump | E to enter/talk/listen | P to shout | I for inventory
+        </span>
       </div>
     </div>
   );

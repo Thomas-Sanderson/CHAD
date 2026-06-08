@@ -1,30 +1,37 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import type { VocabWord } from "../types";
-import { pronounceWord, speakText } from "../engine/audio";
+import { pronounceWord, speakText, speakAsChad } from "../engine/audio";
 
 interface Props {
   learnedWords: VocabWord[];
   onSelect: (word: VocabWord) => void;
   onCancel: () => void;
+  forceWASD?: boolean;
+  chadVoice?: boolean;
+  title?: string;
+  subtitle?: string;
 }
 
 const FLAT_LIST_THRESHOLD = 6;
 
-export function ShoutMenu({ learnedWords, onSelect, onCancel }: Props) {
-  const useFlatList = learnedWords.length <= FLAT_LIST_THRESHOLD;
+export function ShoutMenu({ learnedWords, onSelect, onCancel, forceWASD, chadVoice, title, subtitle }: Props) {
+  const useFlatList = !forceWASD && learnedWords.length <= FLAT_LIST_THRESHOLD;
 
   if (useFlatList) {
-    return <FlatMenu learnedWords={learnedWords} onSelect={onSelect} onCancel={onCancel} />;
+    return <FlatMenu learnedWords={learnedWords} onSelect={onSelect} onCancel={onCancel} chadVoice={chadVoice} title={title} subtitle={subtitle} />;
   }
-  return <WASDNavigator learnedWords={learnedWords} onSelect={onSelect} onCancel={onCancel} />;
+  return <WASDNavigator learnedWords={learnedWords} onSelect={onSelect} onCancel={onCancel} chadVoice={chadVoice} title={title} subtitle={subtitle} />;
 }
 
 // ── Flat list (≤6 words) ───────────────────────────────────────────
 
-function FlatMenu({ learnedWords, onSelect, onCancel }: Props) {
+function FlatMenu({ learnedWords, onSelect, onCancel, chadVoice, title, subtitle }: Props) {
   const handleSelect = useCallback(
-    (word: VocabWord) => { pronounceWord(word); onSelect(word); },
-    [onSelect]
+    (word: VocabWord) => {
+      if (chadVoice) speakAsChad(word.script); else pronounceWord(word);
+      onSelect(word);
+    },
+    [onSelect, chadVoice]
   );
 
   useEffect(() => {
@@ -39,10 +46,10 @@ function FlatMenu({ learnedWords, onSelect, onCancel }: Props) {
     <div style={S.overlay}>
       <div style={S.panel}>
         <div style={S.header}>
-          <h2 style={S.title}>SHOUT A WORD</h2>
+          <h2 style={S.title}>{title ?? "SHOUT A WORD"}</h2>
           <button style={S.closeBtn} onClick={onCancel}>&times;</button>
         </div>
-        <div style={S.subtitle}>What do you want from this shop?</div>
+        <div style={S.subtitle}>{subtitle ?? "What do you want from this shop?"}</div>
         <div style={S.flatList}>
           {learnedWords.map((word) => (
             <button key={word.id} style={S.flatWord} onClick={() => handleSelect(word)}>
@@ -76,7 +83,7 @@ function groupByChar(words: VocabWord[], charIndex: number): LetterGroup[] {
     .map(([letter, ws]) => ({ letter, words: ws }));
 }
 
-function WASDNavigator({ learnedWords, onSelect, onCancel }: Props) {
+function WASDNavigator({ learnedWords, onSelect, onCancel, chadVoice, title, subtitle }: Props) {
   // Drill path: each entry is the prefix char chosen
   const [path, setPath] = useState<string[]>([]);
   const [groupOffset, setGroupOffset] = useState(0);
@@ -114,11 +121,11 @@ function WASDNavigator({ learnedWords, onSelect, onCancel }: Props) {
 
   // Drill into a letter
   const drill = useCallback((letter: string) => {
-    speakText(letter);
+    if (!chadVoice) speakText(letter); // skip letter TTS in conversation mode
     setPath((p) => [...p, letter]);
     setGroupOffset(0);
     setHighlightKey(null);
-  }, []);
+  }, [chadVoice]);
 
   // Cycle S
   const cycle = useCallback(() => {
@@ -138,9 +145,9 @@ function WASDNavigator({ learnedWords, onSelect, onCancel }: Props) {
   }, [groups.length, path.length]);
 
   const handleWordClick = useCallback((word: VocabWord) => {
-    pronounceWord(word);
+    if (chadVoice) speakAsChad(word.script); else pronounceWord(word);
     onSelect(word);
-  }, [onSelect]);
+  }, [onSelect, chadVoice]);
 
   // Keyboard
   useEffect(() => {
@@ -208,7 +215,7 @@ function WASDNavigator({ learnedWords, onSelect, onCancel }: Props) {
     <div style={S.overlay}>
       <div style={{ ...S.panel, width: 460 }}>
         <div style={S.header}>
-          <h2 style={S.title}>SHOUT A WORD</h2>
+          <h2 style={S.title}>{title ?? "SHOUT A WORD"}</h2>
           <button style={S.closeBtn} onClick={onCancel}>&times;</button>
         </div>
         {pathDisplay && (
@@ -225,7 +232,7 @@ function WASDNavigator({ learnedWords, onSelect, onCancel }: Props) {
           </div>
         )}
         <div style={S.subtitle}>
-          {path.length === 0 ? "Navigate with W/A/D, cycle with S" : "Drill deeper or tap a word"}
+          {path.length === 0 ? (subtitle ?? "Navigate with W/A/D, cycle with S") : "Drill deeper or tap a word"}
         </div>
 
         {/* WASD layout */}

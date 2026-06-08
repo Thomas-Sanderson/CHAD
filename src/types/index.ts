@@ -12,6 +12,10 @@ export type {
   LevelData,
   DoorDef,
   ShopKeeperDef,
+  ShopKeeperConversation,
+  ShopkeeperPhrase,
+  ConvoAction,
+  ConvoPhrase,
   LevelSegment,
   LandmarkDef,
 } from "./content";
@@ -31,6 +35,7 @@ export type {
   InferenceResult,
   ShoutResponse,
   DoorTransition,
+  ShopConvoState,
 } from "./engine";
 
 export type {

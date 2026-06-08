@@ -1,7 +1,10 @@
 import type { InputState } from "../types";
 
 export function createInputState(): InputState {
-  return { left: false, right: false, jump: false, interact: false, shout: false, inventory: false };
+  return {
+    left: false, right: false, jump: false, interact: false,
+    shout: false, inventory: false,
+  };
 }
 
 export function setupKeyboardInput(state: InputState): () => void {

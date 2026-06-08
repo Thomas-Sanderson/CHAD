@@ -29,6 +29,11 @@ export function speakText(text: string): void {
   doSpeak(text);
 }
 
+/** Chad's voice: low pitch, slightly fast — bad robot attempting Russian */
+export function speakAsChad(text: string): void {
+  doSpeak(text, undefined, { pitch: 0.5, rate: 1.15 });
+}
+
 export function speakScold(text: string): void {
   doSpeak(text, undefined, { pitch: 1.4, rate: 1.1 });
 }
@@ -84,6 +89,20 @@ function fireSpeak(
   utterance.lang = lang ?? detectLang(text);
   utterance.rate = rate ?? 0.8;
   if (pitch !== undefined) utterance.pitch = pitch;
+  utterance.onstart = () => { speaking = true; };
+  utterance.onend = () => { speaking = false; };
+  utterance.onerror = () => { speaking = false; };
+  speechSynthesis.speak(utterance);
+}
+
+/** Queue speech after the current utterance finishes — no cancel, no overlap. */
+export function speakQueued(text: string, opts?: VoiceOpts): void {
+  if (typeof speechSynthesis === "undefined") return;
+  const lang = detectLang(text);
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = lang;
+  utterance.rate = opts?.rate ?? 0.8;
+  if (opts?.pitch !== undefined) utterance.pitch = opts.pitch;
   utterance.onstart = () => { speaking = true; };
   utterance.onend = () => { speaking = false; };
   utterance.onerror = () => { speaking = false; };
