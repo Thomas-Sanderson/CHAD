@@ -1,7 +1,7 @@
 import type { InputState } from "../types";
 
 export function createInputState(): InputState {
-  return { left: false, right: false, jump: false, interact: false, shout: false };
+  return { left: false, right: false, jump: false, interact: false, shout: false, inventory: false };
 }
 
 export function setupKeyboardInput(state: InputState): () => void {
@@ -31,6 +31,10 @@ export function setupKeyboardInput(state: InputState): () => void {
         state.shout = true;
         e.preventDefault();
         break;
+      case "KeyI":
+        state.inventory = true;
+        e.preventDefault();
+        break;
     }
   };
 
@@ -54,6 +58,9 @@ export function setupKeyboardInput(state: InputState): () => void {
         break;
       case "KeyP":
         state.shout = false;
+        break;
+      case "KeyI":
+        state.inventory = false;
         break;
     }
   };

@@ -22,6 +22,11 @@ import {
   counterSprite,
   landmarkSprites,
   shopFacadeSprites,
+  heartFullSprite,
+  heartEmptySprite,
+  bagSprite,
+  speakerOnSprite,
+  speakerOffSprite,
 } from "./sprites";
 
 const CANVAS_WIDTH = 800;
@@ -52,12 +57,19 @@ function getChadFrame(state: GameRunState): typeof chadIdle {
   return chadIdle;
 }
 
+export interface HudData {
+  hearts: number;
+  maxHearts: number;
+  muted: boolean;
+}
+
 export function renderFrame(
   ctx: CanvasRenderingContext2D,
   state: GameRunState,
   level: LevelData,
   itemDefs: Map<string, CollectibleItem>,
-  env: SkinEnvironment
+  env: SkinEnvironment,
+  hud?: HudData
 ): void {
   // Resolve current segment
   let currentSegment: LevelSegment | null = null;
@@ -242,6 +254,19 @@ export function renderFrame(
     ctx.shadowBlur = 0;
   }
 
+  // --- Dropping items (bouncing out from babushka collisions) ---
+  for (const drop of state.droppingItems) {
+    const sx = drop.x - cam;
+    const sprite = getItemSprite(drop.itemId);
+    if (sprite) {
+      drawSprite(ctx, sprite, sx, drop.y, 2);
+    } else {
+      const def = itemDefs.get(drop.itemId);
+      ctx.fillStyle = def?.color ?? "#FFD700";
+      ctx.fillRect(sx, drop.y, 32, 26);
+    }
+  }
+
   // --- Sacred item (potato / coffee bean — with idle bob) ---
   if (state.potato && !state.potato.collected) {
     const inSegment = !state.potato.segmentId || !currentSegment || state.potato.segmentId === currentSegment.id;
@@ -294,7 +319,13 @@ export function renderFrame(
 
     const sx = b.x - cam;
     const flipH = b.direction === -1;
-    drawSprite(ctx, env.npcSprite, sx, b.y, 2, flipH);
+    // Flash when stunned (head-bounced)
+    const isStunned = b.stunUntil > state.elapsed;
+    if (isStunned && Math.floor(state.elapsed / 80) % 2 === 0) {
+      // blink frame — skip drawing sprite
+    } else {
+      drawSprite(ctx, env.npcSprite, sx, b.y, 2, flipH);
+    }
     if (b.scoldingText && b.scoldingUntil > state.elapsed) {
       ctx.fillStyle = "#FF0000";
       ctx.font = "bold 12px monospace";
@@ -363,27 +394,38 @@ export function renderFrame(
   ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
   ctx.fillRect(0, 0, CANVAS_WIDTH, 30);
   ctx.shadowBlur = 0;
+
+  // Left: Score
   ctx.fillStyle = "#FFD54F";
   ctx.font = "bold 14px monospace";
   ctx.textAlign = "left";
   ctx.fillText(`Score: ${state.score}`, 10, 20);
-  ctx.textAlign = "center";
-  ctx.fillStyle = "#FFF";
-  if (isInterior && currentSegment) {
-    // Show which shop we're in
-    const entryDoor = level.segments
-      ?.flatMap(s => s.doors)
-      .find(d => d.targetSegmentId === currentSegment!.id);
-    const shopName = entryDoor?.label ?? "";
-    ctx.fillText(`Items: ${state.collectedItems.length}  |  ${shopName}`, CANVAS_WIDTH / 2, 20);
+
+  if (hud) {
+    // Center-left: Hearts
+    const heartsStartX = 150;
+    for (let i = 0; i < hud.maxHearts; i++) {
+      const sprite = i < hud.hearts ? heartFullSprite : heartEmptySprite;
+      drawSprite(ctx, sprite, heartsStartX + i * 18, 5, 2);
+    }
+
+    // Center-right: Bag + collected count
+    const bagX = CANVAS_WIDTH / 2 + 60;
+    drawSprite(ctx, bagSprite, bagX, 4, 2);
+    ctx.fillStyle = "#FFF";
+    ctx.font = "bold 13px monospace";
+    ctx.textAlign = "left";
+    ctx.fillText(`${state.collectedItems.length}`, bagX + 20, 20);
+
+    // Right: Mute icon
+    const muteX = CANVAS_WIDTH - 30;
+    drawSprite(ctx, hud.muted ? speakerOffSprite : speakerOnSprite, muteX, 5, 2);
   } else {
+    // Fallback HUD (no hearts data)
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#FFF";
     ctx.fillText(`Items: ${state.collectedItems.length}`, CANVAS_WIDTH / 2, 20);
   }
-  ctx.textAlign = "right";
-  ctx.fillStyle = "#aaa";
-  ctx.font = "12px monospace";
-  const itemNames = state.collectedItems.map(id => itemDefs.get(id)?.name ?? id).join(", ");
-  ctx.fillText(itemNames || "No items", CANVAS_WIDTH - 10, 20);
   ctx.textAlign = "left";
 
   // --- Interact prompt ---
@@ -402,6 +444,16 @@ export function renderFrame(
         CANVAS_HEIGHT - 36
       );
     }
+  }
+
+  // --- Gate interact prompt ---
+  if (state.nearGate && !state.reachedGate) {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+    ctx.fillRect(CANVAS_WIDTH / 2 - 60, CANVAS_HEIGHT - 55, 120, 28);
+    ctx.fillStyle = "#FFD54F";
+    ctx.font = "bold 13px monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("[E] Enter", CANVAS_WIDTH / 2, CANVAS_HEIGHT - 36);
   }
 
   // --- Shout response bubble (centered — only when no shopkeeper speech bubble) ---

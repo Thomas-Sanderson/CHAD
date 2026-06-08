@@ -2,8 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import type { VocabPack, InferenceResult, RevealLine } from "../types";
 import type { CollectibleItem } from "../types/content";
 import type { LevelScore } from "./scoring";
-import { getItemSprite, drawSprite } from "../engine/sprites";
+import { getItemSprite, drawSprite, heartFullSprite, heartEmptySprite } from "../engine/sprites";
 import { pronounceWord } from "../engine/audio";
+import { sfxHeartRefill } from "../engine/sfx";
 
 function ItemSpriteThumb({ itemId }: { itemId: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -33,6 +34,30 @@ function ItemSpriteThumb({ itemId }: { itemId: string }) {
   );
 }
 
+// Small canvas for drawing heart sprites in React
+function HeartSprite({ full }: { full: boolean }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const sprite = full ? heartFullSprite : heartEmptySprite;
+    canvas.width = 14;
+    canvas.height = 12;
+    ctx.clearRect(0, 0, 14, 12);
+    drawSprite(ctx, sprite, 0, 0, 2);
+  }, [full]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{ width: 14, height: 12, imageRendering: "pixelated" }}
+    />
+  );
+}
+
 interface Props {
   vocabPack: VocabPack;
   inferenceResult: InferenceResult;
@@ -43,6 +68,10 @@ interface Props {
   hasNextLevel: boolean;
   onNextLevel: () => void;
   onBackToLevels: () => void;
+  hearts?: number;
+  maxHearts?: number;
+  sacredItemName?: string;
+  onHeartsRefilled?: () => void;
 }
 
 export function RevealScreen({
@@ -55,12 +84,43 @@ export function RevealScreen({
   hasNextLevel,
   onNextLevel,
   onBackToLevels,
+  hearts = 3,
+  maxHearts = 3,
+  sacredItemName,
+  onHeartsRefilled,
 }: Props) {
   const [revealedCount, setRevealedCount] = useState(0);
   const prevRevealedCount = useRef(0);
+  const [heartsFilled, setHeartsFilled] = useState(0);
+  const [showExtraLife, setShowExtraLife] = useState(false);
+  const heartRefillDone = useRef(false);
 
   const targetWords = vocabPack.words.filter((w) => w.matchesItemId !== null);
   const allRevealed = revealedCount >= targetWords.length;
+
+  // Heart refill animation when all words revealed and potato collected
+  useEffect(() => {
+    if (!allRevealed || !collectedPotato || heartRefillDone.current) return;
+    heartRefillDone.current = true;
+
+    const wasFullHealth = hearts === maxHearts;
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < maxHearts) {
+        sfxHeartRefill(i);
+        setHeartsFilled(i + 1);
+        i++;
+      } else {
+        clearInterval(interval);
+        if (wasFullHealth && maxHearts < 5) {
+          setShowExtraLife(true);
+        }
+        onHeartsRefilled?.();
+      }
+    }, 400);
+
+    return () => clearInterval(interval);
+  }, [allRevealed, collectedPotato, hearts, maxHearts, onHeartsRefilled]);
 
   // Auto-pronounce when a new word is revealed
   useEffect(() => {
@@ -128,9 +188,19 @@ export function RevealScreen({
       ) : (
         <div style={styles.scoreSection}>
           {collectedPotato && (
-            <div style={styles.potatoLine}>
-              The Sacred Potato acknowledges your devotion. (+100)
-            </div>
+            <>
+              <div style={styles.potatoLine}>
+                {sacredItemName ?? "The Sacred Potato"} acknowledges your devotion. (+100)
+              </div>
+              <div style={styles.heartsRow}>
+                {Array.from({ length: maxHearts }, (_, i) => (
+                  <HeartSprite key={i} full={i < heartsFilled} />
+                ))}
+                {showExtraLife && (
+                  <span style={styles.extraLife}>+1 Extra Life!</span>
+                )}
+              </div>
+            </>
           )}
           <div style={styles.scoreBreakdown}>
             <div>Run score: {score.runScore}</div>
@@ -305,5 +375,18 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 16,
     fontWeight: "bold",
     cursor: "pointer",
+  },
+  heartsRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    justifyContent: "center",
+  },
+  extraLife: {
+    color: "#FFD54F",
+    fontFamily: "monospace",
+    fontSize: 14,
+    fontWeight: "bold",
+    marginLeft: 8,
   },
 };

@@ -29,7 +29,16 @@ export function speakText(text: string): void {
   doSpeak(text);
 }
 
-function doSpeak(text: string, pronunciation?: string): void {
+export function speakScold(text: string): void {
+  doSpeak(text, undefined, { pitch: 1.4, rate: 1.1 });
+}
+
+interface VoiceOpts {
+  pitch?: number;
+  rate?: number;
+}
+
+function doSpeak(text: string, pronunciation?: string, opts?: VoiceOpts): void {
   if (typeof speechSynthesis === "undefined") return;
 
   // Clear any pending queued speech
@@ -50,10 +59,10 @@ function doSpeak(text: string, pronunciation?: string): void {
     speaking = false;
     pendingSpeech = setTimeout(() => {
       pendingSpeech = null;
-      fireSpeak(speakable, speakLang);
+      fireSpeak(speakable, speakLang, opts?.pitch, opts?.rate);
     }, 80);
   } else {
-    fireSpeak(speakable, speakLang);
+    fireSpeak(speakable, speakLang, opts?.pitch, opts?.rate);
   }
 }
 
@@ -63,12 +72,18 @@ function detectLang(text: string): string {
   return "ru-RU";
 }
 
-function fireSpeak(text: string, lang?: string): void {
+function fireSpeak(
+  text: string,
+  lang?: string,
+  pitch?: number,
+  rate?: number,
+): void {
   if (typeof speechSynthesis === "undefined") return;
 
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = lang ?? detectLang(text);
-  utterance.rate = 0.8;
+  utterance.rate = rate ?? 0.8;
+  if (pitch !== undefined) utterance.pitch = pitch;
   utterance.onstart = () => { speaking = true; };
   utterance.onend = () => { speaking = false; };
   utterance.onerror = () => { speaking = false; };

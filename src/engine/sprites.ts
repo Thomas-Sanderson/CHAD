@@ -332,6 +332,62 @@ export const platformTile: SpriteData = [
   [BT, BT, BT, BT, BT, BT, BT, BT, BT, BT, BT, BT, BT, BT, BT, BT],
 ];
 
+// --- HUD sprites ---
+
+// Heart full (7×6) — red filled heart
+export const heartFullSprite: SpriteData = [
+  [_, RD, RD, _, RD, RD, _],
+  [RD, RD, RD, RD, RD, RD, RD],
+  [RD, RD, RD, RD, RD, RD, RD],
+  [_, RD, RD, RD, RD, RD, _],
+  [_, _, RD, RD, RD, _, _],
+  [_, _, _, RD, _, _, _],
+];
+
+// Heart empty (7×6) — dark gray outline
+export const heartEmptySprite: SpriteData = [
+  [_, DG, DG, _, DG, DG, _],
+  [DG, _, _, DG, _, _, DG],
+  [DG, _, _, _, _, _, DG],
+  [_, DG, _, _, _, DG, _],
+  [_, _, DG, _, DG, _, _],
+  [_, _, _, DG, _, _, _],
+];
+
+// Bag sprite (7×8) — brown sack
+export const bagSprite: SpriteData = [
+  [_, _, BN, BN, BN, _, _],
+  [_, BN, _, _, _, BN, _],
+  [_, BN, LN, LN, LN, BN, _],
+  [BN, LN, LN, LN, LN, LN, BN],
+  [BN, LN, LN, LN, LN, LN, BN],
+  [BN, LN, LN, LN, LN, LN, BN],
+  [BN, LN, LN, LN, LN, LN, BN],
+  [_, BN, BN, BN, BN, BN, _],
+];
+
+// Speaker on (7×7)
+export const speakerOnSprite: SpriteData = [
+  [_, _, DG, DG, _, _, _],
+  [_, DG, DG, DG, _, LG, _],
+  [DG, DG, DG, DG, LG, _, LG],
+  [DG, DG, DG, DG, _, LG, _],
+  [DG, DG, DG, DG, LG, _, LG],
+  [_, DG, DG, DG, _, LG, _],
+  [_, _, DG, DG, _, _, _],
+];
+
+// Speaker off (7×7) — speaker with X
+export const speakerOffSprite: SpriteData = [
+  [_, _, DG, DG, _, _, _],
+  [_, DG, DG, DG, RD, _, RD],
+  [DG, DG, DG, DG, _, RD, _],
+  [DG, DG, DG, DG, RD, _, _],
+  [DG, DG, DG, DG, _, RD, _],
+  [_, DG, DG, DG, RD, _, RD],
+  [_, _, DG, DG, _, _, _],
+];
+
 // Apartment gate (32×40 logical, drawn at 2x = 64×80)
 // Taller sprite to reach ground level. Includes flagpole on right side.
 export const apartmentSprite: SpriteData = [
@@ -358,33 +414,31 @@ export const apartmentSprite: SpriteData = [
   [AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,AT,AT,_,DG,_,_],
   [AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,WB,WB,WB,AT,AT,AT,AT,AT,_,DG,_,_],
   [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
-  // Light above door
-  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,YL,YL,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
-  // Door area
-  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
-  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
-  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
-  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,YL,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
-  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
-  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
-  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
-  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
-  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
-  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,DB,DB,DB,DB,DB,DB,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  // Canopy above door
+  [AT,AT,AT,AT,AT,AT,AT,AT,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,DG,DG,DG,DG,DG,DG,DG,DG,DG,DG,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  // Light
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,YL,YL,YL,YL,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  // Door frame + double door
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,BM,DB,DB,DB,DB,DB,DB,DB,DB,BM,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,BM,DB,DB,DB,BK,BK,DB,DB,DB,BM,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,BM,DB,DB,DB,BK,BK,DB,DB,DB,BM,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,BM,DB,DB,YL,BK,BK,YL,DB,DB,BM,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,BM,DB,DB,DB,BK,BK,DB,DB,DB,BM,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,BM,DB,DB,DB,BK,BK,DB,DB,DB,BM,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,BM,DB,DB,DB,BK,BK,DB,DB,DB,BM,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
+  [AT,AT,AT,AT,AT,AT,AT,AT,AT,BM,DB,DB,DB,BK,BK,DB,DB,DB,BM,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
   // Base
   [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
   [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
   [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
   [AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,AT,_,DG,_,_],
   [BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,BM,_,DG,_,_],
-  // Steps
-  [_,_,_,_,_,_,_,_,_,BL,BL,BL,BL,BL,BL,BL,BL,BL,BL,_,_,_,_,_,_,_,_,_,_,DG,_,_],
-  [_,_,_,_,_,_,_,_,BL,BL,BL,BL,BL,BL,BL,BL,BL,BL,BL,BL,_,_,_,_,_,_,_,_,_,DG,_,_],
-  // Flagpole base
-  [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,DG,DG,DG,_],
-  [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,DG,DG,DG,_],
-  [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+  // Foundation — full width, fills gap to ground
+  [BT,BT,BT,BT,BT,BT,BT,BT,BT,BL,BL,BL,BL,BL,BL,BL,BL,BL,BL,BT,BT,BT,BT,BT,BT,BT,BT,BT,DG,DG,DG,_],
+  [BT,BT,BT,BT,BT,BT,BT,BT,BL,BL,BL,BL,BL,BL,BL,BL,BL,BL,BL,BL,BT,BT,BT,BT,BT,BT,BT,BT,DG,DG,DG,_],
+  [BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,DG,DG,DG,_],
+  [BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,BT,DG,DG,DG,_],
 ];
 
 // --- Distinct shop exterior sprites (24×24 logical, drawn at 2x = 48×48) ---

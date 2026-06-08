@@ -69,4 +69,12 @@ export const ethiopiaSkin: SkinConfig = {
 
   sacredItemName: "The Sacred Coffee Bean",
   sacredItemLine: "The Sacred Coffee Bean knows. It always knew.",
+  deathText: "ሞተ!",
+  deathQuips: [
+    "The taxi does not slow down. I said this.",
+    "He saw it coming. I watched him see it.",
+    "...and he was doing so well.",
+    "The aunties tried to warn him.",
+    "I'm going to finish my coffee.",
+  ],
 };

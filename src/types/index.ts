@@ -25,6 +25,7 @@ export type {
   BabushkaState,
   PotatoState,
   CollectedInfo,
+  DroppingItem,
   GameRunState,
   InputState,
   InferenceResult,

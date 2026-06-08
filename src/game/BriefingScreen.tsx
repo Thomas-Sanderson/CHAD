@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { BriefingScript, VocabPack, VocabWord } from "../types";
 import { pronounceWord } from "../engine/audio";
 
@@ -53,6 +53,15 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
     const timer = setTimeout(() => setPhoneticHint(null), 3000);
     return () => clearTimeout(timer);
   }, [phoneticHint]);
+
+  // Auto-scroll messages to bottom
+  const messagesRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = messagesRef.current;
+    if (el) {
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    }
+  }, [visibleCount, typing]);
 
   // Build a map of cyrillic words for highlighting
   const cyrillicWordMap = new Map(vocabPack.words.map((w) => [w.script, w]));
@@ -114,7 +123,7 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
           </div>
         </div>
 
-        <div style={styles.messages}>
+        <div ref={messagesRef} style={styles.messages}>
           {briefing.messages.slice(0, visibleCount).map((msg, i) => {
             const isLast = i === visibleCount - 1;
             const showTyping = isLast && typing;
@@ -177,13 +186,14 @@ const styles: Record<string, React.CSSProperties> = {
   phone: {
     width: 380,
     maxWidth: "95vw",
+    height: 600,
+    maxHeight: "90vh",
     background: "#0f0f1a",
     borderRadius: 24,
     overflow: "hidden",
     boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
     display: "flex",
     flexDirection: "column",
-    maxHeight: "90vh",
   },
   phoneHeader: {
     background: "#1a1a2e",

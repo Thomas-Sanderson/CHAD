@@ -6,7 +6,7 @@ import type {
   CollectedInfo,
 } from "../types";
 import type { CollectibleItem, LevelSegment, PlatformDef, LandmarkDef } from "../types/content";
-import { speakText } from "./audio";
+import { speakText, speakScold } from "./audio";
 import {
   applyGravity,
   applyMovement,
@@ -16,6 +16,7 @@ import {
   playerAABB,
   PLAYER_WIDTH,
   PLAYER_HEIGHT,
+  GRAVITY,
 } from "./physics";
 import { CANVAS_WIDTH } from "./renderer";
 
@@ -24,6 +25,12 @@ const MARSHRUTKA_HEIGHT = 40;
 const BABUSHKA_SHOVE = 200;
 const RESPAWN_INVINCIBILITY = 1500; // ms
 const SCOLDING_DURATION = 800; // ms
+const HEAD_BOUNCE_VY = -250;
+const SUPER_BOUNCE_VY = -600;
+const BABUSHKA_STUN_DURATION = 500; // ms — babushka flashes, not Chad
+const ITEM_SIZE = 24;
+const DROP_BOUNCE_DAMPING = 0.45;
+const DROP_SETTLE_THRESHOLD = 40; // vy below this → item settles
 const TRANSITION_MS = 150; // ms per fade phase
 
 const DEFAULT_SCOLDINGS = [
@@ -102,6 +109,7 @@ export function createGameRunState(level: LevelData, scoldings?: string[]): Game
       height: 44,
       scoldingText: null,
       scoldingUntil: 0,
+      stunUntil: 0,
       segmentId: n._segmentId,
     })),
     potato: potatoData
@@ -110,6 +118,7 @@ export function createGameRunState(level: LevelData, scoldings?: string[]): Game
     remainingCollectibles: hasSegments
       ? []
       : level.collectibles.map(c => ({ itemId: c.itemId, x: c.x, y: c.y })),
+    droppingItems: [],
     camera: { x: 0 },
     score: 0,
     reachedGate: false,
@@ -125,8 +134,14 @@ export function createGameRunState(level: LevelData, scoldings?: string[]): Game
     shoutMenuOpen: false,
     shoutTarget: null,
     shoutResponse: null,
+    // Gate
+    nearGate: false,
     // Flag animation
     flagProgress: 0,
+    // Hearts system
+    hitCount: 0,
+    // Inventory
+    inventoryOpen: false,
   };
 }
 
@@ -191,6 +206,9 @@ export function updateGameState(
   // Input direction
   const dirX = (input.right ? 1 : 0) - (input.left ? 1 : 0);
 
+  // Capture jump intent before consuming (used for super-bounce on babushka heads)
+  const jumpPressed = input.jump;
+
   // Jump (consume the flag so it's one-shot)
   if (input.jump) {
     tryJump(state.player);
@@ -214,6 +232,7 @@ export function updateGameState(
 
   // Fall off bottom → respawn
   if (state.player.position.y > activeBounds.height + 100) {
+    state.hitCount++;
     respawnPlayer(state);
     return;
   }
@@ -221,15 +240,29 @@ export function updateGameState(
   // Platform collisions
   resolvePlatformCollisions(state.player, activePlatforms);
 
-  // Collectible pickups
+  // Collectible pickups (skip while invincible — prevents re-collecting dropped items)
   const pBox = playerAABB(state.player);
+  const canPickup = state.player.invincibleUntil < state.elapsed;
 
-  if (activeCollectiblesKey !== null) {
-    // Segment-based collectibles
-    const remaining = state.segmentCollectibles[activeCollectiblesKey];
-    if (remaining) {
-      state.segmentCollectibles[activeCollectiblesKey] = remaining.filter(item => {
-        const itemBox = { x: item.x, y: item.y, width: 24, height: 24 };
+  if (canPickup) {
+    if (activeCollectiblesKey !== null) {
+      // Segment-based collectibles
+      const remaining = state.segmentCollectibles[activeCollectiblesKey];
+      if (remaining) {
+        state.segmentCollectibles[activeCollectiblesKey] = remaining.filter(item => {
+          const itemBox = { x: item.x, y: item.y, width: ITEM_SIZE, height: ITEM_SIZE };
+          if (aabbOverlap(pBox, itemBox)) {
+            state.collectedItems.push(item.itemId);
+            state.score += 25;
+            return false;
+          }
+          return true;
+        });
+      }
+    } else {
+      // Non-segment collectibles (L1-5)
+      state.remainingCollectibles = state.remainingCollectibles.filter(item => {
+        const itemBox = { x: item.x, y: item.y, width: ITEM_SIZE, height: ITEM_SIZE };
         if (aabbOverlap(pBox, itemBox)) {
           state.collectedItems.push(item.itemId);
           state.score += 25;
@@ -238,17 +271,6 @@ export function updateGameState(
         return true;
       });
     }
-  } else {
-    // Non-segment collectibles (L1-5)
-    state.remainingCollectibles = state.remainingCollectibles.filter(item => {
-      const itemBox = { x: item.x, y: item.y, width: 24, height: 24 };
-      if (aabbOverlap(pBox, itemBox)) {
-        state.collectedItems.push(item.itemId);
-        state.score += 25;
-        return false;
-      }
-      return true;
-    });
   }
 
   // Sacred Potato (check segment match)
@@ -275,25 +297,101 @@ export function updateGameState(
     if (currentSegment && b.segmentId && b.segmentId !== currentSegment.id) continue;
     if (!currentSegment && b.segmentId) continue;
 
-    // Patrol
-    b.x += b.speed * b.direction * dt;
-    if (b.x > b.originX + b.patrolRange) b.direction = -1;
-    if (b.x < b.originX - b.patrolRange) b.direction = 1;
+    // Patrol (skip while stunned)
+    if (b.stunUntil < state.elapsed) {
+      b.x += b.speed * b.direction * dt;
+      if (b.x > b.originX + b.patrolRange) b.direction = -1;
+      if (b.x < b.originX - b.patrolRange) b.direction = 1;
+    }
 
     // Collision with player
     const bBox = { x: b.x, y: b.y, width: b.width, height: b.height };
     if (
       aabbOverlap(pBox, bBox) &&
-      state.player.invincibleUntil < state.elapsed
+      state.player.invincibleUntil < state.elapsed &&
+      b.stunUntil < state.elapsed
     ) {
-      const shoveDir = state.player.position.x > b.x ? 1 : -1;
-      state.player.velocity.x = shoveDir * BABUSHKA_SHOVE;
-      state.player.velocity.y = -150;
-      state.player.invincibleUntil = state.elapsed + RESPAWN_INVINCIBILITY;
-      b.scoldingText = state.scoldings[Math.floor(Math.random() * state.scoldings.length)] ?? "!";
-      b.scoldingUntil = state.elapsed + SCOLDING_DURATION;
+      // Head bounce: player falling, bottom near babushka top, horizontally overlapping
+      const playerBottom = state.player.position.y + state.player.height;
+      const isHeadBounce =
+        state.player.velocity.y > 0 &&
+        playerBottom <= b.y + 8 &&
+        pBox.x + pBox.width > bBox.x &&
+        pBox.x < bBox.x + bBox.width;
+
+      if (isHeadBounce) {
+        // Super bounce if player pressed jump this frame, otherwise small bounce
+        state.player.velocity.y = jumpPressed ? SUPER_BOUNCE_VY : HEAD_BOUNCE_VY;
+        state.player.onGround = false;
+        // Stun the babushka (she flashes), NOT Chad
+        b.stunUntil = state.elapsed + BABUSHKA_STUN_DURATION;
+        b.scoldingText = "блять";
+        b.scoldingUntil = state.elapsed + SCOLDING_DURATION;
+        speakScold("блять");
+      } else {
+        // Side collision: shove + drop item + scolding
+        const shoveDir = state.player.position.x > b.x ? 1 : -1;
+        state.player.velocity.x = shoveDir * BABUSHKA_SHOVE;
+        state.player.velocity.y = -150;
+        state.player.invincibleUntil = state.elapsed + RESPAWN_INVINCIBILITY;
+        b.scoldingText = state.scoldings[Math.floor(Math.random() * state.scoldings.length)] ?? "!";
+        b.scoldingUntil = state.elapsed + SCOLDING_DURATION;
+        speakScold(b.scoldingText);
+
+        // Drop last collected item — bounces out as a DroppingItem
+        if (state.collectedItems.length > 0) {
+          const droppedId = state.collectedItems.pop()!;
+          state.droppingItems.push({
+            itemId: droppedId,
+            x: state.player.position.x,
+            y: state.player.position.y,
+            vx: -shoveDir * 120, // flies opposite to Chad's shove direction
+            vy: -200,
+          });
+          state.score = Math.max(0, state.score - 25);
+        }
+      }
     }
   }
+
+  // Dropping items — bounce physics, settle into collectibles
+  state.droppingItems = state.droppingItems.filter(item => {
+    item.vy += GRAVITY * dt;
+    item.x += item.vx * dt;
+    item.y += item.vy * dt;
+
+    // Platform collision — bounce or settle
+    for (const p of activePlatforms) {
+      if (
+        item.vy > 0 &&
+        item.y + ITEM_SIZE >= p.y &&
+        item.y + ITEM_SIZE <= p.y + p.height &&
+        item.x + ITEM_SIZE > p.x &&
+        item.x < p.x + p.width
+      ) {
+        if (Math.abs(item.vy) < DROP_SETTLE_THRESHOLD) {
+          // Settle: convert to static collectible
+          const info: CollectedInfo = { itemId: item.itemId, x: item.x, y: p.y - ITEM_SIZE };
+          if (activeCollectiblesKey !== null) {
+            const seg = state.segmentCollectibles[activeCollectiblesKey];
+            if (seg) seg.push(info);
+          } else {
+            state.remainingCollectibles.push(info);
+          }
+          return false;
+        }
+        item.y = p.y - ITEM_SIZE;
+        item.vy *= -DROP_BOUNCE_DAMPING;
+        item.vx *= 0.7;
+        return true;
+      }
+    }
+
+    // Fell out of bounds
+    if (item.y > activeBounds.height + 100) return false;
+
+    return true;
+  });
 
   // Marshrutka spawning (from current segment hazards or level hazards)
   for (const h of activeHazards) {
@@ -326,6 +424,7 @@ export function updateGameState(
       aabbOverlap(pBox, mBox) &&
       state.player.invincibleUntil < state.elapsed
     ) {
+      state.hitCount++;
       respawnPlayer(state);
     }
 
@@ -370,6 +469,23 @@ export function updateGameState(
     }
   }
 
+  // Gate check (only in first segment or non-segment levels) — before landmarks so E isn't consumed
+  if (!currentSegment || isFirstSegment) {
+    const gateBox = {
+      x: level.gatePosition.x,
+      y: level.gatePosition.y,
+      width: 60,
+      height: 80,
+    };
+    state.nearGate = aabbOverlap(pBox, gateBox);
+    if (state.nearGate && input.interact) {
+      state.reachedGate = true;
+      input.interact = false;
+    }
+  } else {
+    state.nearGate = false;
+  }
+
   // Landmark audio — E near a landmark speaks its label
   if (input.interact && currentSegment?.type !== "interior") {
     const landmarks: LandmarkDef[] = currentSegment?.landmarks ?? level.landmarks ?? [];
@@ -386,25 +502,6 @@ export function updateGameState(
   // Shout response decay
   if (state.shoutResponse && state.shoutResponse.until < state.elapsed) {
     state.shoutResponse = null;
-  }
-
-  // Gate check (only in first segment or non-segment levels)
-  if (!currentSegment || isFirstSegment) {
-    const gateBox = {
-      x: level.gatePosition.x,
-      y: level.gatePosition.y,
-      width: 60,
-      height: 80,
-    };
-    // Flag rises as Chad approaches (within 120px)
-    const distToGate = Math.abs(state.player.position.x - level.gatePosition.x);
-    if (distToGate < 120 && state.flagProgress < 1) {
-      state.flagProgress = Math.min(1, state.flagProgress + dt * 1.5);
-    }
-    if (aabbOverlap(pBox, gateBox)) {
-      state.flagProgress = 1;
-      state.reachedGate = true;
-    }
   }
 
   // Camera — lerp for consistent feel in both street and interior

@@ -14,6 +14,9 @@ import { GateScreen } from "./GateScreen";
 import { RevealScreen } from "./RevealScreen";
 import { LevelSelectScreen } from "./LevelSelectScreen";
 import { WinScreen } from "./WinScreen";
+import { DeathScreen } from "./DeathScreen";
+import { sfxDeath } from "../engine/sfx";
+import { startMusic, stopMusic } from "../engine/music";
 
 const ALL_SKINS: SkinConfig[] = [belarusSkin, ethiopiaSkin];
 
@@ -62,6 +65,12 @@ export function Game() {
   const [levelScore, setLevelScore] = useState<LevelScore | null>(null);
   const [collectedPotato, setCollectedPotato] = useState(false);
   const [runScore, setRunScore] = useState(0);
+
+  // Hearts system
+  const [hearts, setHearts] = useState(3);
+  const [maxHearts, setMaxHearts] = useState(3);
+  const [isDead, setIsDead] = useState(false);
+  const [deathQuipIndex, setDeathQuipIndex] = useState(0);
 
   // Learned vocabulary tracking (persisted per skin)
   const [learnedVocab, setLearnedVocab] = useState<Record<string, string[]>>(() => {
@@ -143,6 +152,39 @@ export function Game() {
     [currentLevel, itemDefs]
   );
 
+  const handleHeartLost = useCallback(() => {
+    setHearts(prev => {
+      const next = prev - 1;
+      if (next <= 0) {
+        setIsDead(true);
+        setDeathQuipIndex(i => (i + 1) % (currentSkin.deathQuips.length || 1));
+        sfxDeath();
+        stopMusic();
+      }
+      return Math.max(0, next);
+    });
+  }, [currentSkin.deathQuips.length]);
+
+  const handleDeathRestart = useCallback(() => {
+    setHearts(3);
+    setMaxHearts(3);
+    setIsDead(false);
+    setInferenceResult(null);
+    setLevelScore(null);
+    setCollectedPotato(false);
+    setRunScore(0);
+    setScreen("BRIEFING");
+  }, []);
+
+  const handleHeartsRefilled = useCallback(() => {
+    // Called after reveal screen heart refill animation
+  }, []);
+
+  const checkGateResult = useCallback((state: GameRunState): boolean => {
+    const result = checkInference(state.collectedItems, currentLevel.vocabPack, itemDefs);
+    return result.passed;
+  }, [currentLevel, itemDefs]);
+
   const handleRestart = useCallback(() => {
     setInferenceResult(null);
     setLevelScore(null);
@@ -179,8 +221,20 @@ export function Game() {
         });
       }
     }
+    // Heart refill: sacred item delivery refills hearts; extra life if at max
+    if (collectedPotato) {
+      if (hearts === maxHearts && maxHearts < 5) {
+        setMaxHearts(prev => prev + 1);
+        setHearts(prev => prev + 1);
+      } else {
+        setHearts(maxHearts);
+      }
+    } else {
+      setHearts(maxHearts);
+    }
+
     setScreen("REVEAL");
-  }, [inferenceResult, runScore, collectedPotato, currentSkin.id, currentLevel.id]);
+  }, [inferenceResult, runScore, collectedPotato, currentSkin.id, currentLevel.id, hearts, maxHearts]);
 
   const handleNextLevel = useCallback(() => {
     const nextIndex = currentLevelIndex + 1;
@@ -216,6 +270,17 @@ export function Game() {
 
   const hasNextLevel = currentLevelIndex < currentSkin.levels.length - 1;
 
+  // Music lifecycle
+  useEffect(() => {
+    if (screen === "BOOT" || screen === "COUNTRY_SELECT" || screen === "LEVEL_SELECT") {
+      startMusic("title");
+    } else if (screen === "BRIEFING" || screen === "RUN") {
+      startMusic("level");
+    } else if (screen === "WIN") {
+      stopMusic();
+    }
+  }, [screen]);
+
   switch (screen) {
     case "BOOT":
       return <BootScreen onComplete={() => setScreen("COUNTRY_SELECT")} />;
@@ -248,6 +313,18 @@ export function Game() {
         />
       );
     case "RUN":
+      if (isDead) {
+        return (
+          <DeathScreen
+            deathText={currentSkin.deathText}
+            quip={currentSkin.deathQuips[deathQuipIndex % currentSkin.deathQuips.length] ?? "..."}
+            mentorAvatar={currentSkin.mentorAvatar}
+            mentorColor={currentSkin.mentorColor}
+            messageColor={currentSkin.messageColor}
+            onRestart={handleDeathRestart}
+          />
+        );
+      }
       return (
         <RunPhase
           key={`${currentSkin.id}-${currentLevel.id}`}
@@ -255,6 +332,10 @@ export function Game() {
           itemDefs={itemDefs}
           environment={currentSkin.environment}
           onGateReached={handleGateReached}
+          onHeartLost={handleHeartLost}
+          hearts={hearts}
+          maxHearts={maxHearts}
+          checkGateResult={checkGateResult}
           learnedWords={learnedWordsForSkin}
           vocabWords={currentLevel.vocabPack.words}
         />
@@ -283,6 +364,10 @@ export function Game() {
           hasNextLevel={hasNextLevel}
           onNextLevel={handleNextLevel}
           onBackToLevels={handleBackToLevels}
+          hearts={hearts}
+          maxHearts={maxHearts}
+          sacredItemName={currentSkin.sacredItemName}
+          onHeartsRefilled={handleHeartsRefilled}
         />
       ) : null;
     case "WIN":

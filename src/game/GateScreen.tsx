@@ -30,13 +30,23 @@ export function GateScreen({ result, vocabPack, gateFailText, gateFailQuiet, men
     return (
       <div style={styles.container}>
         <div style={styles.building}>
-          <div style={styles.buildingWindows}>
-            <div style={styles.window} />
-            <div style={styles.window} />
-            <div style={styles.window} />
-            <div style={styles.window} />
+          <div style={styles.buildingRoof} />
+          <div style={styles.buildingBody}>
+            <div style={styles.buildingWindows}>
+              <div style={styles.window} />
+              <div style={styles.window} />
+              <div style={styles.window} />
+              <div style={styles.window} />
+              <div style={styles.window} />
+              <div style={styles.window} />
+            </div>
+            <div style={styles.canopy} />
+            <div style={styles.doorFrame}>
+              <div style={styles.doorPanel} />
+              <div style={styles.doorPanel} />
+            </div>
           </div>
-          <div style={styles.door} />
+          <div style={styles.buildingBase} />
         </div>
         <div style={styles.checkingText}>Checking bags...</div>
       </div>
@@ -99,6 +109,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
+    justifyContent: "center",
     height: "100vh",
     overflowY: "auto",
     background: "#0a0a1a",
@@ -112,34 +123,62 @@ const styles: Record<string, React.CSSProperties> = {
     animation: "shake 0.5s ease-in-out",
   },
   building: {
-    width: 120,
-    height: 160,
-    background: "#aa9977",
-    borderRadius: "4px 4px 0 0",
-    position: "relative",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    padding: 16,
+    width: 160,
+  },
+  buildingRoof: {
+    width: 160,
+    height: 6,
+    background: "#776655",
+    borderRadius: "2px 2px 0 0",
+  },
+  buildingBody: {
+    width: 160,
+    background: "#aa9977",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    padding: "12px 16px",
+    gap: 8,
   },
   buildingWindows: {
     display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 12,
-    marginBottom: 16,
+    gridTemplateColumns: "1fr 1fr 1fr",
+    gap: 10,
   },
   window: {
     width: 28,
-    height: 24,
+    height: 22,
     background: "#88ccdd",
     borderRadius: 2,
+    border: "2px solid #776655",
   },
-  door: {
-    width: 36,
-    height: 50,
-    background: "#664422",
+  canopy: {
+    width: 100,
+    height: 6,
+    background: "#776655",
+    borderRadius: 2,
+    marginTop: 4,
+  },
+  doorFrame: {
+    display: "flex",
+    gap: 2,
+    padding: 4,
+    background: "#776655",
     borderRadius: "4px 4px 0 0",
-    marginTop: "auto",
+  },
+  doorPanel: {
+    width: 28,
+    height: 48,
+    background: "#664422",
+    borderRadius: 2,
+  },
+  buildingBase: {
+    width: 160,
+    height: 8,
+    background: "#887766",
   },
   checkingText: {
     fontSize: 20,

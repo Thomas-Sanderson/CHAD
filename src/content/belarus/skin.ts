@@ -64,6 +64,14 @@ export const belarusSkin: SkinConfig = {
   winMessage: "You survived grocery shopping in Belarus. ...I suppose you can stay.",
   sacredItemName: "The Sacred Potato",
   sacredItemLine: "The Sacred Potato is proud. Probably.",
+  deathText: "УБИТ!",
+  deathQuips: [
+    "Good. Maybe now he'll stop.",
+    "I told him about the buses.",
+    "...he walked into it. Again.",
+    "The marshrutka does not negotiate.",
+    "This is why I didn't give him my real number.",
+  ],
   wordsLearned: [
     { script: "СМЕТАНА", translation: "sour cream" },
     { script: "КЕФИР", translation: "kefir" },

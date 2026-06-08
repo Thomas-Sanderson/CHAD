@@ -43,6 +43,7 @@ export interface BabushkaState {
   height: number;
   scoldingText: string | null;
   scoldingUntil: number;
+  stunUntil: number;
   segmentId?: string;
 }
 
@@ -59,6 +60,14 @@ export interface CollectedInfo {
   itemId: string;
   x: number;
   y: number;
+}
+
+export interface DroppingItem {
+  itemId: string;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
 }
 
 export interface ShoutResponse {
@@ -82,6 +91,7 @@ export interface GameRunState {
   babushkas: BabushkaState[];
   potato: PotatoState | null;
   remainingCollectibles: CollectedInfo[];
+  droppingItems: DroppingItem[];
   camera: { x: number };
   score: number;
   reachedGate: boolean;
@@ -97,8 +107,14 @@ export interface GameRunState {
   shoutMenuOpen: boolean;
   shoutTarget: string | null; // door ID for locked doors
   shoutResponse: ShoutResponse | null;
+  // Gate
+  nearGate: boolean; // player is near gate building
   // Flag animation
   flagProgress: number; // 0→1, rises when gate reached
+  // Hearts system
+  hitCount: number; // incremented on marshrutka hit or fall death
+  // Inventory
+  inventoryOpen: boolean;
 }
 
 export interface InputState {
@@ -107,6 +123,7 @@ export interface InputState {
   shout: boolean; // P key — locked door shout menu
   jump: boolean;
   interact: boolean;
+  inventory: boolean; // I key — open inventory
 }
 
 export interface InferenceResult {

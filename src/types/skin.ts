@@ -57,4 +57,6 @@ export interface SkinConfig {
   wordsLearned: { script: string; translation: string }[];
   sacredItemName: string; // "The Sacred Potato" / "The Sacred Coffee Bean"
   sacredItemLine: string; // end-screen potato/bean line
+  deathText: string; // "УБИТ!" / "ሞተ!" — big heading on death screen
+  deathQuips: string[]; // rotating mentor lines for death screen
 }
