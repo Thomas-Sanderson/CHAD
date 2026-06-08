@@ -1,4 +1,14 @@
 import { useState, useEffect, useRef } from "react";
+import {
+  drawSprite,
+  chadWalk1,
+  chadWalk2,
+  chadJump,
+  babushkaSprite,
+  marshrutkaSprite,
+  potatoSprite,
+  groundTile,
+} from "../engine/sprites";
 
 interface Props {
   onComplete: () => void;
@@ -12,7 +22,6 @@ const ATTEMPTS = [
   { text: "Chad Rescues Nobody", hesitate: 0, backspaceAll: false },
 ];
 
-// Human-like typing: variable speed, occasional pauses
 function humanDelay(): number {
   const base = 30 + Math.random() * 35;
   if (Math.random() < 0.06) return base + 80 + Math.random() * 100;
@@ -23,76 +32,48 @@ function wordBackspaceDelay(): number {
   return 40 + Math.random() * 30;
 }
 
+const W = 600;
+const H = 200;
+const GROUND = 160;
+const SCALE = 2.5;
+const WALK_MS = 180;
+
 export function BootScreen({ onComplete }: Props) {
   const [display, setDisplay] = useState("");
-  const [cursor, setCursor] = useState(true);
-  const [done, setDone] = useState(false);
+  const [phase, setPhase] = useState<"typing" | "scene" | "ready">("typing");
+  const [blink, setBlink] = useState(true);
   const cancelled = useRef(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Cursor blink
   useEffect(() => {
-    const id = setInterval(() => setCursor((c) => !c), 530);
+    if (phase !== "typing") return;
+    const id = setInterval(() => setBlink((b) => !b), 530);
     return () => clearInterval(id);
-  }, []);
-
-  // Skip on click/key
-  useEffect(() => {
-    const skip = () => {
-      if (done) return;
-      cancelled.current = true;
-      setDisplay("Chad Rescues Nobody");
-      setDone(true);
-    };
-    window.addEventListener("click", skip);
-    window.addEventListener("keydown", skip);
-    return () => {
-      window.removeEventListener("click", skip);
-      window.removeEventListener("keydown", skip);
-    };
-  }, [done]);
-
-  // Auto-advance after done
-  useEffect(() => {
-    if (!done) return;
-    const timer = setTimeout(onComplete, 1200);
-    return () => clearTimeout(timer);
-  }, [done, onComplete]);
+  }, [phase]);
 
   // Typing animation
   useEffect(() => {
     let active = true;
-
-    async function sleep(ms: number): Promise<void> {
-      return new Promise((r) => setTimeout(r, ms));
-    }
+    const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
     async function run() {
       for (const attempt of ATTEMPTS) {
         if (!active || cancelled.current) return;
-
-        // Type forward
         for (let i = 0; i <= attempt.text.length; i++) {
           if (!active || cancelled.current) return;
-          const partial = attempt.text.slice(0, i);
-          setDisplay(partial);
+          setDisplay(attempt.text.slice(0, i));
           await sleep(humanDelay());
-
-          // Hesitate before finishing some attempts
           if (attempt.hesitate > 0 && i === attempt.hesitate) {
             await sleep(200 + Math.random() * 200);
           }
         }
-
         if (!attempt.backspaceAll) {
-          // Final answer — done
-          setDone(true);
+          await sleep(600);
+          if (active && !cancelled.current) setPhase("scene");
           return;
         }
-
-        // Pause before backspacing (realizing it's wrong)
         await sleep(300 + Math.random() * 300);
-
-        // Backspace by whole words
         let remaining = attempt.text;
         while (remaining.length > 0) {
           if (!active || cancelled.current) return;
@@ -101,8 +82,6 @@ export function BootScreen({ onComplete }: Props) {
           setDisplay(remaining);
           await sleep(wordBackspaceDelay());
         }
-
-        // Brief pause before next attempt
         await sleep(150 + Math.random() * 150);
       }
     }
@@ -111,18 +90,183 @@ export function BootScreen({ onComplete }: Props) {
     return () => { active = false; };
   }, []);
 
+  // Skip typing on click/key
+  useEffect(() => {
+    if (phase === "ready") return;
+    const skip = (e: KeyboardEvent | MouseEvent) => {
+      if (phase === "typing") {
+        cancelled.current = true;
+        setDisplay("Chad Rescues Nobody");
+        setPhase("scene");
+      } else if (phase === "scene") {
+        if (e instanceof KeyboardEvent && e.code !== "Enter" && e.code !== "Space") return;
+        onComplete();
+      }
+    };
+    window.addEventListener("keydown", skip);
+    window.addEventListener("click", skip);
+    return () => {
+      window.removeEventListener("keydown", skip);
+      window.removeEventListener("click", skip);
+    };
+  }, [phase, onComplete]);
+
+  // Scene animation
+  useEffect(() => {
+    if (phase !== "scene") return;
+
+    // Short delay then show "ready"
+    const readyTimer = setTimeout(() => setPhase("ready"), 800);
+
+    return () => clearTimeout(readyTimer);
+  }, [phase]);
+
+  // "PRESS ENTER" blink when ready
+  useEffect(() => {
+    if (phase !== "ready") return;
+    const id = setInterval(() => setBlink((b) => !b), 600);
+    return () => clearInterval(id);
+  }, [phase]);
+
+  // Enter to proceed when ready
+  useEffect(() => {
+    if (phase !== "ready") return;
+    const handler = (e: KeyboardEvent | MouseEvent) => {
+      if (e instanceof KeyboardEvent && e.code !== "Enter" && e.code !== "Space") return;
+      onComplete();
+    };
+    window.addEventListener("keydown", handler);
+    window.addEventListener("click", handler);
+    return () => {
+      window.removeEventListener("keydown", handler);
+      window.removeEventListener("click", handler);
+    };
+  }, [phase, onComplete]);
+
+  // Canvas animation (runs during scene + ready)
+  useEffect(() => {
+    if (phase !== "scene" && phase !== "ready") return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const chad = { x: -50, y: GROUND - 24 * SCALE, vy: 0, onGround: true };
+    const bab1 = { x: 380, speed: 0.4 };
+    const bab2 = { x: 500, speed: -0.3 };
+    const marsh = { x: W + 80 };
+    const marshSpeed = -3;
+    let elapsed = 0;
+    let animId: number;
+
+    const loop = (now: number) => {
+      elapsed = now;
+      ctx.clearRect(0, 0, W, H);
+
+      // Stars
+      ctx.fillStyle = "#ffffff";
+      for (let i = 0; i < 20; i++) {
+        const sx = (i * 137 + 50) % W;
+        const sy = (i * 97 + 10) % (GROUND - 30);
+        ctx.globalAlpha = 0.2 + (Math.sin(elapsed / 1000 + i) * 0.3 + 0.3);
+        ctx.fillRect(sx, sy, 2, 2);
+      }
+      ctx.globalAlpha = 1;
+
+      // Ground
+      for (let tx = 0; tx < W; tx += 16 * SCALE) {
+        drawSprite(ctx, groundTile, tx, GROUND, SCALE);
+      }
+
+      // Babushkas
+      bab1.x += bab1.speed;
+      if (bab1.x > 440 || bab1.x < 340) bab1.speed *= -1;
+      drawSprite(ctx, babushkaSprite, bab1.x, GROUND - 22 * SCALE, SCALE, bab1.speed < 0);
+
+      bab2.x += bab2.speed;
+      if (bab2.x > 540 || bab2.x < 450) bab2.speed *= -1;
+      drawSprite(ctx, babushkaSprite, bab2.x, GROUND - 22 * SCALE, SCALE, bab2.speed < 0);
+
+      // Marshrutka
+      marsh.x += marshSpeed;
+      if (marsh.x < -120) marsh.x = W + 80 + Math.random() * 200;
+      drawSprite(ctx, marshrutkaSprite, marsh.x, GROUND - 20 * SCALE, SCALE, true);
+
+      // Chad — walks, jumps over marshrutka
+      chad.x += 1.2;
+      if (chad.x > W + 60) chad.x = -50;
+
+      // Auto-jump when marshrutka is close
+      const distToMarsh = marsh.x - chad.x;
+      if (distToMarsh > 10 && distToMarsh < 70 && chad.onGround) {
+        chad.vy = -8;
+        chad.onGround = false;
+      }
+
+      // Gravity
+      if (!chad.onGround) {
+        chad.vy += 0.4;
+        chad.y += chad.vy;
+        if (chad.y >= GROUND - 24 * SCALE) {
+          chad.y = GROUND - 24 * SCALE;
+          chad.vy = 0;
+          chad.onGround = true;
+        }
+      }
+
+      const chadSprite = !chad.onGround
+        ? chadJump
+        : (Math.floor(elapsed / WALK_MS) % 2 === 0 ? chadWalk1 : chadWalk2);
+      drawSprite(ctx, chadSprite, chad.x, chad.y, SCALE);
+
+      // Sacred Potato floating
+      const potatoY = 30 + Math.sin(elapsed / 800) * 6;
+      ctx.fillStyle = "rgba(255, 238, 136, 0.12)";
+      ctx.beginPath();
+      ctx.arc(W / 2 + 8 * SCALE, potatoY + 5 * SCALE, 18, 0, Math.PI * 2);
+      ctx.fill();
+      drawSprite(ctx, potatoSprite, W / 2, potatoY, SCALE);
+
+      animId = requestAnimationFrame(loop);
+    };
+
+    animId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(animId);
+  }, [phase]);
+
   return (
     <div style={styles.container}>
-      <div style={styles.terminal}>
-        <div style={styles.prompt}>
-          <span style={styles.prefix}>C.H.A.D. &gt; </span>
-          <span style={styles.text}>{display}</span>
-          <span style={{ ...styles.cursor, opacity: cursor ? 1 : 0 }}>_</span>
-        </div>
+      {/* Title — typed during typing phase, stays as scene title */}
+      <div style={{
+        ...styles.title,
+        fontSize: phase === "typing" ? 15 : 28,
+        transition: "font-size 0.6s ease",
+      }}>
+        {phase === "typing" && <span style={styles.prefix}>C.H.A.D. &gt; </span>}
+        <span style={styles.titleText}>{display}</span>
+        {phase === "typing" && (
+          <span style={{ ...styles.cursor, opacity: blink ? 1 : 0 }}>_</span>
+        )}
       </div>
-      {done && (
-        <div style={styles.subtitle}>
-          a language-learning platformer about groceries, tea, and poor life choices
+
+      {/* Scene canvas — fades in */}
+      {(phase === "scene" || phase === "ready") && (
+        <canvas
+          ref={canvasRef}
+          width={W}
+          height={H}
+          style={{
+            ...styles.canvas,
+            opacity: phase === "ready" ? 1 : 0,
+            transition: "opacity 0.8s ease",
+          }}
+        />
+      )}
+
+      {/* Press enter */}
+      {phase === "ready" && (
+        <div style={{ ...styles.prompt, opacity: blink ? 1 : 0.2 }}>
+          PRESS ENTER
         </div>
       )}
     </div>
@@ -137,37 +281,36 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: "center",
     height: "100vh",
     background: "#0a0a1a",
-    gap: 24,
+    gap: 16,
   },
-  terminal: {
-    padding: "0 24px",
-    maxWidth: 600,
-  },
-  prompt: {
+  title: {
     fontFamily: "monospace",
-    fontSize: 15,
     lineHeight: 1.6,
+    textAlign: "center",
   },
   prefix: {
     color: "#555",
+    fontSize: 15,
   },
-  text: {
+  titleText: {
     color: "#FFD54F",
     fontWeight: "bold",
-    letterSpacing: 1,
+    letterSpacing: 2,
   },
   cursor: {
     color: "#FFD54F",
     fontWeight: "bold",
     transition: "opacity 0.1s",
   },
-  subtitle: {
-    color: "#555",
+  canvas: {
+    imageRendering: "pixelated" as const,
+    maxWidth: "95vw",
+  },
+  prompt: {
+    color: "#FFD54F",
     fontFamily: "monospace",
-    fontSize: 12,
-    textAlign: "center",
-    maxWidth: 400,
-    opacity: 0,
-    animation: "fadeIn 0.8s ease forwards",
+    fontSize: 13,
+    letterSpacing: 4,
+    transition: "opacity 0.15s",
   },
 };
