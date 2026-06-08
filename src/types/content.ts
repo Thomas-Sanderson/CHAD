@@ -83,12 +83,37 @@ export interface DoorDef {
   label?: string;
 }
 
+export interface ShopkeeperPhrase {
+  script: string;
+  pronunciation?: string;
+  ipa?: string;
+  translation?: string;
+}
+
+export type ConvoAction = "greet" | "ask" | "price" | "bye";
+
+export interface ConvoPhrase extends VocabWord {
+  action: ConvoAction;
+}
+
+export interface ShopKeeperConversation {
+  greetings: ShopkeeperPhrase[];
+  greetingWarm?: ShopkeeperPhrase; // warmer response after пожалуйста
+  askPrefix: string;               // "Это " — prepended to item script
+  askKnown: ShopkeeperPhrase;      // "Ты знаешь." — impatient for known words
+  prices: Record<string, ShopkeeperPhrase>; // itemId → price phrase
+  farewells: ShopkeeperPhrase[];
+  farewellEmpty: ShopkeeperPhrase; // "bought nothing?" line
+  playerPhrases: ConvoPhrase[];    // phrases player can say via WASD trie picker
+}
+
 export interface ShopKeeperDef {
   x: number;
   y: number;
   acceptsItemIds: string[];
   daResponses: string[];
   netResponses: string[];
+  conversation?: ShopKeeperConversation;
 }
 
 export interface LandmarkDef {

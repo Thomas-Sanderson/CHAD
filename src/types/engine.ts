@@ -76,6 +76,12 @@ export interface ShoutResponse {
   until: number;
 }
 
+export interface ShopConvoState {
+  greetIndex: number;
+  farewellIndex: number;
+  askedItems: string[];   // item IDs player has asked about
+}
+
 export interface DoorTransition {
   phase: "fadeOut" | "fadeIn";
   timer: number;
@@ -108,13 +114,19 @@ export interface GameRunState {
   shoutTarget: string | null; // door ID for locked doors
   shoutResponse: ShoutResponse | null;
   // Gate
-  nearGate: boolean; // player is near gate building
+  nearGate: boolean;
   // Flag animation
-  flagProgress: number; // 0→1, rises when gate reached
+  flagProgress: number;
   // Hearts system
-  hitCount: number; // incremented on marshrutka hit or fall death
+  hitCount: number;
   // Inventory
   inventoryOpen: boolean;
+  // Shopkeeper conversation
+  nearShopkeeper: boolean;
+  nearItem: string | null;       // item ID player is standing near (for "what is this?")
+  shopConvo: ShopConvoState | null;
+  shopConvoMenuOpen: boolean;
+  shopBubble: { text: string; pronunciation?: string; translation?: string; until: number } | null;
 }
 
 export interface InputState {

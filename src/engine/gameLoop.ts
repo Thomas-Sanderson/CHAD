@@ -6,7 +6,7 @@ import type {
   CollectedInfo,
 } from "../types";
 import type { CollectibleItem, LevelSegment, PlatformDef, LandmarkDef } from "../types/content";
-import { speakText, speakScold } from "./audio";
+import { speakText, speakScold, speakAsChad } from "./audio";
 import {
   applyGravity,
   applyMovement,
@@ -32,6 +32,8 @@ const ITEM_SIZE = 24;
 const DROP_BOUNCE_DAMPING = 0.45;
 const DROP_SETTLE_THRESHOLD = 40; // vy below this → item settles
 const TRANSITION_MS = 150; // ms per fade phase
+const SHOPKEEPER_RANGE = 120; // px — interaction radius
+const NEAR_ITEM_RANGE = 60;   // px — "standing near" an item
 
 const DEFAULT_SCOLDINGS = [
   "КУДА?!",
@@ -142,6 +144,12 @@ export function createGameRunState(level: LevelData, scoldings?: string[]): Game
     hitCount: 0,
     // Inventory
     inventoryOpen: false,
+    // Shopkeeper conversation
+    nearShopkeeper: false,
+    nearItem: null,
+    shopConvo: null,
+    shopConvoMenuOpen: false,
+    shopBubble: null,
   };
 }
 
@@ -448,7 +456,7 @@ export function updateGameState(
         const isLocked = door.locked && !state.unlockedDoors.includes(door.id);
         if (input.shout && isLocked) {
           // P key — say "please" then open shout menu
-          speakText("пожалуйста");
+          speakAsChad("пожалуйста");
           state.shoutMenuOpen = true;
           state.shoutTarget = door.id;
           input.shout = false;
@@ -467,6 +475,51 @@ export function updateGameState(
       if (input.interact) input.interact = false;
       if (input.shout) input.shout = false;
     }
+  }
+
+  // --- Shopkeeper conversation ---
+  if (currentSegment?.type === "interior" && currentSegment.shopkeeper?.conversation) {
+    const sk = currentSegment.shopkeeper;
+    const dist = Math.abs(state.player.position.x - sk.x);
+    state.nearShopkeeper = dist < SHOPKEEPER_RANGE;
+
+    // Detect nearest shelf item (for "what is this?")
+    const segItems = state.segmentCollectibles[currentSegment.id] ?? [];
+    let closestItem: string | null = null;
+    let closestDist = NEAR_ITEM_RANGE;
+    for (const item of segItems) {
+      const dx = Math.abs(state.player.position.x - item.x);
+      const dy = Math.abs(state.player.position.y - item.y);
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < closestDist) {
+        closestDist = d;
+        closestItem = item.itemId;
+      }
+    }
+    state.nearItem = closestItem;
+
+    // Init conversation tracking per segment visit
+    if (!state.shopConvo) {
+      state.shopConvo = { greetIndex: 0, farewellIndex: 0, askedItems: [] };
+    }
+
+    // E key near shopkeeper → open WASD trie picker (runs AFTER door handling)
+    if (state.nearShopkeeper && input.interact && !state.shopConvoMenuOpen) {
+      state.shopConvoMenuOpen = true;
+      input.interact = false;
+    }
+  } else {
+    state.nearShopkeeper = false;
+    state.nearItem = null;
+    // Reset conversation when leaving interior
+    if (state.shopConvo && !currentSegment?.shopkeeper) {
+      state.shopConvo = null;
+    }
+  }
+
+  // Shop bubble decay
+  if (state.shopBubble && state.elapsed > state.shopBubble.until) {
+    state.shopBubble = null;
   }
 
   // Gate check (only in first segment or non-segment levels) — before landmarks so E isn't consumed
@@ -522,3 +575,4 @@ function respawnPlayer(state: GameRunState): void {
   state.player.invincibleUntil = state.elapsed + RESPAWN_INVINCIBILITY;
   state.score = Math.max(0, state.score - 10);
 }
+

@@ -1,7 +1,71 @@
 import type { LevelData } from "../../types";
+import type { ShopKeeperConversation, ConvoPhrase } from "../../types/content";
 
 const GROUND_Y = 410;
 const LEVEL_WIDTH = 3400;
+
+// Shared greetings / farewells — all Belarus shopkeepers use these
+const GREETINGS = [
+  { script: "ЗДРАВСТВУЙТЕ.", pronunciation: "ZDRAH-stvooy-tyeh", ipa: "/ˈzdrastvujtʲe/", translation: "Hello." },
+  { script: "ДОБРЫЙ ДЕНЬ.", pronunciation: "DOH-briy DYEN", ipa: "/ˈdobrɨj dʲenʲ/", translation: "Good day." },
+];
+const GREETING_WARM = { script: "О, ПОЖАЛУЙСТА! ДОБРО ПОЖАЛОВАТЬ.", pronunciation: "oh, pah-ZHAH-loo-stah! dah-BROH pah-ZHAH-lah-vaht", ipa: "/pɐˈʐalʊstə dɐˈbro pɐˈʐaləvətʲ/", translation: "Oh, please! Welcome." };
+const FAREWELLS = [
+  { script: "ДО СВИДАНИЯ.", pronunciation: "dah svee-DAH-nyah", ipa: "/dɐ svʲɪˈdanʲɪjə/", translation: "Goodbye." },
+  { script: "ПОКА.", pronunciation: "pah-KAH", ipa: "/pɐˈka/", translation: "Bye." },
+  { script: "УДАЧИ.", pronunciation: "oo-DAH-chee", ipa: "/ʊˈdatɕɪ/", translation: "Good luck." },
+];
+const FAREWELL_EMPTY = { script: "ДО СВИДАНИЯ... ничего не купил?", pronunciation: "dah svee-DAH-nyah... nee-cheh-VOH nyeh koo-PEEL", ipa: "/dɐ svʲɪˈdanʲɪjə nʲɪtɕɪˈvo nʲe kʊˈpʲil/", translation: "Goodbye... bought nothing?" };
+const ASK_KNOWN = { script: "Ты знаешь.", pronunciation: "tih ZNAH-yesh", ipa: "/tɨ ˈznajɪʂ/", translation: "You know." };
+
+const PLAYER_PHRASES: ConvoPhrase[] = [
+  { id: "convo-greet-1", script: "ЗДРАВСТВУЙТЕ", translation: "Hello (formal)", matchesItemId: null, pronunciation: "ZDRAH-stvooy-tyeh", ipa: "/ˈzdrastvujtʲe/", action: "greet" },
+  { id: "convo-greet-2", script: "ПРИВЕТ", translation: "Hi (informal)", matchesItemId: null, pronunciation: "pree-VYET", ipa: "/prʲɪˈvʲet/", action: "greet" },
+  { id: "convo-ask", script: "ЧТО ЭТО", translation: "What is this?", matchesItemId: null, pronunciation: "SHTOH EH-tah", ipa: "/ʂto ˈɛtə/", action: "ask" },
+  { id: "convo-price", script: "СКОЛЬКО", translation: "How much?", matchesItemId: null, pronunciation: "SKOHL-kah", ipa: "/ˈskolʲkə/", action: "price" },
+  { id: "convo-bye-1", script: "ДО СВИДАНИЯ", translation: "Goodbye (formal)", matchesItemId: null, pronunciation: "dah svee-DAH-nyah", ipa: "/dɐ svʲɪˈdanʲɪjə/", action: "bye" },
+  { id: "convo-bye-2", script: "ПОКА", translation: "Bye (informal)", matchesItemId: null, pronunciation: "pah-KAH", ipa: "/pɐˈka/", action: "bye" },
+];
+
+const dairyConversation: ShopKeeperConversation = {
+  greetings: GREETINGS,
+  greetingWarm: GREETING_WARM,
+  askPrefix: "Это ",
+  askKnown: ASK_KNOWN,
+  prices: {
+    syr_wheel: { script: "ПЯТЬ рублей.", pronunciation: "PYAHT roo-BLYEY", ipa: "/pʲætʲ rʊˈblʲej/", translation: "Five rubles." },
+    slivki_jar: { script: "ТРИ рубля.", pronunciation: "TREE roob-LYAH", ipa: "/trʲi rʊˈblʲa/", translation: "Three rubles." },
+  },
+  farewells: FAREWELLS,
+  farewellEmpty: FAREWELL_EMPTY,
+  playerPhrases: PLAYER_PHRASES,
+};
+
+const fishConversation: ShopKeeperConversation = {
+  greetings: [...GREETINGS, { script: "ПРИВЕТ.", pronunciation: "pree-VYET", ipa: "/prʲɪˈvʲet/", translation: "Hi." }],
+  greetingWarm: GREETING_WARM,
+  askPrefix: "Это ",
+  askKnown: ASK_KNOWN,
+  prices: {
+    ryba_smoked: { script: "ДЕСЯТЬ рублей.", pronunciation: "DYEH-syaht roo-BLYEY", ipa: "/ˈdʲesʲətʲ rʊˈblʲej/", translation: "Ten rubles." },
+  },
+  farewells: FAREWELLS,
+  farewellEmpty: FAREWELL_EMPTY,
+  playerPhrases: PLAYER_PHRASES,
+};
+
+const veggiesConversation: ShopKeeperConversation = {
+  greetings: GREETINGS,
+  greetingWarm: GREETING_WARM,
+  askPrefix: "Это ",
+  askKnown: ASK_KNOWN,
+  prices: {
+    grib_basket: { script: "ДВА рубля.", pronunciation: "DVAH roob-LYAH", ipa: "/dva rʊˈblʲa/", translation: "Two rubles." },
+  },
+  farewells: FAREWELLS,
+  farewellEmpty: FAREWELL_EMPTY,
+  playerPhrases: PLAYER_PHRASES,
+};
 
 export const level6Data: LevelData = {
   id: "the-market",
@@ -146,6 +210,7 @@ export const level6Data: LevelData = {
         acceptsItemIds: ["syr_wheel", "slivki_jar"],
         daResponses: ["ДА! Свежее!", "ДА, берите!"],
         netResponses: ["НЕТ, не то.", "НЕТ!"],
+        conversation: dairyConversation,
       },
     },
 
@@ -186,6 +251,7 @@ export const level6Data: LevelData = {
         acceptsItemIds: ["ryba_smoked"],
         daResponses: ["ДА! Утром коптили!", "ДА, свежая!"],
         netResponses: ["НЕТ, только рыба.", "НЕТ."],
+        conversation: fishConversation,
       },
     },
 
@@ -226,6 +292,7 @@ export const level6Data: LevelData = {
         acceptsItemIds: ["grib_basket"],
         daResponses: ["ДА! Из леса!", "ДА! Свежие грибы!"],
         netResponses: ["НЕТ! Нет такого!", "НЕТ, попробуйте снова."],
+        conversation: veggiesConversation,
       },
     },
   ],
