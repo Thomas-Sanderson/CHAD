@@ -475,8 +475,17 @@ export function updateGameState(
         }
       }
       if (input.interact) input.interact = false;
-      if (input.shout) input.shout = false;
+      if (input.shout) {
+        speakAsChad("пожалуйста");
+        input.shout = false;
+      }
     }
+  }
+
+  // P key anywhere else — Chad says please even though nobody's listening
+  if (input.shout) {
+    speakAsChad("пожалуйста");
+    input.shout = false;
   }
 
   // --- Shopkeeper conversation ---

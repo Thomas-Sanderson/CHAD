@@ -13,11 +13,13 @@ import { BriefingScreen } from "./BriefingScreen";
 import { RunPhase } from "./RunPhase";
 import { GateScreen } from "./GateScreen";
 import { RevealScreen } from "./RevealScreen";
+import { SortingScreen } from "./SortingScreen";
 import { LevelSelectScreen } from "./LevelSelectScreen";
 import { WinScreen } from "./WinScreen";
 import { DeathScreen } from "./DeathScreen";
 import { sfxDeath } from "../engine/sfx";
 import { startMusic, stopMusic } from "../engine/music";
+import { isTouchDevice } from "../engine/touch";
 
 const ALL_SKINS: SkinConfig[] = [belarusSkin, ethiopiaSkin, italySkin];
 
@@ -66,6 +68,9 @@ export function Game() {
   const [levelScore, setLevelScore] = useState<LevelScore | null>(null);
   const [collectedPotato, setCollectedPotato] = useState(false);
   const [runScore, setRunScore] = useState(0);
+
+  // Collected items for sorting screen
+  const [collectedItemIds, setCollectedItemIds] = useState<string[]>([]);
 
   // Hearts system
   const [hearts, setHearts] = useState(3);
@@ -131,6 +136,7 @@ export function Game() {
     setLevelScore(null);
     setCollectedPotato(false);
     setRunScore(0);
+    setCollectedItemIds([]);
     setScreen("BRIEFING");
   }, []);
 
@@ -148,6 +154,7 @@ export function Game() {
       setInferenceResult(result);
       setRunScore(state.score);
       setCollectedPotato(state.potato?.collected ?? false);
+      setCollectedItemIds(state.collectedItems);
       setScreen("GATE");
     },
     [currentLevel, itemDefs]
@@ -174,6 +181,7 @@ export function Game() {
     setLevelScore(null);
     setCollectedPotato(false);
     setRunScore(0);
+    setCollectedItemIds([]);
     setScreen("BRIEFING");
   }, []);
 
@@ -191,6 +199,7 @@ export function Game() {
     setLevelScore(null);
     setCollectedPotato(false);
     setRunScore(0);
+    setCollectedItemIds([]);
     setScreen("BRIEFING");
   }, []);
 
@@ -234,8 +243,12 @@ export function Game() {
       setHearts(maxHearts);
     }
 
-    setScreen("REVEAL");
+    setScreen("SORTING");
   }, [inferenceResult, runScore, collectedPotato, currentSkin.id, currentLevel.id, hearts, maxHearts]);
+
+  const handleSortingComplete = useCallback(() => {
+    setScreen("REVEAL");
+  }, []);
 
   const handleNextLevel = useCallback(() => {
     const nextIndex = currentLevelIndex + 1;
@@ -247,6 +260,7 @@ export function Game() {
       setLevelScore(null);
       setCollectedPotato(false);
       setRunScore(0);
+      setCollectedItemIds([]);
       setScreen("BRIEFING");
     }
   }, [currentLevelIndex, currentSkin.levels.length]);
@@ -270,6 +284,29 @@ export function Game() {
   }, [progress, currentSkin]);
 
   const hasNextLevel = currentLevelIndex < currentSkin.levels.length - 1;
+
+  // Force landscape on mobile (global — covers all screens)
+  useEffect(() => {
+    if (!isTouchDevice) return;
+    let locked = false;
+    const orient = window.screen.orientation as ScreenOrientation & {
+      lock?: (dir: string) => Promise<void>;
+      unlock?: () => void;
+    };
+    (async () => {
+      try {
+        await orient.lock?.("landscape");
+        locked = true;
+      } catch {
+        // Not supported (iOS Safari) or requires fullscreen
+      }
+    })();
+    return () => {
+      if (locked) {
+        try { orient.unlock?.(); } catch {}
+      }
+    };
+  }, []);
 
   // Music lifecycle
   useEffect(() => {
@@ -351,6 +388,20 @@ export function Game() {
           mentorName={currentSkin.mentorName}
           onRestart={handleRestart}
           onReveal={handleReveal}
+        />
+      ) : null;
+    case "SORTING":
+      return inferenceResult ? (
+        <SortingScreen
+          vocabPack={currentLevel.vocabPack}
+          collectedItemIds={collectedItemIds}
+          itemDefs={itemDefs}
+          revealLines={currentLevel.revealLines}
+          mentorName={currentSkin.mentorName}
+          mentorAvatar={currentSkin.mentorAvatar}
+          mentorColor={currentSkin.mentorColor}
+          messageColor={currentSkin.messageColor}
+          onComplete={handleSortingComplete}
         />
       ) : null;
     case "REVEAL":

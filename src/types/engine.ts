@@ -1,4 +1,4 @@
-export type Phase = "BRIEFING" | "RUN" | "GATE" | "REVEAL";
+export type Phase = "BRIEFING" | "RUN" | "GATE" | "SORTING" | "REVEAL";
 
 export interface Vec2 {
   x: number;

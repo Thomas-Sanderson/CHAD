@@ -163,7 +163,7 @@ export function RunPhase({
           setTimeout(() => pronounceWord(matchingWord), 100);
         } else {
           const itemDef = itemDefs.get(newItemId!);
-          if (itemDef?.script) setTimeout(() => speakText(itemDef.script), 100);
+          if (itemDef?.script?.trim()) setTimeout(() => speakText(itemDef.script), 100);
         }
       }
 
