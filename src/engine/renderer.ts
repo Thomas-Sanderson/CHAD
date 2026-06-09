@@ -419,16 +419,9 @@ export function renderFrame(
     }
   }
 
-  // --- Vehicles (marshrutkas / blue taxis — street only) ---
-  if (!isInterior) {
-    for (const m of state.marshrutkas) {
-      const sx = m.x - cam;
-      const flipH = m.speed > 0;
-      drawSprite(ctx, env.vehicleSprite, sx, m.y, 2, flipH);
-    }
-  }
-
   // --- Gate building (street / non-segment only) ---
+  // Drawn before vehicles so vehicles pass in front of it
+
   if (!isInterior) {
     const gx = level.gatePosition.x - cam;
     const groundY = activePlatforms[0]?.y ?? CANVAS_HEIGHT - 40;
@@ -457,6 +450,18 @@ export function renderFrame(
         ctx.fillStyle = env.flagColors[i]!;
         ctx.fillRect(poleX + 1, flagY + i * stripeH, flagWidth, stripeH);
       }
+    }
+  }
+
+  // --- Vehicles (marshrutkas / vespas / taxis — street only) ---
+  if (!isInterior) {
+    for (const m of state.marshrutkas) {
+      const sx = m.x - cam;
+      const flipH = m.speed > 0;
+      // Bottom-align sprite to collision box bottom (sits on ground)
+      const sprH = env.vehicleSprite.length * 2;
+      const vy = m.y + m.height - sprH;
+      drawSprite(ctx, env.vehicleSprite, sx, vy, 2, flipH);
     }
   }
 

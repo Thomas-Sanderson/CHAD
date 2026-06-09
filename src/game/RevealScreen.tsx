@@ -93,6 +93,7 @@ export function RevealScreen({
   const prevRevealedCount = useRef(0);
   const [heartsFilled, setHeartsFilled] = useState(0);
   const [showExtraLife, setShowExtraLife] = useState(false);
+  const [showRefilled, setShowRefilled] = useState(false);
   const heartRefillDone = useRef(false);
 
   const targetWords = vocabPack.words.filter((w) => w.matchesItemId !== null);
@@ -114,6 +115,8 @@ export function RevealScreen({
         clearInterval(interval);
         if (wasFullHealth && maxHearts < 5) {
           setShowExtraLife(true);
+        } else if (!wasFullHealth) {
+          setShowRefilled(true);
         }
         onHeartsRefilled?.();
       }
@@ -199,6 +202,9 @@ export function RevealScreen({
                 {showExtraLife && (
                   <span style={styles.extraLife}>+1 Extra Life!</span>
                 )}
+                {showRefilled && (
+                  <span style={styles.extraLife}>Lives refilled!</span>
+                )}
               </div>
             </>
           )}
@@ -206,7 +212,7 @@ export function RevealScreen({
             <div>Run score: {score.runScore}</div>
             <div>Vocab score: {score.inferenceScore}</div>
             {score.potatoBonus > 0 && (
-              <div>Potato bonus: {score.potatoBonus}</div>
+              <div>{(sacredItemName ?? "The Sacred Potato").replace("The Sacred ", "")} bonus: {score.potatoBonus}</div>
             )}
             <div style={styles.totalScore}>Total: {score.total}</div>
           </div>

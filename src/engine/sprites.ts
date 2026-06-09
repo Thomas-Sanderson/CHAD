@@ -517,6 +517,10 @@ export const shopFacadeSprites: Record<string, SpriteData> = {
   "МОЛОЧНАЯ": shopDairySprite,
   "РЫБНАЯ": shopFishSprite,
   "ОВОЩИ-ФРУКТЫ": shopProduceSprite,
+  // Italy shops
+  "SALUMERIA": macelleriaSpriteIT,
+  "PANETTERIA": panetteriaSpriteIT,
+  "FRUTTIVENDOLO": fruttivendoloSpriteIT,
 };
 
 // --- ITEM SPRITES (all 16×13 logical, drawn at 2x = 32×26) ---
@@ -1624,6 +1628,20 @@ import {
   koloBowlSprite, eggSprite, teaCupSprite,
 } from "./sprites_ethiopia";
 
+import {
+  pannaTubSprite, latteBottleSprite, salameLinkSprite,
+  oliveJarSprite, breadRoundSprite, vinegarBottleSprite,
+  caffeTinSprite, zuccheroBagSprite, biscottiBoxSprite,
+  wineBottleSprite, pastaBoxSprite, olioBottleSprite,
+  pomodoroSprite, paneLoafSprite, aglioBulbSprite,
+  cioccolatoBarSprite, formaggioWedgeSprite, melaAppleSprite,
+  piattoPlateSprite, cucchiaioSpoonSprite, tazzaCupSprite,
+  cuscinoPillowSprite, orologioClockSprite, saponeSoapSprite,
+  telecomandoRemoteSprite, pecorinoWheelSprite, prosciuttoLegSprite,
+  focacciaSlabSprite, basilicoBunchSprite, salameRingSprite,
+  panetteriaSpriteIT, macelleriaSpriteIT, fruttivendoloSpriteIT,
+} from "./sprites_italy";
+
 const itemSpriteMap: Record<string, SpriteData> = {
   // Belarus items (L1-4)
   smetana_tub: smetanaTubSprite,
@@ -1684,6 +1702,37 @@ const itemSpriteMap: Record<string, SpriteData> = {
   kolo_bowl: koloBowlSprite,
   egg: eggSprite,
   tea_cup: teaCupSprite,
+  // Italy items
+  panna_tub: pannaTubSprite,
+  latte_bottle: latteBottleSprite,
+  salame_link: salameLinkSprite,
+  olive_jar: oliveJarSprite,
+  bread_round: breadRoundSprite,
+  vinegar_bottle: vinegarBottleSprite,
+  caffe_tin: caffeTinSprite,
+  zucchero_bag: zuccheroBagSprite,
+  biscotti_box: biscottiBoxSprite,
+  wine_bottle: wineBottleSprite,
+  pasta_box: pastaBoxSprite,
+  olio_bottle: olioBottleSprite,
+  pomodoro: pomodoroSprite,
+  pane_loaf: paneLoafSprite,
+  aglio_bulb: aglioBulbSprite,
+  cioccolato_bar: cioccolatoBarSprite,
+  formaggio_wedge: formaggioWedgeSprite,
+  mela_apple: melaAppleSprite,
+  piatto_plate: piattoPlateSprite,
+  cucchiaio_spoon: cucchiaioSpoonSprite,
+  tazza_cup: tazzaCupSprite,
+  cuscino_pillow: cuscinoPillowSprite,
+  orologio_clock: orologioClockSprite,
+  sapone_soap: saponeSoapSprite,
+  telecomando_remote: telecomandoRemoteSprite,
+  pecorino_wheel: pecorinoWheelSprite,
+  prosciutto_leg: prosciuttoLegSprite,
+  focaccia_slab: focacciaSlabSprite,
+  basilico_bunch: basilicoBunchSprite,
+  salame_ring: salameRingSprite,
 };
 
 export function getItemSprite(itemId: string): SpriteData | undefined {

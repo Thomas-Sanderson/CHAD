@@ -1,4 +1,5 @@
 import type { SkinConfig } from "../types";
+import { isEmbedded } from "../engine/embed";
 
 interface Props {
   skins: SkinConfig[];
@@ -14,13 +15,17 @@ const SKIN_VISUALS: Record<string, { colors: string[]; flag: string }> = {
     colors: ["#009900", "#ffcc00", "#cc0000"],
     flag: "ET",
   },
+  italy: {
+    colors: ["#009246", "#ffffff", "#ce2b37"],
+    flag: "IT",
+  },
 };
 
 export function SkinSelectScreen({ skins, onSelectSkin }: Props) {
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>CHAD RESCUES NOBODY</h1>
-      <div style={styles.subtitle}>Different language. Same cargo shorts.</div>
+    <div style={{ ...styles.container, ...(isEmbedded ? styles.containerEmbed : {}) }}>
+      {!isEmbedded && <h1 style={styles.title}>CHAD RESCUES NOBODY</h1>}
+      {!isEmbedded && <div style={styles.subtitle}>Different language. Same cargo shorts.</div>}
 
       <div style={styles.skinGrid}>
         {skins.map((skin) => {
@@ -62,9 +67,11 @@ export function SkinSelectScreen({ skins, onSelectSkin }: Props) {
         })}
       </div>
 
-      <div style={styles.footer}>
-        Same Chad. Different groceries.
-      </div>
+      {!isEmbedded && (
+        <div style={styles.footer}>
+          Same Chad. Different groceries.
+        </div>
+      )}
     </div>
   );
 }
@@ -81,6 +88,11 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: "'SF Pro', -apple-system, sans-serif",
     padding: 32,
     gap: 32,
+  },
+  containerEmbed: {
+    justifyContent: "center",
+    padding: 24,
+    gap: 16,
   },
   title: {
     fontSize: 32,

@@ -56,8 +56,9 @@ function doSpeak(text: string, pronunciation?: string, opts?: VoiceOpts): void {
   // If idle, speak immediately.
   // For scripts without browser TTS support (Amharic), use pronunciation (Latin) with English voice
   const lang = detectLang(text);
-  const speakable = (lang !== "ru-RU" && pronunciation) ? pronunciation : text;
-  const speakLang = (lang !== "ru-RU" && pronunciation) ? "en-US" : lang;
+  const needsFallback = lang === "am-ET" && pronunciation;
+  const speakable = needsFallback ? pronunciation : text;
+  const speakLang = needsFallback ? "en-US" : lang;
 
   if (speaking) {
     speechSynthesis.cancel();
@@ -74,7 +75,10 @@ function doSpeak(text: string, pronunciation?: string, opts?: VoiceOpts): void {
 function detectLang(text: string): string {
   // Ge'ez script (Amharic/Ethiopic): U+1200–U+137F
   if (/[\u1200-\u137F]/.test(text)) return "am-ET";
-  return "ru-RU";
+  // Cyrillic script: Russian
+  if (/[\u0400-\u04FF]/.test(text)) return "ru-RU";
+  // Latin script defaults to Italian (only Latin-script skin for now)
+  return "it-IT";
 }
 
 function fireSpeak(

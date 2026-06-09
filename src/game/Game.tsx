@@ -3,6 +3,7 @@ import type { Phase, GameRunState, InferenceResult, SkinConfig, VocabWord } from
 import type { CollectibleItem } from "../types/content";
 import { belarusSkin } from "../content/belarus";
 import { ethiopiaSkin } from "../content/ethiopia";
+import { italySkin } from "../content/italy";
 import { checkInference, calculateLevelScore } from "./index";
 import type { LevelScore } from "./scoring";
 import { buildShoutWords } from "./shoutWords";
@@ -18,7 +19,7 @@ import { DeathScreen } from "./DeathScreen";
 import { sfxDeath } from "../engine/sfx";
 import { startMusic, stopMusic } from "../engine/music";
 
-const ALL_SKINS: SkinConfig[] = [belarusSkin, ethiopiaSkin];
+const ALL_SKINS: SkinConfig[] = [belarusSkin, ethiopiaSkin, italySkin];
 
 type GameScreen = "BOOT" | "COUNTRY_SELECT" | "LEVEL_SELECT" | Phase | "WIN";
 

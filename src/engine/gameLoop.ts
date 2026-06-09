@@ -333,9 +333,10 @@ export function updateGameState(
         state.player.onGround = false;
         // Stun the babushka (she flashes), NOT Chad
         b.stunUntil = state.elapsed + BABUSHKA_STUN_DURATION;
-        b.scoldingText = "блять";
+        const headBounceScold = state.scoldings[Math.floor(Math.random() * state.scoldings.length)] ?? "!";
+        b.scoldingText = headBounceScold;
         b.scoldingUntil = state.elapsed + SCOLDING_DURATION;
-        speakScold("блять");
+        speakScold(headBounceScold);
       } else {
         // Side collision: shove + drop item + scolding
         const shoveDir = state.player.position.x > b.x ? 1 : -1;

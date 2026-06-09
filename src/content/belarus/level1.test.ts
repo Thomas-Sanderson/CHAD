@@ -1,9 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { belarusSkin } from "./skin";
 import { ethiopiaSkin } from "../ethiopia/skin";
+import { italySkin } from "../italy/skin";
 import type { SkinConfig } from "../../types/skin";
 
-const allSkins: SkinConfig[] = [belarusSkin, ethiopiaSkin];
+const allSkins: SkinConfig[] = [belarusSkin, ethiopiaSkin, italySkin];
 
 // Validate every level of every skin
 for (const skin of allSkins) {
