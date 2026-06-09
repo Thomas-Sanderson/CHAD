@@ -62,12 +62,11 @@ export function RunPhase({
   const [currentSegmentId, setCurrentSegmentId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasScale, setCanvasScale] = useState(() => {
-    if (isEmbedded) return 1.95;
     if (typeof window === "undefined") return 1.5;
-    const pad = isTouchDevice ? 0 : 32; // no padding on touch — fill the viewport
+    const pad = isEmbedded || isTouchDevice ? 0 : 32;
     const scaleX = (window.innerWidth - pad) / CANVAS_WIDTH;
     const scaleY = (window.innerHeight - pad) / CANVAS_HEIGHT;
-    return Math.min(scaleX, scaleY, isEmbedded ? 1.95 : 3);
+    return Math.min(scaleX, scaleY, 3);
   });
   const pausedRef = useRef(false);
   const prevHitCountRef = useRef(0);
@@ -232,9 +231,8 @@ export function RunPhase({
 
   // Dynamic canvas scaling on resize
   useEffect(() => {
-    if (isEmbedded) return;
     const onResize = () => {
-      const pad = isTouchDevice ? 0 : 32;
+      const pad = isEmbedded || isTouchDevice ? 0 : 32;
       const scaleX = (window.innerWidth - pad) / CANVAS_WIDTH;
       const scaleY = (window.innerHeight - pad) / CANVAS_HEIGHT;
       setCanvasScale(Math.min(scaleX, scaleY, 3));
