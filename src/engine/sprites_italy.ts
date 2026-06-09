@@ -6,6 +6,11 @@ import type { SpriteData } from "./sprites";
 
 const _ = null;
 
+// Exit sign palette (same GOST green as Belarus)
+const ED = '#1f6b2e'; // border
+const EG = '#2d8c3c'; // background
+const WH = '#ffffff'; // letters
+
 // --- ENVIRONMENT SPRITES ---
 
 export const nonnaSprite: SpriteData = [
@@ -642,5 +647,17 @@ export const salameRingSprite: SpriteData = [
   [_,_,'#8b2500','#8b2500','#8b2500','#1a1a2e','#1a1a2e','#1a1a2e','#8b2500','#8b2500','#8b2500',_,_],
   [_,_,'#8b2500','#8b2500','#8b2500','#8b2500','#8b2500','#8b2500','#8b2500','#8b2500','#8b2500',_,_],
   [_,_,_,_,_,_,_,_,_,_,_,_,_],
+];
+
+// --- EXIT SIGN: "USCITA" (green GOST-style, 24×8 logical, same size as ВЫХОД) ---
+export const exitSignItalySprite: SpriteData = [
+  [ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED],
+  [ED,EG,WH,EG,WH,EG,EG,WH,WH,EG,WH,WH,EG,EG,WH,EG,WH,WH,WH,EG,EG,WH,EG,ED],
+  [ED,EG,WH,EG,WH,EG,WH,EG,EG,EG,WH,EG,EG,EG,WH,EG,EG,WH,EG,EG,WH,EG,WH,ED],
+  [ED,EG,WH,EG,WH,EG,EG,WH,EG,EG,WH,EG,EG,EG,WH,EG,EG,WH,EG,EG,WH,WH,WH,ED],
+  [ED,EG,WH,EG,WH,EG,EG,EG,WH,EG,WH,EG,EG,EG,WH,EG,EG,WH,EG,EG,WH,EG,WH,ED],
+  [ED,EG,EG,WH,EG,EG,WH,WH,EG,EG,WH,WH,EG,EG,WH,EG,EG,WH,EG,EG,WH,EG,WH,ED],
+  [ED,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,EG,ED],
+  [ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED,ED],
 ];
 

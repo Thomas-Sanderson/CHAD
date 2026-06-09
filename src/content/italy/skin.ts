@@ -6,6 +6,7 @@ import {
   cobblestoneGround,
   terracottaPlatform,
   appartamentoSprite,
+  exitSignItalySprite,
 } from "../../engine/sprites_italy";
 import {
   interiorWallTile,
@@ -17,7 +18,6 @@ import {
   doorFrontSprite,
   doorBackSprite,
   doorLockedOverlay,
-  exitSignSprite,
   shopkeeperSprite,
   shopkeeperBabushkaSprite,
 } from "../../engine/sprites";
@@ -57,7 +57,7 @@ export const italySkin: SkinConfig = {
     doorFrontSprite,
     doorBackSprite,
     doorLockedOverlay,
-    exitSignSprite,
+    exitSignSprite: exitSignItalySprite,
     shopkeeperSprite,
     shopkeeperBabushkaSprite,
   },
