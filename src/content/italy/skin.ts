@@ -33,6 +33,7 @@ export const italySkin: SkinConfig = {
     vehicleSprite: vespaSprite,
     sacredItemSprite: sacredOliveSprite,
     scoldings: ["ATTENZIONE!", "MA CHE FAI?!", "VAI VIA!", "MALEDUCATO!", "MADONNA MIA!"],
+    headBounceCurse: "CAZZO!",
   },
 
   winMessage:

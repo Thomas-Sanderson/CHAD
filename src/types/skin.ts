@@ -25,6 +25,7 @@ export interface SkinEnvironment {
   vehicleSprite: SpriteData;
   sacredItemSprite: SpriteData;
   scoldings: string[];
+  headBounceCurse: string; // profanity when player jumps on NPC's head
   shopExteriorSprite?: SpriteData;
   shopInteriorBg?: SpriteData;
   shopShelfSprite?: SpriteData;

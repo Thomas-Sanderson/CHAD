@@ -43,8 +43,9 @@ const DEFAULT_SCOLDINGS = [
   "ИДИ ОТСЮДА!",
 ];
 
-export function createGameRunState(level: LevelData, scoldings?: string[]): GameRunState {
+export function createGameRunState(level: LevelData, scoldings?: string[], headBounceCurse?: string): GameRunState {
   const _scoldings = scoldings ?? DEFAULT_SCOLDINGS;
+  const _curse = headBounceCurse ?? "блять!";
   const hasSegments = !!level.segments?.length;
   const firstSegment = hasSegments ? level.segments![0]! : null;
 
@@ -126,6 +127,7 @@ export function createGameRunState(level: LevelData, scoldings?: string[]): Game
     reachedGate: false,
     elapsed: 0,
     scoldings: _scoldings,
+    headBounceCurse: _curse,
     // Segment state
     currentSegmentId: firstSegment?.id ?? null,
     segmentCollectibles,
@@ -333,10 +335,9 @@ export function updateGameState(
         state.player.onGround = false;
         // Stun the babushka (she flashes), NOT Chad
         b.stunUntil = state.elapsed + BABUSHKA_STUN_DURATION;
-        const headBounceScold = state.scoldings[Math.floor(Math.random() * state.scoldings.length)] ?? "!";
-        b.scoldingText = headBounceScold;
+        b.scoldingText = state.headBounceCurse;
         b.scoldingUntil = state.elapsed + SCOLDING_DURATION;
-        speakScold(headBounceScold);
+        speakScold(state.headBounceCurse);
       } else {
         // Side collision: shove + drop item + scolding
         const shoveDir = state.player.position.x > b.x ? 1 : -1;

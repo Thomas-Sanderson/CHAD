@@ -45,6 +45,7 @@ export const belarusSkin: SkinConfig = {
     vehicleSprite: marshrutkaSprite,
     sacredItemSprite: potatoSprite,
     scoldings: ["КУДА?!", "ОЙ!", "НЕ ЛЕЗЬ!", "БЕЗОБРАЗИЕ!", "ИДИ ОТСЮДА!"],
+    headBounceCurse: "блять!",
     shopExteriorSprite,
     shopInteriorBg: shopInteriorBgSprite,
     shopShelfSprite,

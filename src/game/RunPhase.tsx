@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback, useState, useMemo } from "react";
 import type { LevelData, GameRunState, InputState, SkinEnvironment, VocabWord } from "../types";
 import type { CollectibleItem, ConvoPhrase } from "../types/content";
+import { isEmbedded } from "../engine/embed";
 import {
   createGameRunState,
   updateGameState,
@@ -71,7 +72,7 @@ export function RunPhase({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const gameState = createGameRunState(level, environment.scoldings);
+    const gameState = createGameRunState(level, environment.scoldings, environment.headBounceCurse);
     stateRef.current = gameState;
     prevHitCountRef.current = 0;
 
@@ -448,11 +449,13 @@ export function RunPhase({
           />
         )}
       </div>
-      <div style={styles.controls}>
-        <span>
-          &larr; &rarr; or A/D to move | &uarr; or W or Space to jump | E to enter/talk/listen | P to shout | I for inventory
-        </span>
-      </div>
+      {!isEmbedded && (
+        <div style={styles.controls}>
+          <span>
+            &larr; &rarr; or A/D to move | &uarr; or W or Space to jump | E to enter/talk/listen | P to shout | I for inventory
+          </span>
+        </div>
+      )}
     </div>
   );
 }
@@ -472,7 +475,7 @@ const styles: Record<string, React.CSSProperties> = {
     border: "2px solid #333",
     borderRadius: 4,
     imageRendering: "pixelated",
-    transform: "scale(1.5)",
+    transform: isEmbedded ? "scale(1.95)" : "scale(1.5)",
     transformOrigin: "top center",
     cursor: "pointer",
   },

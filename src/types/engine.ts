@@ -103,6 +103,7 @@ export interface GameRunState {
   reachedGate: boolean;
   elapsed: number;
   scoldings: string[];
+  headBounceCurse: string;
   // Segment state
   currentSegmentId: string | null;
   segmentCollectibles: Record<string, CollectedInfo[]>;

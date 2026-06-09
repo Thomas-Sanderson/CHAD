@@ -33,6 +33,7 @@ export const ethiopiaSkin: SkinConfig = {
     vehicleSprite: blueTaxiSprite,
     sacredItemSprite: coffeeBeanSprite,
     scoldings: ["ቀጭን ነህ!", "ተው!", "ወዴት!", "ጠንቀቅ!", "ኧረ!"],
+    headBounceCurse: "ወይ ጉድ!",
   },
 
   winMessage:
