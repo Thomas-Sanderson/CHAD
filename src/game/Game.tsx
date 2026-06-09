@@ -285,26 +285,19 @@ export function Game() {
 
   const hasNextLevel = currentLevelIndex < currentSkin.levels.length - 1;
 
-  // Force landscape on mobile (global — covers all screens)
+  // Portrait detection for mobile — show rotate overlay after BOOT
+  const [isPortrait, setIsPortrait] = useState(
+    () => isTouchDevice && window.innerHeight > window.innerWidth
+  );
+
   useEffect(() => {
     if (!isTouchDevice) return;
-    let locked = false;
-    const orient = window.screen.orientation as ScreenOrientation & {
-      lock?: (dir: string) => Promise<void>;
-      unlock?: () => void;
-    };
-    (async () => {
-      try {
-        await orient.lock?.("landscape");
-        locked = true;
-      } catch {
-        // Not supported (iOS Safari) or requires fullscreen
-      }
-    })();
+    const check = () => setIsPortrait(window.innerHeight > window.innerWidth);
+    window.addEventListener("resize", check);
+    window.addEventListener("orientationchange", check);
     return () => {
-      if (locked) {
-        try { orient.unlock?.(); } catch {}
-      }
+      window.removeEventListener("resize", check);
+      window.removeEventListener("orientationchange", check);
     };
   }, []);
 
@@ -318,6 +311,33 @@ export function Game() {
       stopMusic();
     }
   }, [screen]);
+
+  // Portrait block — let BOOT through, block everything else
+  if (isPortrait && screen !== "BOOT") {
+    return (
+      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100dvh",
+        background: "#0a0a1a",
+        color: "#FFD54F",
+        fontFamily: "monospace",
+        gap: 20,
+        padding: 32,
+        textAlign: "center",
+      }}>
+        <div style={{ fontSize: 48 }}>&#x21BB;</div>
+        <div style={{ fontSize: 18, fontWeight: "bold", letterSpacing: 2 }}>
+          ROTATE YOUR DEVICE
+        </div>
+        <div style={{ fontSize: 13, color: "#888", maxWidth: 260 }}>
+          Chad needs room to run. Turn your phone sideways.
+        </div>
+      </div>
+    );
+  }
 
   switch (screen) {
     case "BOOT":
