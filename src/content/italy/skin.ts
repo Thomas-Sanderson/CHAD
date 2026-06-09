@@ -7,6 +7,20 @@ import {
   terracottaPlatform,
   appartamentoSprite,
 } from "../../engine/sprites_italy";
+import {
+  interiorWallTile,
+  interiorFloorTile,
+  interiorCeilingTile,
+  shelfWoodSprite,
+  shelfMetalSprite,
+  counterSprite,
+  doorFrontSprite,
+  doorBackSprite,
+  doorLockedOverlay,
+  exitSignSprite,
+  shopkeeperSprite,
+  shopkeeperBabushkaSprite,
+} from "../../engine/sprites";
 import { allLevels } from "./levels";
 
 export const italySkin: SkinConfig = {
@@ -34,6 +48,18 @@ export const italySkin: SkinConfig = {
     sacredItemSprite: sacredOliveSprite,
     scoldings: ["ATTENZIONE!", "MA CHE FAI?!", "VAI VIA!", "MALEDUCATO!", "MADONNA MIA!"],
     headBounceCurse: "CAZZO!",
+    interiorWallTile,
+    interiorFloorTile,
+    interiorCeilingTile,
+    shelfWoodSprite,
+    shelfMetalSprite,
+    counterSprite,
+    doorFrontSprite,
+    doorBackSprite,
+    doorLockedOverlay,
+    exitSignSprite,
+    shopkeeperSprite,
+    shopkeeperBabushkaSprite,
   },
 
   winMessage:
