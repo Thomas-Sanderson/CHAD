@@ -196,8 +196,39 @@ export function SortingScreen({
       </div>
 
       <div className="sorting-body">
-        {/* Left side in landscape: word prompt + progress + feedback */}
-        <div className="sorting-left">
+        {/* Left 2/3: bag grid */}
+        <div className="sorting-bag" style={styles.bagGrid}>
+          {bagItems.map((item) => {
+            const isPickedItem = picked === item.id;
+            const borderColor = isPickedItem
+              ? isCorrect
+                ? "#4CAF50"
+                : "#f44336"
+              : "transparent";
+
+            return (
+              <button
+                key={item.id}
+                style={{
+                  ...styles.itemButton,
+                  borderColor,
+                  animation:
+                    isPickedItem && !isCorrect && shaking
+                      ? "shake 0.5s ease-in-out"
+                      : undefined,
+                }}
+                onClick={() => handlePick(item.id)}
+                disabled={picked !== null}
+              >
+                <ItemSpriteThumb itemId={item.id} />
+                <span style={styles.itemName}>{item.name}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Right 1/3: word prompt + picked flash + progress + feedback + button */}
+        <div className="sorting-right">
           {/* Current word prompt */}
           <div className="sorting-word" style={styles.wordPrompt}>
             <span style={styles.wordScript}>{currentWord?.script}</span>
@@ -248,7 +279,7 @@ export function SortingScreen({
             ))}
           </div>
 
-          {/* Mentor feedback (shown in left column in landscape) */}
+          {/* Mentor feedback */}
           <div className="sorting-feedback" style={styles.feedbackArea}>
             <div
               style={{
@@ -274,53 +305,24 @@ export function SortingScreen({
             </div>
           </div>
 
+          {/* Spacer pushes button to bottom */}
+          <div style={{ flex: 1 }} />
+
+          {/* Action button pinned at bottom of right column */}
+          {picked !== null && (
+            <button
+              className="sorting-action-btn"
+              style={isCorrect ? styles.nextButton : styles.retryButton}
+              onClick={isCorrect ? handleNext : handleRetry}
+            >
+              {isCorrect
+                ? currentIndex + 1 >= targetWords.length
+                  ? "See results \u2192"
+                  : "Next \u2192"
+                : "Try again"}
+            </button>
+          )}
         </div>
-
-        {/* Right side in landscape: bag grid */}
-        <div className="sorting-bag" style={styles.bagGrid}>
-          {bagItems.map((item) => {
-            const isPickedItem = picked === item.id;
-            const borderColor = isPickedItem
-              ? isCorrect
-                ? "#4CAF50"
-                : "#f44336"
-              : "transparent";
-
-            return (
-              <button
-                key={item.id}
-                style={{
-                  ...styles.itemButton,
-                  borderColor,
-                  animation:
-                    isPickedItem && !isCorrect && shaking
-                      ? "shake 0.5s ease-in-out"
-                      : undefined,
-                }}
-                onClick={() => handlePick(item.id)}
-                disabled={picked !== null}
-              >
-                <ItemSpriteThumb itemId={item.id} />
-                <span style={styles.itemName}>{item.name}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Action button — below the bag grid */}
-        {picked !== null && (
-          <button
-            className="sorting-action-btn"
-            style={isCorrect ? styles.nextButton : styles.retryButton}
-            onClick={isCorrect ? handleNext : handleRetry}
-          >
-            {isCorrect
-              ? currentIndex + 1 >= targetWords.length
-                ? "See results \u2192"
-                : "Next \u2192"
-              : "Try again"}
-          </button>
-        )}
       </div>
 
       <style>{sortingCSS}</style>
@@ -342,27 +344,31 @@ const sortingCSS = `
     100% { opacity: 1; transform: scale(1); }
   }
 
-  /* Default (portrait / desktop): stacked column layout */
+  /* Default: 2/3 bag + 1/3 text side-by-side */
   .sorting-header {
     text-align: center;
     flex-shrink: 0;
+    width: 100%;
   }
   .sorting-body {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
     gap: var(--game-gap, 12px);
     flex: 1;
     min-height: 0;
     width: 100%;
-    max-width: 500px;
   }
-  .sorting-left {
+  .sorting-bag {
+    flex: 2;
+    min-width: 0;
+  }
+  .sorting-right {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--game-gap, 12px);
-    width: 100%;
+    min-width: 0;
   }
 
   /* Landscape on short viewports (mobile landscape) */
@@ -375,6 +381,7 @@ const sortingCSS = `
     .sorting-header {
       display: flex;
       align-items: baseline;
+      justify-content: center;
       gap: 8px;
     }
     .sorting-title {
@@ -385,16 +392,7 @@ const sortingCSS = `
       font-size: 11px !important;
       margin: 0 !important;
     }
-    .sorting-body {
-      flex-direction: row;
-      align-items: flex-start;
-      max-width: 100%;
-      gap: 12px;
-    }
-    .sorting-left {
-      flex: 0 0 auto;
-      width: 200px;
-      min-width: 160px;
+    .sorting-right {
       gap: 8px;
     }
     .sorting-word {
@@ -402,12 +400,8 @@ const sortingCSS = `
       min-width: auto !important;
     }
     .sorting-bag {
-      flex: 1 !important;
-      max-width: none !important;
       grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)) !important;
       gap: 6px !important;
-      max-height: none !important;
-      overflow-y: auto !important;
     }
     .sorting-feedback {
       padding: 4px 0 !important;
@@ -480,9 +474,6 @@ const styles: Record<string, React.CSSProperties> = {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))",
     gap: "var(--game-list-gap, 8px)",
-    width: "100%",
-    maxWidth: 500,
-    flex: 1,
     overflowY: "auto",
     minHeight: 0,
     padding: "4px 0",
@@ -514,7 +505,6 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     gap: 12,
     width: "100%",
-    maxWidth: 500,
     padding: "8px 0",
   },
   avatar: {
