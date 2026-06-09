@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import type { VocabWord } from "../types";
 import { pronounceWord, speakText, speakAsChad } from "../engine/audio";
+import { isTouchDevice } from "../engine/touch";
 
 interface Props {
   learnedWords: VocabWord[];
@@ -17,8 +18,13 @@ const FLAT_LIST_THRESHOLD = 6;
 export function ShoutMenu({ learnedWords, onSelect, onCancel, forceWASD, chadVoice, title, subtitle }: Props) {
   const useFlatList = !forceWASD && learnedWords.length <= FLAT_LIST_THRESHOLD;
 
-  if (useFlatList) {
+  // On touch devices, always use a tap-friendly list instead of WASD navigation
+  if (useFlatList || (isTouchDevice && !forceWASD)) {
     return <FlatMenu learnedWords={learnedWords} onSelect={onSelect} onCancel={onCancel} chadVoice={chadVoice} title={title} subtitle={subtitle} />;
+  }
+  // Touch devices with forceWASD (shop convo): use tap grid too
+  if (isTouchDevice && forceWASD) {
+    return <FlatMenu learnedWords={learnedWords} onSelect={onSelect} onCancel={onCancel} chadVoice={chadVoice} title={title} subtitle={subtitle ?? "Tap a phrase"} />;
   }
   return <WASDNavigator learnedWords={learnedWords} onSelect={onSelect} onCancel={onCancel} chadVoice={chadVoice} title={title} subtitle={subtitle} />;
 }
@@ -49,7 +55,7 @@ function FlatMenu({ learnedWords, onSelect, onCancel, chadVoice, title, subtitle
           <h2 style={S.title}>{title ?? "SHOUT A WORD"}</h2>
           <button style={S.closeBtn} onClick={onCancel}>&times;</button>
         </div>
-        <div style={S.subtitle}>{subtitle ?? "What do you want from this shop?"}</div>
+        <div style={S.subtitle}>{subtitle ?? (isTouchDevice ? "Tap a word to shout it" : "What do you want from this shop?")}</div>
         <div style={S.flatList}>
           {learnedWords.map((word) => (
             <button key={word.id} style={S.flatWord} onClick={() => handleSelect(word)}>
@@ -526,7 +532,8 @@ const S: Record<string, React.CSSProperties> = {
     background: "#2a2a3e",
     border: "1px solid #3a3a4e",
     borderRadius: 10,
-    padding: "10px 14px",
+    padding: isTouchDevice ? "12px 16px" : "10px 14px",
     cursor: "pointer",
+    minHeight: 44,
   },
 };

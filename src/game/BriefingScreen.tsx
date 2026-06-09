@@ -133,7 +133,7 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
                 key={msg.id}
                 style={{
                   ...styles.messageBubble,
-                  ...(msg.sender === "anya"
+                  ...(msg.sender === "mentor"
                     ? styles.anyaBubble
                     : styles.chadBubble),
                   opacity: showTyping ? 0.6 : 1,
@@ -179,17 +179,17 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     justifyContent: "center",
     height: "100vh",
-    padding: 32,
+    padding: "var(--game-pad)",
     background: "#1a1a2e",
     fontFamily: "'SF Pro', -apple-system, sans-serif",
   },
   phone: {
     width: 380,
     maxWidth: "95vw",
-    height: 600,
-    maxHeight: "90vh",
+    height: "clamp(400px, 85vh, 600px)",
+    maxHeight: "95vh",
     background: "#0f0f1a",
-    borderRadius: 24,
+    borderRadius: "clamp(16px, 3vw, 24px)",
     overflow: "hidden",
     boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
     display: "flex",

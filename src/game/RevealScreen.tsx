@@ -95,6 +95,7 @@ export function RevealScreen({
   const [showExtraLife, setShowExtraLife] = useState(false);
   const [showRefilled, setShowRefilled] = useState(false);
   const heartRefillDone = useRef(false);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const targetWords = vocabPack.words.filter((w) => w.matchesItemId !== null);
   const allRevealed = revealedCount >= targetWords.length;
@@ -125,6 +126,14 @@ export function RevealScreen({
     return () => clearInterval(interval);
   }, [allRevealed, collectedPotato, hearts, maxHearts, onHeartsRefilled]);
 
+  // Auto-scroll reveal list to bottom
+  useEffect(() => {
+    const el = listRef.current;
+    if (el) {
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    }
+  }, [revealedCount]);
+
   // Auto-pronounce when a new word is revealed
   useEffect(() => {
     if (revealedCount > prevRevealedCount.current && revealedCount <= targetWords.length) {
@@ -139,7 +148,7 @@ export function RevealScreen({
       <h1 style={styles.title}>WHAT YOU LEARNED</h1>
       <div style={styles.subtitle}>(whether you wanted to or not)</div>
 
-      <div style={styles.revealList}>
+      <div ref={listRef} style={styles.revealList}>
         {targetWords.slice(0, revealedCount).map((word) => {
           const result = inferenceResult.matches.find(
             (m) => m.vocabWordId === word.id
@@ -243,41 +252,44 @@ const styles: Record<string, React.CSSProperties> = {
     background: "#0a0a1a",
     color: "#fff",
     fontFamily: "'SF Pro', -apple-system, sans-serif",
-    padding: 32,
-    overflowY: "auto",
+    padding: "var(--game-pad)",
+    overflow: "hidden",
   },
   title: {
-    fontSize: 28,
+    fontSize: "var(--game-font-lg)",
     fontWeight: "bold",
     color: "#FFD54F",
     letterSpacing: 2,
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: "var(--game-font-sm)",
     color: "#555",
-    marginBottom: 32,
+    marginBottom: "var(--game-gap)",
   },
   revealList: {
     display: "flex",
     flexDirection: "column",
-    gap: 20,
+    gap: "var(--game-list-gap)",
     width: "100%",
     maxWidth: 500,
+    flex: 1,
+    overflowY: "auto",
+    minHeight: 0,
   },
   revealCard: {
     background: "#1a1a2e",
     borderRadius: 12,
-    padding: 20,
+    padding: "var(--game-card-pad)",
     display: "flex",
     flexDirection: "column",
-    gap: 10,
+    gap: "var(--game-card-gap)",
   },
   wordRow: {
     display: "flex",
     alignItems: "center",
-    gap: 12,
-    fontSize: 20,
+    gap: "var(--game-word-gap)",
+    fontSize: "var(--game-word-font)",
   },
   wordStack: {
     display: "flex",

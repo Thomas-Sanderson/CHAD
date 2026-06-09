@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { isTouchDevice } from "../engine/touch";
 import {
   drawSprite,
   chadWalk1,
@@ -101,19 +102,22 @@ export function BootScreen({ onComplete }: Props) {
       startMusic("title");
       window.removeEventListener("click", initAudio);
       window.removeEventListener("keydown", initAudio);
+      window.removeEventListener("touchstart", initAudio);
     };
     window.addEventListener("click", initAudio);
     window.addEventListener("keydown", initAudio);
+    window.addEventListener("touchstart", initAudio);
     return () => {
       window.removeEventListener("click", initAudio);
       window.removeEventListener("keydown", initAudio);
+      window.removeEventListener("touchstart", initAudio);
     };
   }, []);
 
   // Skip typing on click/key
   useEffect(() => {
     if (phase === "ready") return;
-    const skip = (e: KeyboardEvent | MouseEvent) => {
+    const skip = (e: KeyboardEvent | MouseEvent | TouchEvent) => {
       if (phase === "typing") {
         cancelled.current = true;
         setDisplay("Chad Rescues Nobody");
@@ -125,9 +129,11 @@ export function BootScreen({ onComplete }: Props) {
     };
     window.addEventListener("keydown", skip);
     window.addEventListener("click", skip);
+    window.addEventListener("touchstart", skip);
     return () => {
       window.removeEventListener("keydown", skip);
       window.removeEventListener("click", skip);
+      window.removeEventListener("touchstart", skip);
     };
   }, [phase, onComplete]);
 
@@ -151,15 +157,17 @@ export function BootScreen({ onComplete }: Props) {
   // Enter to proceed when ready
   useEffect(() => {
     if (phase !== "ready") return;
-    const handler = (e: KeyboardEvent | MouseEvent) => {
+    const handler = (e: KeyboardEvent | MouseEvent | TouchEvent) => {
       if (e instanceof KeyboardEvent && e.code !== "Enter" && e.code !== "Space") return;
       onComplete();
     };
     window.addEventListener("keydown", handler);
     window.addEventListener("click", handler);
+    window.addEventListener("touchstart", handler);
     return () => {
       window.removeEventListener("keydown", handler);
       window.removeEventListener("click", handler);
+      window.removeEventListener("touchstart", handler);
     };
   }, [phase, onComplete]);
 
@@ -540,7 +548,7 @@ export function BootScreen({ onComplete }: Props) {
       {/* Press enter */}
       {phase === "ready" && (
         <div style={{ ...styles.prompt, opacity: blink ? 1 : 0.2 }}>
-          PRESS ENTER
+          {isTouchDevice ? "TAP TO START" : "PRESS ENTER"}
         </div>
       )}
     </div>

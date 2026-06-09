@@ -1,4 +1,5 @@
 import type { LevelConfig } from "../types/skin";
+import { isTouchDevice } from "../engine/touch";
 
 interface LevelProgress {
   completed: boolean;
@@ -71,7 +72,9 @@ export function LevelSelectScreen({ levels, progress, onSelectLevel, skinName, o
       </div>
 
       <div style={styles.footer}>
-        Arrow keys to move. Space to jump. Collect what Anya asked for.
+        {isTouchDevice
+          ? "Tap controls to move and jump. Collect what Anya asked for."
+          : "Arrow keys to move. Space to jump. Collect what Anya asked for."}
       </div>
     </div>
   );
@@ -82,13 +85,13 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    height: "100vh",
+    minHeight: "100vh",
     overflowY: "auto",
     background: "#0a0a1a",
     color: "#fff",
     fontFamily: "'SF Pro', -apple-system, sans-serif",
-    padding: 32,
-    gap: 32,
+    padding: "var(--game-pad)",
+    gap: "var(--game-gap)",
   },
   backButton: {
     alignSelf: "flex-start",
@@ -113,14 +116,14 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: "center",
   },
   title: {
-    fontSize: 32,
+    fontSize: "var(--game-font-title)",
     fontWeight: "bold",
     color: "#FFD54F",
-    letterSpacing: 3,
+    letterSpacing: "var(--game-letter-sm)",
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: "var(--game-font-sm)",
     color: "#666",
     maxWidth: 400,
   },
@@ -134,8 +137,8 @@ const styles: Record<string, React.CSSProperties> = {
   levelCard: {
     display: "flex",
     alignItems: "center",
-    gap: 16,
-    padding: "16px 20px",
+    gap: "var(--game-gap-sm)",
+    padding: "var(--game-card-pad)",
     background: "#1a1a2e",
     border: "2px solid #2a2a3e",
     borderRadius: 12,
@@ -145,6 +148,7 @@ const styles: Record<string, React.CSSProperties> = {
     transition: "border-color 0.2s",
     fontFamily: "inherit",
     fontSize: "inherit",
+    minHeight: 44,
   },
   lockedCard: {
     opacity: 0.4,

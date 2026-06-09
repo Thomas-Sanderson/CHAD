@@ -27,7 +27,7 @@ export function SkinSelectScreen({ skins, onSelectSkin }: Props) {
       {!isEmbedded && <h1 style={styles.title}>CHAD RESCUES NOBODY</h1>}
       {!isEmbedded && <div style={styles.subtitle}>Different language. Same cargo shorts.</div>}
 
-      <div style={styles.skinGrid}>
+      <div className="skin-grid" style={styles.skinGrid}>
         {skins.map((skin) => {
           const vis = SKIN_VISUALS[skin.id];
           return (
@@ -86,8 +86,8 @@ const styles: Record<string, React.CSSProperties> = {
     background: "#0a0a1a",
     color: "#fff",
     fontFamily: "'SF Pro', -apple-system, sans-serif",
-    padding: 32,
-    gap: 32,
+    padding: "var(--game-pad)",
+    gap: "var(--game-gap)",
   },
   containerEmbed: {
     justifyContent: "center",
@@ -95,25 +95,26 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 16,
   },
   title: {
-    fontSize: 32,
+    fontSize: "var(--game-font-title)",
     fontWeight: "bold",
     color: "#FFD54F",
     letterSpacing: 3,
     marginBottom: 0,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: "var(--game-font-sm)",
     color: "#666",
   },
   skinGrid: {
     display: "flex",
-    gap: 20,
+    gap: "var(--game-list-gap)",
     flexWrap: "wrap",
     justifyContent: "center",
     maxWidth: 600,
+    width: "100%",
   },
   skinCard: {
-    width: 240,
+    width: "min(100%, 240px)",
     background: "#1a1a2e",
     border: "2px solid #2a2a3e",
     borderRadius: 16,

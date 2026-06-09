@@ -16,7 +16,7 @@ export interface VocabPack {
 
 export interface Message {
   id: string;
-  sender: "anya" | "chad";
+  sender: "mentor" | "chad";
   text: string;
   vocabWordIds: string[];
   voiceAudio?: string; // path to voice line audio (future)

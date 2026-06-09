@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback, useState, useMemo } from "react";
 import type { LevelData, GameRunState, InputState, SkinEnvironment, VocabWord } from "../types";
 import type { CollectibleItem, ConvoPhrase } from "../types/content";
 import { isEmbedded } from "../engine/embed";
+import { isTouchDevice } from "../engine/touch";
 import {
   createGameRunState,
   updateGameState,
@@ -18,6 +19,7 @@ import { sfxJump, sfxCollect, sfxHeartLost, sfxDoorEnter, sfxShout, sfxGateSucce
 import { setMusicVolume } from "../engine/music";
 import { ShoutMenu } from "./ShoutMenu";
 import { InventoryPanel } from "./InventoryPanel";
+import { TouchControls } from "./TouchControls";
 
 interface Props {
   level: LevelData;
@@ -58,6 +60,15 @@ export function RunPhase({
   const [shopConvoOpen, setShopConvoOpen] = useState(false);
   const [inventoryOpen, setInventoryOpen] = useState(false);
   const [currentSegmentId, setCurrentSegmentId] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [canvasScale, setCanvasScale] = useState(() => {
+    if (isEmbedded) return 1.95;
+    if (typeof window === "undefined") return 1.5;
+    const pad = isTouchDevice ? 0 : 32; // no padding on touch — fill the viewport
+    const scaleX = (window.innerWidth - pad) / CANVAS_WIDTH;
+    const scaleY = (window.innerHeight - pad) / CANVAS_HEIGHT;
+    return Math.min(scaleX, scaleY, isEmbedded ? 1.95 : 3);
+  });
   const pausedRef = useRef(false);
   const prevHitCountRef = useRef(0);
   const prevOnGroundRef = useRef(true);
@@ -218,6 +229,19 @@ export function RunPhase({
     const cleanup = initAndRun();
     return cleanup;
   }, [initAndRun]);
+
+  // Dynamic canvas scaling on resize
+  useEffect(() => {
+    if (isEmbedded) return;
+    const onResize = () => {
+      const pad = isTouchDevice ? 0 : 32;
+      const scaleX = (window.innerWidth - pad) / CANVAS_WIDTH;
+      const scaleY = (window.innerHeight - pad) / CANVAS_HEIGHT;
+      setCanvasScale(Math.min(scaleX, scaleY, 3));
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   // Canvas click handler for mute toggle and inventory bag
   const handleCanvasClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -411,16 +435,31 @@ export function RunPhase({
     pausedRef.current = false;
   }, []);
 
+  const scaledW = CANVAS_WIDTH * canvasScale;
+  const scaledH = CANVAS_HEIGHT * canvasScale;
+
   return (
-    <div style={styles.container}>
-      <div style={{ position: "relative" }}>
+    <div style={styles.container} ref={containerRef}>
+      <div style={{
+        position: "relative",
+        width: scaledW,
+        height: scaledH,
+      }}>
         <canvas
           ref={canvasRef}
           width={CANVAS_WIDTH}
           height={CANVAS_HEIGHT}
-          style={styles.canvas}
+          style={{
+            ...styles.canvas,
+            width: scaledW,
+            height: scaledH,
+            transform: "none",
+          }}
           onClick={handleCanvasClick}
         />
+        {isTouchDevice && !shoutMenuOpen && !shopConvoOpen && !inventoryOpen && (
+          <TouchControls inputRef={inputRef} canvasScale={canvasScale} />
+        )}
         {shoutMenuOpen && (
           <ShoutMenu
             learnedWords={learnedWords}
@@ -449,7 +488,7 @@ export function RunPhase({
           />
         )}
       </div>
-      {!isEmbedded && (
+      {!isEmbedded && !isTouchDevice && (
         <div style={styles.controls}>
           <span>
             &larr; &rarr; or A/D to move | &uarr; or W or Space to jump | E to enter/talk/listen | P to shout | I for inventory
@@ -465,19 +504,16 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: "flex-start",
-    paddingTop: 16,
+    justifyContent: isTouchDevice ? "center" : "flex-start",
+    paddingTop: isTouchDevice ? 0 : 16,
     minHeight: "100vh",
     background: "#0a0a1a",
     overflow: "hidden",
   },
   canvas: {
-    border: "2px solid #333",
-    borderRadius: 4,
     imageRendering: "pixelated",
-    transform: isEmbedded ? "scale(1.95)" : "scale(1.5)",
-    transformOrigin: "top center",
     cursor: "pointer",
+    display: "block",
   },
   controls: {
     marginTop: 12,
