@@ -178,7 +178,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    height: "100vh",
+    height: "100dvh",
     padding: "var(--game-pad)",
     background: "#1a1a2e",
     fontFamily: "'SF Pro', -apple-system, sans-serif",

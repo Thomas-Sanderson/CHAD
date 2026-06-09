@@ -248,7 +248,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    height: "100vh",
+    height: "100dvh",
     background: "#0a0a1a",
     color: "#fff",
     fontFamily: "'SF Pro', -apple-system, sans-serif",

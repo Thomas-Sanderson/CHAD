@@ -110,7 +110,7 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    minHeight: "100vh",
+    minHeight: "100dvh",
     overflowY: "auto",
     background: "#0a0a1a",
     color: "#fff",

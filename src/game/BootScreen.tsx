@@ -561,7 +561,7 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    height: "100vh",
+    height: "100dvh",
     background: "#0a0a1a",
     gap: 16,
   },

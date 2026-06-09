@@ -504,7 +504,7 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     justifyContent: isTouchDevice ? "center" : "flex-start",
     paddingTop: isTouchDevice ? 0 : 16,
-    minHeight: "100vh",
+    minHeight: "100dvh",
     background: "#0a0a1a",
     overflow: "hidden",
   },
