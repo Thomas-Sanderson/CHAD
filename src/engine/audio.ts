@@ -35,8 +35,8 @@ export function speakAsChad(text: string): void {
   doSpeak(text, undefined, { lang: "en-US", male: true });
 }
 
-export function speakScold(text: string): void {
-  doSpeak(text, undefined, { pitch: 1.4, rate: 1.1 });
+export function speakScold(text: string, lang?: string): void {
+  doSpeak(text, undefined, { pitch: 1.4, rate: 1.1, lang });
 }
 
 interface VoiceOpts {

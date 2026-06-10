@@ -113,8 +113,13 @@ export function SortingScreen({
     if (!correct) {
       setShaking(true);
       setTimeout(() => setShaking(false), 500);
-      // Scold after the item speech finishes — use script so language detection is correct
-      if (item) setTimeout(() => speakScold(item.script), 1200);
+      // Scold the English name in the native accent (e.g. "Sausage Link" in Russian voice)
+      if (item) {
+        const lang = /[\u0400-\u04FF]/.test(item.script) ? "ru-RU"
+          : /[\u1200-\u137F]/.test(item.script) ? "am-ET"
+          : "it-IT";
+        setTimeout(() => speakScold(item.name, lang), 1200);
+      }
     }
   };
 
