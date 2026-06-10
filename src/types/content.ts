@@ -53,6 +53,8 @@ export interface PlatformDef {
   y: number;
   width: number;
   height: number;
+  isGround?: boolean; // marks avenue ground platforms in tall levels
+  passThrough?: boolean; // jump up through from below, land on top (street stairs)
 }
 
 export interface PlacedItem {
@@ -121,6 +123,13 @@ export interface ShopKeeperDef {
   conversation?: ShopKeeperConversation;
 }
 
+export interface StreetCorridor {
+  x: number;       // corridor left inner wall face (world x)
+  width: number;   // inner corridor width (between wall faces)
+  topY: number;    // upper avenue ground Y (corridor opens here)
+  bottomY: number; // lower avenue ground Y (corridor opens here)
+}
+
 export interface LandmarkDef {
   label: string;
   x: number;
@@ -139,6 +148,8 @@ export interface LevelSegment {
   shopkeeper?: ShopKeeperDef;
   shelfType?: "wood" | "metal";
   landmarks?: LandmarkDef[];
+  streetSigns?: { label: string; x: number; y: number }[];
+  streetCorridors?: StreetCorridor[];
 }
 
 export interface LevelData {
@@ -153,4 +164,6 @@ export interface LevelData {
   bounds: { width: number; height: number };
   segments?: LevelSegment[];
   landmarks?: LandmarkDef[];
+  skylineY?: number; // world Y where sky ends and buildings begin (tall levels)
+  deathFloorY?: number; // Y of lowest ground + margin; fall below = respawn
 }

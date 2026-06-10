@@ -6,6 +6,8 @@ export const MOVE_SPEED = 280;
 export const FRICTION = 0.85;
 export const PLAYER_WIDTH = 32;
 export const PLAYER_HEIGHT = 48;
+export const JUMP_CUT_VELOCITY = -200;
+export const COYOTE_MS = 100;
 
 export function applyGravity(player: PlayerState, dt: number): void {
   if (!player.onGround) {
@@ -26,10 +28,19 @@ export function applyMovement(player: PlayerState, dirX: number, dt: number): vo
   player.position.y += player.velocity.y * dt;
 }
 
-export function tryJump(player: PlayerState): void {
-  if (player.onGround) {
+export function tryJump(player: PlayerState, elapsed?: number): void {
+  const canJump = player.onGround ||
+    (elapsed !== undefined && (elapsed - player.lastGroundedTime) < COYOTE_MS);
+  if (canJump) {
     player.velocity.y = JUMP_VELOCITY;
     player.onGround = false;
+    player.lastGroundedTime = -Infinity; // consume coyote window
+  }
+}
+
+export function cutJump(player: PlayerState, jumpHeld: boolean): void {
+  if (!jumpHeld && player.velocity.y < JUMP_CUT_VELOCITY) {
+    player.velocity.y = JUMP_CUT_VELOCITY;
   }
 }
 
@@ -59,6 +70,20 @@ export function resolvePlatformCollisions(
 
   for (const plat of platforms) {
     if (!aabbOverlap(pBox, plat)) continue;
+
+    // Pass-through: only land on top when falling
+    if (plat.passThrough) {
+      const overlapTop = pBox.y + pBox.height - plat.y;
+      if (player.velocity.y >= 0 && overlapTop > 0 && overlapTop < 16) {
+        player.position.y = plat.y - player.height;
+        player.velocity.y = 0;
+        player.onGround = true;
+        player.lastSafePosition = { ...player.position };
+      }
+      pBox.x = player.position.x;
+      pBox.y = player.position.y;
+      continue;
+    }
 
     const overlapLeft = pBox.x + pBox.width - plat.x;
     const overlapRight = plat.x + plat.width - pBox.x;

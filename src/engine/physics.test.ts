@@ -3,10 +3,12 @@ import {
   applyGravity,
   applyMovement,
   tryJump,
+  cutJump,
   aabbOverlap,
   resolvePlatformCollisions,
   GRAVITY,
   JUMP_VELOCITY,
+  JUMP_CUT_VELOCITY,
   MOVE_SPEED,
   PLAYER_WIDTH,
   PLAYER_HEIGHT,
@@ -24,6 +26,7 @@ function makePlayer(overrides: Partial<PlayerState> = {}): PlayerState {
     facing: "right",
     invincibleUntil: 0,
     dead: false,
+    lastGroundedTime: 0,
     ...overrides,
   };
 }
@@ -84,6 +87,54 @@ describe("tryJump", () => {
     tryJump(player);
     expect(player.velocity.y).toBe(0);
   });
+
+  it("allows jump within coyote time window after leaving ground", () => {
+    const player = makePlayer({ onGround: false, lastGroundedTime: 950 });
+    // 1000 - 950 = 50ms < COYOTE_MS (100ms) → should jump
+    tryJump(player, 1000);
+    expect(player.velocity.y).toBe(JUMP_VELOCITY);
+    expect(player.onGround).toBe(false);
+  });
+
+  it("does not allow jump outside coyote time window", () => {
+    const player = makePlayer({ onGround: false, lastGroundedTime: 800 });
+    // 1000 - 800 = 200ms > COYOTE_MS (100ms) → should not jump
+    tryJump(player, 1000);
+    expect(player.velocity.y).toBe(0);
+  });
+
+  it("consumes coyote window after use", () => {
+    const player = makePlayer({ onGround: false, lastGroundedTime: 950 });
+    tryJump(player, 1000);
+    expect(player.velocity.y).toBe(JUMP_VELOCITY);
+    // Second jump should fail — coyote consumed
+    player.velocity.y = -300;
+    player.onGround = false;
+    tryJump(player, 1010);
+    expect(player.velocity.y).toBe(-300); // unchanged
+  });
+});
+
+describe("cutJump", () => {
+  it("cuts velocity when jump released and velocity below threshold", () => {
+    const player = makePlayer({ velocity: { x: 0, y: JUMP_VELOCITY } });
+    // JUMP_VELOCITY (-480) < JUMP_CUT_VELOCITY (-200) → should clamp
+    cutJump(player, false);
+    expect(player.velocity.y).toBe(JUMP_CUT_VELOCITY);
+  });
+
+  it("does not cut velocity when jump is held", () => {
+    const player = makePlayer({ velocity: { x: 0, y: JUMP_VELOCITY } });
+    cutJump(player, true);
+    expect(player.velocity.y).toBe(JUMP_VELOCITY);
+  });
+
+  it("does not cut velocity when already above threshold", () => {
+    const player = makePlayer({ velocity: { x: 0, y: -100 } });
+    // -100 > JUMP_CUT_VELOCITY (-200) → no change
+    cutJump(player, false);
+    expect(player.velocity.y).toBe(-100);
+  });
 });
 
 describe("aabbOverlap", () => {
@@ -136,5 +187,29 @@ describe("resolvePlatformCollisions", () => {
     resolvePlatformCollisions(player, platforms);
     expect(player.position.y).toBe(16);
     expect(player.velocity.y).toBe(0);
+  });
+
+  it("does not block player jumping up through pass-through platform", () => {
+    const player = makePlayer({
+      position: { x: 50, y: 15 }, // overlapping bottom
+      velocity: { x: 0, y: -100 }, // jumping up
+    });
+    const platforms = [{ x: 0, y: 0, width: 200, height: 16, passThrough: true }];
+    resolvePlatformCollisions(player, platforms);
+    // Should NOT be pushed down — pass-through ignores head-bump
+    expect(player.position.y).toBe(15);
+    expect(player.velocity.y).toBe(-100);
+  });
+
+  it("lands player on top of pass-through platform when falling", () => {
+    const player = makePlayer({
+      position: { x: 50, y: 100 - PLAYER_HEIGHT + 5 }, // feet 5px into platform top
+      velocity: { x: 0, y: 100 }, // falling
+    });
+    const platforms = [{ x: 0, y: 100, width: 200, height: 16, passThrough: true }];
+    resolvePlatformCollisions(player, platforms);
+    expect(player.position.y).toBe(100 - PLAYER_HEIGHT);
+    expect(player.velocity.y).toBe(0);
+    expect(player.onGround).toBe(true);
   });
 });

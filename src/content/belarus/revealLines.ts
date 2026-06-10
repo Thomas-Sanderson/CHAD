@@ -132,6 +132,92 @@ export const level6RevealLines: RevealLine[] = [
   },
 ];
 
+export const level7RevealLines: RevealLine[] = [
+  {
+    vocabWordId: "sveokla",
+    correct:
+      "СВЁКЛА! Beetroot! You climbed stairs for a beetroot. I'm... proud? Confused? Both.",
+    wrong:
+      "No СВЁКЛА? It's a BEETROOT. Purple. Makes borscht. You literally walked past it.",
+  },
+  {
+    vocabWordId: "smetana_street",
+    correct:
+      "СМЕТАНА again. At least you remember the white tub. Progress.",
+    wrong:
+      "You forgot СМЕТАНА? You bought this in level one, Chad. LEVEL ONE.",
+  },
+  {
+    vocabWordId: "hleb_street",
+    correct:
+      "ХЛЕБ. The right bread. Again. Maybe muscle memory counts as learning.",
+    wrong:
+      "No ХЛЕБ? Bread. The dark kind. We've done this. Multiple times.",
+  },
+  {
+    vocabWordId: "maslo_street",
+    correct:
+      "МАСЛО. Butter. From the dairy upstairs. Okay. You can navigate vertically. Noted.",
+    wrong:
+      "Where's the МАСЛО? Butter. It was in the dairy. The one UPSTAIRS.",
+  },
+];
+
+export const level8RevealLines: RevealLine[] = [
+  {
+    vocabWordId: "ukrop",
+    correct:
+      "УКРОП! Dill! The herb that grows on everything in this country. You found it.",
+    wrong:
+      "No УКРОП? It's dill. Green. Feathery. Smells like a Belarusian grandmother's garden.",
+  },
+  {
+    vocabWordId: "ryba_intersection",
+    correct:
+      "РЫБА. Fish. Again. At this point you could order fish in your sleep.",
+    wrong:
+      "No РЫБА? Fish. You've bought fish three times now. How.",
+  },
+  {
+    vocabWordId: "grib_intersection",
+    correct:
+      "ГРИБ! Mushrooms from behind the locked door. You remembered to shout. Good boy.",
+    wrong:
+      "No ГРИБ? Mushrooms. Behind the locked door. Did you even try shouting?",
+  },
+];
+
+export const level9RevealLines: RevealLine[] = [
+  {
+    vocabWordId: "tvorog",
+    correct:
+      "ТВОРОГ! Cottage cheese. The grainy one, not the creamy one. Important distinction.",
+    wrong:
+      "No ТВОРОГ? It's cottage cheese. In a tub. NOT the same as сметана. Different tub.",
+  },
+  {
+    vocabWordId: "sosiski",
+    correct:
+      "СОСИСКИ! Frankfurters. Little sausages. Not колбаса. You're learning the nuances.",
+    wrong:
+      "No СОСИСКИ? They're small sausages. In a pack. The butcher had them. On the second floor.",
+  },
+  {
+    vocabWordId: "sveokla_return",
+    correct:
+      "СВЁКЛА again. You remembered from last time. The purple root. I'm impressed.",
+    wrong:
+      "You forgot СВЁКЛА already? You JUST learned this. Last level. Beetroot. Purple. Come on.",
+  },
+  {
+    vocabWordId: "kefir_return",
+    correct:
+      "КЕФИР! Full circle. The fizzy milk from day one. You actually remember things.",
+    wrong:
+      "No КЕФИР? The fizzy milk. From your first day here. This was the test, Chad. You failed.",
+  },
+];
+
 export const level4RevealLines: RevealLine[] = [
   {
     vocabWordId: "konfeta",

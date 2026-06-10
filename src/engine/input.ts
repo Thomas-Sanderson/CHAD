@@ -3,7 +3,7 @@ import { isTouchDevice } from "./touch";
 
 export function createInputState(): InputState {
   return {
-    left: false, right: false, jump: false, interact: false,
+    left: false, right: false, jump: false, jumpHeld: false, interact: false,
     shout: false, inventory: false,
   };
 }
@@ -25,6 +25,7 @@ export function setupKeyboardInput(state: InputState): () => void {
       case "KeyW":
       case "Space":
         state.jump = true;
+        state.jumpHeld = true;
         e.preventDefault();
         break;
       case "KeyE":
@@ -56,6 +57,7 @@ export function setupKeyboardInput(state: InputState): () => void {
       case "KeyW":
       case "Space":
         state.jump = false;
+        state.jumpHeld = false;
         break;
       case "KeyE":
         state.interact = false;

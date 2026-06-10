@@ -11,6 +11,7 @@ import {
   applyGravity,
   applyMovement,
   tryJump,
+  cutJump,
   resolvePlatformCollisions,
   aabbOverlap,
   playerAABB,
@@ -18,7 +19,7 @@ import {
   PLAYER_HEIGHT,
   GRAVITY,
 } from "./physics";
-import { CANVAS_WIDTH } from "./renderer";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./renderer";
 
 const MARSHRUTKA_WIDTH = 80;
 const MARSHRUTKA_HEIGHT = 40;
@@ -99,6 +100,7 @@ export function createGameRunState(level: LevelData, scoldings?: string[], headB
       facing: "right",
       invincibleUntil: 0,
       dead: false,
+      lastGroundedTime: 0,
     },
     collectedItems: [],
     marshrutkas: [],
@@ -123,7 +125,7 @@ export function createGameRunState(level: LevelData, scoldings?: string[], headB
       ? []
       : level.collectibles.map(c => ({ itemId: c.itemId, x: c.x, y: c.y })),
     droppingItems: [],
-    camera: { x: 0 },
+    camera: { x: 0, y: 0 },
     score: 0,
     reachedGate: false,
     elapsed: 0,
@@ -190,6 +192,9 @@ export function updateGameState(
         if (seg) {
           const targetCamX = state.player.position.x - CANVAS_WIDTH / 3;
           state.camera.x = Math.max(0, Math.min(targetCamX, seg.bounds.width - CANVAS_WIDTH));
+          const segMaxCamY = Math.max(0, seg.bounds.height - CANVAS_HEIGHT);
+          const targetSnapCamY = state.player.position.y - CANVAS_HEIGHT * 0.4;
+          state.camera.y = Math.max(0, Math.min(targetSnapCamY, segMaxCamY));
         }
       } else {
         state.transition = null;
@@ -224,9 +229,14 @@ export function updateGameState(
   // Capture jump intent before consuming (used for super-bounce on babushka heads)
   const jumpPressed = input.jump;
 
+  // Track last grounded time for coyote time
+  if (state.player.onGround) {
+    state.player.lastGroundedTime = state.elapsed;
+  }
+
   // Jump (consume the flag so it's one-shot)
   if (input.jump) {
-    tryJump(state.player);
+    tryJump(state.player, state.elapsed);
     input.jump = false;
   }
 
@@ -234,6 +244,9 @@ export function updateGameState(
   state.player.onGround = false;
   applyGravity(state.player, dt);
   applyMovement(state.player, dirX, dt);
+
+  // Variable jump height — cut jump arc on early release
+  cutJump(state.player, input.jumpHeld);
 
   // Clamp to bounds
   if (state.player.position.x < 0) {
@@ -245,8 +258,9 @@ export function updateGameState(
     state.player.velocity.x = 0;
   }
 
-  // Fall off bottom → respawn
-  if (state.player.position.y > activeBounds.height + 100) {
+  // Fall off bottom → respawn (deathFloorY for tall levels, bounds.height for flat)
+  const deathY = (level.deathFloorY ?? activeBounds.height) + 100;
+  if (state.player.position.y > deathY) {
     state.hitCount++;
     respawnPlayer(state);
     return;
@@ -377,6 +391,7 @@ export function updateGameState(
 
     // Platform collision — bounce or settle
     for (const p of activePlatforms) {
+      if (p.passThrough) continue; // items fall through stairs
       if (
         item.vy > 0 &&
         item.y + ITEM_SIZE >= p.y &&
@@ -411,6 +426,9 @@ export function updateGameState(
   // Marshrutka spawning (from current segment hazards or level hazards)
   for (const h of activeHazards) {
     if (h.type === "marshrutka") {
+      // Only spawn if hazard Y is within vertical camera range
+      const inVerticalRange = h.y >= state.camera.y - 50 && h.y <= state.camera.y + CANVAS_HEIGHT + 50;
+      if (!inVerticalRange) continue;
       const shouldSpawn =
         Math.floor(state.elapsed / h.interval) !==
         Math.floor((state.elapsed - dt * 1000) / h.interval);
@@ -430,7 +448,11 @@ export function updateGameState(
   state.marshrutkas = state.marshrutkas.filter(m => {
     m.x += m.speed * dt;
 
+    // Cull if off-screen horizontally OR vertically (for tall levels)
     if (m.x + m.width < state.camera.x - 100 || m.x > state.camera.x + CANVAS_WIDTH + 200) {
+      return false;
+    }
+    if (m.y + m.height < state.camera.y - 200 || m.y > state.camera.y + CANVAS_HEIGHT + 200) {
       return false;
     }
 
@@ -604,6 +626,14 @@ export function updateGameState(
   );
   const camLerp = 1 - Math.pow(0.001, dt); // ~0.92 at 60fps — smooth but responsive
   state.camera.x += (targetCamX - state.camera.x) * camLerp;
+
+  // Camera Y — player at 40% from top, clamped to bounds
+  const maxCamY = Math.max(0, activeBounds.height - CANVAS_HEIGHT);
+  const targetCamY = Math.max(0, Math.min(
+    state.player.position.y - CANVAS_HEIGHT * 0.4,
+    maxCamY
+  ));
+  state.camera.y += (targetCamY - state.camera.y) * camLerp;
 }
 
 function respawnPlayer(state: GameRunState): void {

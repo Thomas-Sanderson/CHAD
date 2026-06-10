@@ -233,3 +233,123 @@ export const level6VocabPack: VocabPack = {
     },
   ],
 };
+
+// === Level 7 vocab ===
+export const level7VocabPack: VocabPack = {
+  levelId: "up-the-street",
+  words: [
+    {
+      id: "sveokla",
+      script: "СВЁКЛА",
+      translation: "beetroot",
+      matchesItemId: "sveokla_beet",
+      pronunciation: "SVYOK-la",
+      ipa: "/ˈsvʲɵklə/",
+      hint: "Purple. Stains everything. Makes borscht that color.",
+    },
+    {
+      id: "smetana_street",
+      script: "СМЕТАНА",
+      translation: "sour cream",
+      matchesItemId: "smetana_tub",
+      pronunciation: "smeh-TAH-nah",
+      ipa: "/smʲɪˈtanə/",
+      hint: "You've seen this before. The white goop.",
+    },
+    {
+      id: "hleb_street",
+      script: "ХЛЕБ",
+      translation: "bread",
+      matchesItemId: "hleb_rye",
+      pronunciation: "KHLYEB",
+      ipa: "/xlʲep/",
+      hint: "The dark one again. You know this.",
+    },
+    {
+      id: "maslo_street",
+      script: "МАСЛО",
+      translation: "butter",
+      matchesItemId: "maslo_butter",
+      pronunciation: "MAHS-lah",
+      ipa: "/ˈmaslə/",
+      hint: "Yellow. In foil. You literally bought this before.",
+    },
+  ],
+};
+
+// === Level 8 vocab ===
+export const level8VocabPack: VocabPack = {
+  levelId: "the-intersection",
+  words: [
+    {
+      id: "ukrop",
+      script: "УКРОП",
+      translation: "dill",
+      matchesItemId: "ukrop_bunch",
+      pronunciation: "oo-KROP",
+      ipa: "/ʊˈkrop/",
+      hint: "Feathery green herb. Goes on everything here. EVERYTHING.",
+    },
+    {
+      id: "ryba_intersection",
+      script: "РЫБА",
+      translation: "fish",
+      matchesItemId: "ryba_smoked",
+      pronunciation: "RIH-bah",
+      ipa: "/ˈrɨbə/",
+      hint: "Still smells. Still has fins. You know this word by now.",
+    },
+    {
+      id: "grib_intersection",
+      script: "ГРИБ",
+      translation: "mushroom",
+      matchesItemId: "grib_basket",
+      pronunciation: "GREEB",
+      ipa: "/grʲip/",
+      hint: "Forest fungus. You bought these last time. Remember?",
+    },
+  ],
+};
+
+// === Level 9 vocab ===
+export const level9VocabPack: VocabPack = {
+  levelId: "the-other-side",
+  words: [
+    {
+      id: "tvorog",
+      script: "ТВОРОГ",
+      translation: "cottage cheese / quark",
+      matchesItemId: "tvorog_tub",
+      pronunciation: "TVOH-rog",
+      ipa: "/ˈtvorək/",
+      hint: "White, grainy, in a tub. Not sour cream. Different tub.",
+    },
+    {
+      id: "sosiski",
+      script: "СОСИСКИ",
+      translation: "frankfurters / small sausages",
+      matchesItemId: "sosiski_pack",
+      pronunciation: "sah-SEES-kee",
+      ipa: "/sɐˈsʲiskʲɪ/",
+      hint: "Thin sausages in a pack. Not колбаса. Smaller.",
+    },
+    {
+      id: "sveokla_return",
+      script: "СВЁКЛА",
+      translation: "beetroot",
+      matchesItemId: "sveokla_beet",
+      pronunciation: "SVYOK-la",
+      ipa: "/ˈsvʲɵklə/",
+      hint: "Purple root. You just learned this. Don't forget already.",
+    },
+    {
+      id: "kefir_return",
+      script: "КЕФИР",
+      translation: "fermented milk drink",
+      matchesItemId: "kefir_bottle",
+      pronunciation: "keh-FEER",
+      ipa: "/kʲɪˈfʲir/",
+      hint: "Tall bottle. Fizzy milk. Level one vocabulary, Chad.",
+    },
+  ],
+};

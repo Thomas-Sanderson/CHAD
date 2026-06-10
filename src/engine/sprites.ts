@@ -1690,6 +1690,83 @@ export const kvassBottleSprite: SpriteData = [
   [_, _, _, _, LG, LG, LG, LG, LG, LG, LG, LG, _, _, _, _],
 ];
 
+// === Belarus items (L7-9) ===
+
+// Beetroot — dark purple-red with green leaf tuft (12×13)
+const b1 = "#6B1F3A"; // beet body
+const b2 = "#4a1028"; // beet dark
+const g1 = "#4CAF50"; // leaf green
+const g2 = "#2E7D32"; // leaf dark
+export const sveoklaBeetSprite: SpriteData = [
+  [_, _, _, _, _, g1, g1, _, _, _, _, _],
+  [_, _, _, _, g1, g2, g1, g1, _, _, _, _],
+  [_, _, _, _, g1, g2, g1, _, _, _, _, _],
+  [_, _, _, _, _, g2, _, _, _, _, _, _],
+  [_, _, _, b1, b1, b1, b1, b1, b1, _, _, _],
+  [_, _, b1, b1, b2, b1, b1, b2, b1, b1, _, _],
+  [_, b1, b1, b2, b1, b1, b1, b1, b2, b1, b1, _],
+  [_, b1, b1, b1, b1, b1, b1, b1, b1, b1, b1, _],
+  [_, b1, b1, b1, b2, b1, b1, b2, b1, b1, b1, _],
+  [_, _, b1, b1, b1, b1, b1, b1, b1, b1, _, _],
+  [_, _, _, b1, b1, b1, b1, b1, b1, _, _, _],
+  [_, _, _, _, b1, b2, b2, b1, _, _, _, _],
+  [_, _, _, _, _, b2, b2, _, _, _, _, _],
+];
+
+// Dill bunch — bright green feathery herb (12×12)
+const UG = "#66BB6A"; // ukrop green
+const UD = "#388E3C"; // ukrop dark
+const US = "#81C784"; // ukrop stem
+export const ukropBunchSprite: SpriteData = [
+  [_, _, UG, _, _, UG, UG, _, _, UG, _, _],
+  [_, UG, UD, UG, _, UG, UG, _, UG, UD, UG, _],
+  [_, UG, UD, UG, UG, UD, UD, UG, UG, UD, UG, _],
+  [_, _, UG, UD, UG, UD, UD, UG, UD, UG, _, _],
+  [_, _, _, UG, UD, UG, UG, UD, UG, _, _, _],
+  [_, _, _, _, UG, UD, UD, UG, _, _, _, _],
+  [_, _, _, _, _, US, US, _, _, _, _, _],
+  [_, _, _, _, _, US, US, _, _, _, _, _],
+  [_, _, _, _, _, US, US, _, _, _, _, _],
+  [_, _, _, _, US, US, US, US, _, _, _, _],
+  [_, _, _, _, US, US, US, US, _, _, _, _],
+  [_, _, _, _, _, US, US, _, _, _, _, _],
+];
+
+// Tvorog tub — green-labeled white tub (12×11)
+const t1 = "#f0f0f0"; // tub white
+const t2 = "#4CAF50"; // tub label green
+const t3 = "#ddd"; // tub shadow
+export const tvorogTubSprite: SpriteData = [
+  [_, _, _, t1, t1, t1, t1, t1, t1, _, _, _],
+  [_, _, t1, t1, t1, t1, t1, t1, t1, t1, _, _],
+  [_, t1, t1, t2, t2, t2, t2, t2, t2, t1, t1, _],
+  [_, t1, t2, t2, t1, t2, t2, t1, t2, t2, t1, _],
+  [_, t1, t2, t2, t2, t2, t2, t2, t2, t2, t1, _],
+  [_, t1, t1, t2, t2, t2, t2, t2, t2, t1, t1, _],
+  [_, t1, t1, t1, t1, t1, t1, t1, t1, t1, t1, _],
+  [_, t3, t1, t1, t1, t1, t1, t1, t1, t1, t3, _],
+  [_, t3, t1, t1, t1, t1, t1, t1, t1, t1, t3, _],
+  [_, t3, t3, t1, t1, t1, t1, t1, t1, t3, t3, _],
+  [_, _, t3, t3, t3, t3, t3, t3, t3, t3, _, _],
+];
+
+// Sosiski pack — package of thin sausages (12×10)
+const s1 = "#e08080"; // sausage pink
+const s2 = "#cc6060"; // sausage dark
+const s3 = "#f0e0e0"; // package wrap
+export const sosiskiPackSprite: SpriteData = [
+  [_, _, s3, s3, s3, s3, s3, s3, s3, s3, _, _],
+  [_, s3, s3, s1, s1, s1, s1, s1, s1, s3, s3, _],
+  [_, s3, s1, s1, s2, s1, s1, s2, s1, s1, s3, _],
+  [_, s3, s1, s2, s1, s1, s1, s1, s2, s1, s3, _],
+  [_, s3, s1, s1, s1, s2, s2, s1, s1, s1, s3, _],
+  [_, s3, s1, s2, s1, s1, s1, s2, s1, s1, s3, _],
+  [_, s3, s1, s2, s1, s1, s1, s1, s2, s1, s3, _],
+  [_, s3, s1, s1, s1, s1, s1, s1, s1, s1, s3, _],
+  [_, s3, s3, s1, s1, s1, s1, s1, s1, s3, s3, _],
+  [_, _, s3, s3, s3, s3, s3, s3, s3, s3, _, _],
+];
+
 // --- Sprite drawing utility ---
 
 export function drawSprite(
@@ -1780,6 +1857,11 @@ const itemSpriteMap: Record<string, SpriteData> = {
   grib_basket: gribBasketSprite,
   kolbasa_ring: kolbasaRingSprite,
   kvass_bottle: kvassBottleSprite,
+  // Belarus items (L7-9)
+  sveokla_beet: sveoklaBeetSprite,
+  ukrop_bunch: ukropBunchSprite,
+  tvorog_tub: tvorogTubSprite,
+  sosiski_pack: sosiskiPackSprite,
   // Ethiopia items
   buna_bag: bunaBagSprite,
   wetet_jug: wetetJugSprite,

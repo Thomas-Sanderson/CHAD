@@ -22,6 +22,7 @@ export interface PlayerState {
   facing: "left" | "right";
   invincibleUntil: number; // timestamp, 0 = not invincible
   dead: boolean;
+  lastGroundedTime: number; // elapsed ms when player was last on ground (coyote time)
 }
 
 export interface ActiveMarshrutka {
@@ -98,7 +99,7 @@ export interface GameRunState {
   potato: PotatoState | null;
   remainingCollectibles: CollectedInfo[];
   droppingItems: DroppingItem[];
-  camera: { x: number };
+  camera: { x: number; y: number };
   score: number;
   reachedGate: boolean;
   elapsed: number;
@@ -139,6 +140,7 @@ export interface InputState {
   right: boolean;
   shout: boolean; // P key — locked door shout menu
   jump: boolean;
+  jumpHeld: boolean; // true while jump key is physically held (variable jump height)
   interact: boolean;
   inventory: boolean; // I key — open inventory
 }

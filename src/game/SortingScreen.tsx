@@ -72,18 +72,30 @@ export function SortingScreen({
     [vocabPack]
   );
 
-  // Items still available in the bag (remove correctly matched ones)
-  const matchedItemIds = useMemo(
-    () => new Set(results.filter((r) => r.correct).map((r) => r.pickedItemId)),
-    [results]
-  );
+  // Items still available in the bag (remove only as many as were correctly matched)
+  const matchedCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const r of results) {
+      if (r.correct) counts.set(r.pickedItemId, (counts.get(r.pickedItemId) ?? 0) + 1);
+    }
+    return counts;
+  }, [results]);
 
   const bagItems = useMemo(() => {
+    const toRemove = new Map(matchedCounts);
     return collectedItemIds
-      .filter((id) => !matchedItemIds.has(id))
-      .map((id) => itemDefs.get(id))
-      .filter((item): item is CollectibleItem => item !== undefined);
-  }, [collectedItemIds, matchedItemIds, itemDefs]);
+      .map((id, idx) => ({ id, idx }))
+      .filter(({ id }) => {
+        const rem = toRemove.get(id) ?? 0;
+        if (rem > 0) {
+          toRemove.set(id, rem - 1);
+          return false;
+        }
+        return true;
+      })
+      .map(({ id, idx }) => ({ item: itemDefs.get(id), idx }))
+      .filter((e): e is { item: CollectibleItem; idx: number } => e.item !== undefined);
+  }, [collectedItemIds, matchedCounts, itemDefs]);
 
   const currentWord = targetWords[currentIndex];
   const done = currentIndex >= targetWords.length;
@@ -230,7 +242,7 @@ export function SortingScreen({
 
         {/* Center: bag grid */}
         <div className="sorting-bag" style={styles.bagGrid}>
-          {bagItems.map((item) => {
+          {bagItems.map(({ item, idx }) => {
             const isPickedItem = picked === item.id;
             const borderColor = isPickedItem
               ? isCorrect
@@ -240,7 +252,7 @@ export function SortingScreen({
 
             return (
               <button
-                key={item.id}
+                key={idx}
                 style={{
                   ...styles.itemButton,
                   borderColor,
