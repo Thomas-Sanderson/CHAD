@@ -281,6 +281,25 @@ export function renderFrame(
     // Ground tiles — render all isGround platforms, or platform[0] as fallback
     const groundPlatforms = activePlatforms.filter(p => p.isGround);
     const groundTargets = groundPlatforms.length > 0 ? groundPlatforms : (activePlatforms[0] ? [activePlatforms[0]] : []);
+
+    // Road surface — continuous asphalt strip at each avenue Y (bridges gaps)
+    const avenueYs = new Set(groundTargets.map(gp => gp.y));
+    for (const aveY of avenueYs) {
+      const roadScreenY = aveY - camY;
+      if (roadScreenY > CANVAS_HEIGHT + 16 || roadScreenY + 40 < -16) continue;
+      // Asphalt
+      ctx.fillStyle = "#555";
+      ctx.fillRect(0, roadScreenY, CANVAS_WIDTH, 16);
+      // Earth beneath the road
+      ctx.fillStyle = "#5a4a3a";
+      ctx.fillRect(0, roadScreenY + 16, CANVAS_WIDTH, 24);
+      // Center line dashes
+      ctx.fillStyle = "#666";
+      for (let dx = Math.floor(camX / 40) * 40; dx < camX + CANVAS_WIDTH + 40; dx += 40) {
+        ctx.fillRect(dx - camX, roadScreenY + 7, 20, 2);
+      }
+    }
+
     // Earth fill below the lowest avenue — extends to canvas bottom
     let lowestGroundY = -Infinity;
     for (const gp of groundTargets) {
@@ -299,6 +318,8 @@ export function renderFrame(
         }
       }
     }
+
+    // Ground tiles — painted over road strips where platforms exist
     for (const gp of groundTargets) {
       const gpScreenY = gp.y - camY;
       if (gpScreenY > CANVAS_HEIGHT + 32 || gpScreenY + 32 < -32) continue;

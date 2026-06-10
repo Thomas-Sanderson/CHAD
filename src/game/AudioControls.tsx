@@ -66,7 +66,7 @@ export function AudioControls() {
   }, []);
 
   return (
-    <div ref={wrapperRef} style={styles.wrapper}>
+    <div ref={wrapperRef} className="audio-controls" style={styles.wrapper}>
       <button
         style={styles.iconButton}
         onClick={() => setOpen(prev => !prev)}
