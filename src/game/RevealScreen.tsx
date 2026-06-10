@@ -73,6 +73,7 @@ interface Props {
   sacredItemName?: string;
   onHeartsRefilled?: () => void;
   sortingAttempts?: Map<string, number>;
+  runElapsed?: number;
 }
 
 export function RevealScreen({
@@ -90,6 +91,7 @@ export function RevealScreen({
   sacredItemName,
   onHeartsRefilled,
   sortingAttempts,
+  runElapsed = 0,
 }: Props) {
   const [revealedCount, setRevealedCount] = useState(0);
   const prevRevealedCount = useRef(0);
@@ -261,11 +263,17 @@ export function RevealScreen({
               <div style={styles.scoreBreakdown}>
                 <div>Run score: {score.runScore}</div>
                 <div>Vocab score: {score.inferenceScore}</div>
+                {runElapsed > 0 && (
+                  <div>Time: {Math.floor(runElapsed / 60000)}:{String(Math.floor((runElapsed / 1000) % 60)).padStart(2, "0")}</div>
+                )}
                 {score.potatoBonus > 0 && (
                   <div>{(sacredItemName ?? "The Sacred Potato").replace("The Sacred ", "")} bonus: {score.potatoBonus}</div>
                 )}
                 {score.decodeBonus > 0 && (
                   <div>Mystery can bonus: {score.decodeBonus}</div>
+                )}
+                {score.achievementBonus > 0 && (
+                  <div>Achievement bonus: {score.achievementBonus}</div>
                 )}
                 <div style={styles.totalScore}>Total: {score.total}</div>
               </div>

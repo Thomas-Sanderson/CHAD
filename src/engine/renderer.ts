@@ -25,8 +25,6 @@ import {
   heartFullSprite,
   heartEmptySprite,
   bagSprite,
-  speakerOnSprite,
-  speakerOffSprite,
 } from "./sprites";
 import type { TimeOfDay } from "./sky";
 import { getSkyPhase, renderSky, renderGroundTint, renderSceneBrightness, renderWarmthOverlay } from "./sky";
@@ -52,7 +50,6 @@ function getChadFrame(state: GameRunState): typeof chadIdle {
 export interface HudData {
   hearts: number;
   maxHearts: number;
-  muted: boolean;
 }
 
 export function renderFrame(
@@ -500,9 +497,14 @@ export function renderFrame(
     ctx.textAlign = "left";
     ctx.fillText(`${state.collectedItems.length}`, bagX + 20, 20);
 
-    // Right: Mute icon
-    const muteX = CANVAS_WIDTH - 30;
-    drawSprite(ctx, hud.muted ? speakerOffSprite : speakerOnSprite, muteX, 5, 2);
+    // Right: Timer
+    const totalSec = Math.floor(state.elapsed / 1000);
+    const mins = Math.floor(totalSec / 60);
+    const secs = totalSec % 60;
+    ctx.fillStyle = "#888";
+    ctx.font = "12px monospace";
+    ctx.textAlign = "right";
+    ctx.fillText(`${mins}:${secs.toString().padStart(2, "0")}`, CANVAS_WIDTH - 10, 19);
   } else {
     // Fallback HUD (no hearts data)
     ctx.textAlign = "center";

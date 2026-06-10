@@ -1,5 +1,80 @@
 import { useState, useEffect } from "react";
 import type { InferenceResult, VocabPack } from "../types";
+import type { EarnedAchievement } from "./achievements";
+import { AchievementBadge } from "./AchievementBadge";
+
+// Skin-specific apartment building palettes
+const BUILDING_THEMES: Record<string, {
+  roof: string; body: string; windowBg: string; windowBorder: string;
+  canopy: string; doorFrame: string; doorPanel: string; base: string;
+  windowRadius: number;
+}> = {
+  belarus: {
+    roof: "#6e6e6e",
+    body: "#9a9a9a",
+    windowBg: "#a8c4d8",
+    windowBorder: "#6e6e6e",
+    canopy: "#7a7a7a",
+    doorFrame: "#6e6e6e",
+    doorPanel: "#5a5a5a",
+    base: "#7a7a7a",
+    windowRadius: 1,
+  },
+  ethiopia: {
+    roof: "#8b5e3c",
+    body: "#c4a062",
+    windowBg: "#3a3020",
+    windowBorder: "#8b5e3c",
+    canopy: "#8b5e3c",
+    doorFrame: "#6d4c2a",
+    doorPanel: "#4a3218",
+    base: "#8b6e4a",
+    windowRadius: 2,
+  },
+  italy: {
+    roof: "#b85c38",
+    body: "#e8d4b8",
+    windowBg: "#6ba3c7",
+    windowBorder: "#b85c38",
+    canopy: "#a04828",
+    doorFrame: "#8b6e4a",
+    doorPanel: "#5a3a1a",
+    base: "#c4a882",
+    windowRadius: 10,
+  },
+};
+
+function Building({ skinId }: { skinId: string }) {
+  const t = BUILDING_THEMES[skinId] ?? BUILDING_THEMES.belarus!;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 160 }}>
+      <div style={{ width: 160, height: 6, background: t.roof, borderRadius: "2px 2px 0 0" }} />
+      <div style={{
+        width: 160, background: t.body, display: "flex", flexDirection: "column",
+        alignItems: "center", padding: "12px 16px", gap: 8,
+      }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+          {Array.from({ length: 6 }, (_, i) => (
+            <div key={i} style={{
+              width: 28, height: 22, background: t.windowBg,
+              borderRadius: t.windowRadius === 10 ? "10px 10px 2px 2px" : t.windowRadius,
+              border: `2px solid ${t.windowBorder}`,
+            }} />
+          ))}
+        </div>
+        <div style={{ width: 100, height: 6, background: t.canopy, borderRadius: 2, marginTop: 4 }} />
+        <div style={{
+          display: "flex", gap: 2, padding: 4, background: t.doorFrame,
+          borderRadius: "4px 4px 0 0",
+        }}>
+          <div style={{ width: 28, height: 48, background: t.doorPanel, borderRadius: 2 }} />
+          <div style={{ width: 28, height: 48, background: t.doorPanel, borderRadius: 2 }} />
+        </div>
+      </div>
+      <div style={{ width: 160, height: 8, background: t.base }} />
+    </div>
+  );
+}
 
 interface Props {
   result: InferenceResult;
@@ -7,11 +82,17 @@ interface Props {
   gateFailText: string;
   gateFailQuiet: boolean;
   mentorName?: string;
+  skinId?: string;
+  achievements?: EarnedAchievement[];
   onRestart: () => void;
   onReveal: () => void;
 }
 
-export function GateScreen({ result, vocabPack, gateFailText, gateFailQuiet, mentorName = "Anya", onRestart, onReveal }: Props) {
+export function GateScreen({
+  result, vocabPack, gateFailText, gateFailQuiet,
+  mentorName = "Anya", skinId = "belarus",
+  achievements = [], onRestart, onReveal,
+}: Props) {
   const [phase, setPhase] = useState<"checking" | "result">("checking");
   const [shakeClass, setShakeClass] = useState(false);
 
@@ -29,25 +110,7 @@ export function GateScreen({ result, vocabPack, gateFailText, gateFailQuiet, men
   if (phase === "checking") {
     return (
       <div style={styles.container}>
-        <div style={styles.building}>
-          <div style={styles.buildingRoof} />
-          <div style={styles.buildingBody}>
-            <div style={styles.buildingWindows}>
-              <div style={styles.window} />
-              <div style={styles.window} />
-              <div style={styles.window} />
-              <div style={styles.window} />
-              <div style={styles.window} />
-              <div style={styles.window} />
-            </div>
-            <div style={styles.canopy} />
-            <div style={styles.doorFrame}>
-              <div style={styles.doorPanel} />
-              <div style={styles.doorPanel} />
-            </div>
-          </div>
-          <div style={styles.buildingBase} />
-        </div>
+        <Building skinId={skinId} />
         <div style={styles.checkingText}>Checking bags...</div>
       </div>
     );
@@ -56,10 +119,29 @@ export function GateScreen({ result, vocabPack, gateFailText, gateFailQuiet, men
   if (result.passed) {
     return (
       <div style={styles.container}>
+        <Building skinId={skinId} />
         <div style={styles.successText}>&#10003; Correct!</div>
         <div style={styles.subtitle}>
           Chad somehow got the right groceries.
         </div>
+
+        {achievements.length > 0 && (
+          <div style={styles.achievementList}>
+            {achievements.map(({ def, isNew }) => (
+              <div key={def.id} style={{
+                ...styles.achievementRow,
+                opacity: isNew ? 1 : 0.6,
+              }}>
+                <AchievementBadge icon={def.icon} color={def.iconColor} size={22} />
+                <span style={styles.achievementTitle}>{def.title}</span>
+                {def.points > 0 && (
+                  <span style={styles.achievementPts}>+{def.points}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
         <button style={styles.continueButton} onClick={onReveal}>
           See what {mentorName} thinks &rarr;
         </button>
@@ -67,18 +149,11 @@ export function GateScreen({ result, vocabPack, gateFailText, gateFailQuiet, men
     );
   }
 
-  // Fail — style differs for quiet vs loud
-  const failTextStyle = gateFailQuiet
-    ? styles.failTextQuiet
-    : styles.failText;
+  // Fail
+  const failTextStyle = gateFailQuiet ? styles.failTextQuiet : styles.failText;
 
   return (
-    <div
-      style={{
-        ...styles.container,
-        ...(shakeClass ? styles.shaking : {}),
-      }}
-    >
+    <div style={{ ...styles.container, ...(shakeClass ? styles.shaking : {}) }}>
       <div style={failTextStyle}>{gateFailText}</div>
       <div style={styles.failSubtitle}>
         {result.matches.filter((m) => m.correct).length} /{" "}
@@ -122,64 +197,6 @@ const styles: Record<string, React.CSSProperties> = {
   shaking: {
     animation: "shake 0.5s ease-in-out",
   },
-  building: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    width: 160,
-  },
-  buildingRoof: {
-    width: 160,
-    height: 6,
-    background: "#776655",
-    borderRadius: "2px 2px 0 0",
-  },
-  buildingBody: {
-    width: 160,
-    background: "#aa9977",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    padding: "12px 16px",
-    gap: 8,
-  },
-  buildingWindows: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr",
-    gap: 10,
-  },
-  window: {
-    width: 28,
-    height: 22,
-    background: "#88ccdd",
-    borderRadius: 2,
-    border: "2px solid #776655",
-  },
-  canopy: {
-    width: 100,
-    height: 6,
-    background: "#776655",
-    borderRadius: 2,
-    marginTop: 4,
-  },
-  doorFrame: {
-    display: "flex",
-    gap: 2,
-    padding: 4,
-    background: "#776655",
-    borderRadius: "4px 4px 0 0",
-  },
-  doorPanel: {
-    width: 28,
-    height: 48,
-    background: "#664422",
-    borderRadius: 2,
-  },
-  buildingBase: {
-    width: 160,
-    height: 8,
-    background: "#887766",
-  },
   checkingText: {
     fontSize: 20,
     color: "#888",
@@ -190,13 +207,36 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: "var(--game-font-success)",
     fontWeight: "bold",
     color: "#4CAF50",
+    marginTop: 12,
   },
   subtitle: {
     fontSize: "var(--game-font-body)",
     color: "#888",
   },
+  achievementList: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 6,
+    marginTop: 4,
+  },
+  achievementRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+  },
+  achievementTitle: {
+    fontSize: 14,
+    color: "#FFD54F",
+    fontWeight: 600,
+  },
+  achievementPts: {
+    fontSize: 13,
+    color: "#4CAF50",
+    fontWeight: "bold",
+    marginLeft: 4,
+  },
   continueButton: {
-    marginTop: 24,
+    marginTop: 16,
     background: "#4CAF50",
     color: "#fff",
     border: "none",

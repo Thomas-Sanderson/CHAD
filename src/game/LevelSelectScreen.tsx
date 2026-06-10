@@ -1,5 +1,7 @@
 import type { LevelConfig } from "../types/skin";
 import { isTouchDevice } from "../engine/touch";
+import { ACHIEVEMENTS } from "./achievements";
+import { AchievementBadge } from "./AchievementBadge";
 
 interface LevelProgress {
   completed: boolean;
@@ -12,9 +14,10 @@ interface Props {
   onSelectLevel: (index: number) => void;
   skinName?: string;
   onBackToSkins?: () => void;
+  achievements?: Map<string, string[]>;
 }
 
-export function LevelSelectScreen({ levels, progress, onSelectLevel, skinName, onBackToSkins }: Props) {
+export function LevelSelectScreen({ levels, progress, onSelectLevel, skinName, onBackToSkins, achievements }: Props) {
   return (
     <div style={styles.container}>
       {onBackToSkins && (
@@ -65,6 +68,22 @@ export function LevelSelectScreen({ levels, progress, onSelectLevel, skinName, o
                 {completed && prog && (
                   <div style={styles.levelScore}>Score: {prog.score}</div>
                 )}
+                {achievements?.get(level.id)?.length ? (
+                  <div style={styles.badgeRow}>
+                    {achievements.get(level.id)!.map(id => {
+                      const def = ACHIEVEMENTS.find(a => a.id === id);
+                      if (!def) return null;
+                      return (
+                        <span key={id} title={def.title}>
+                          <AchievementBadge icon={def.icon} color={def.iconColor} size={18} />
+                        </span>
+                      );
+                    })}
+                    {achievements.get(level.id)!.length >= ACHIEVEMENTS.length && (
+                      <AchievementBadge icon="sacred" color="#fdd835" size={20} />
+                    )}
+                  </div>
+                ) : null}
               </div>
             </button>
           );
@@ -192,6 +211,12 @@ const styles: Record<string, React.CSSProperties> = {
   levelScore: {
     fontSize: 12,
     color: "#4CAF50",
+  },
+  badgeRow: {
+    display: "flex",
+    gap: 3,
+    alignItems: "center",
+    marginTop: 2,
   },
   footer: {
     fontSize: 13,

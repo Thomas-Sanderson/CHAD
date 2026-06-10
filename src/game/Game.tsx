@@ -7,6 +7,13 @@ import { italySkin } from "../content/italy";
 import { checkInference, calculateLevelScore } from "./index";
 import type { LevelScore, DecodeResult } from "./scoring";
 import { buildShoutWords } from "./shoutWords";
+import type { EarnedAchievement } from "./achievements";
+import {
+  checkAndAwardAchievements,
+  countTotalCollectibles,
+  countTotalLandmarks,
+  loadAllAchievements,
+} from "./achievements";
 import { SkinSelectScreen } from "./SkinSelectScreen";
 import { BootScreen } from "./BootScreen";
 import { BriefingScreen } from "./BriefingScreen";
@@ -15,6 +22,7 @@ import { GateScreen } from "./GateScreen";
 import { RevealScreen } from "./RevealScreen";
 import { SortingScreen } from "./SortingScreen";
 import { DecodeScreen } from "./DecodeScreen";
+import { AudioControls } from "./AudioControls";
 import { LevelSelectScreen } from "./LevelSelectScreen";
 import { WinScreen } from "./WinScreen";
 import { DeathScreen } from "./DeathScreen";
@@ -78,6 +86,10 @@ export function Game() {
 
   // Decode screen results
   const [decodeResults, setDecodeResults] = useState<DecodeResult[]>([]);
+
+  // Achievement system
+  const [runElapsed, setRunElapsed] = useState(0);
+  const [earnedAchievements, setEarnedAchievements] = useState<EarnedAchievement[]>([]);
 
   // Hearts system
   const [hearts, setHearts] = useState(3);
@@ -145,6 +157,7 @@ export function Game() {
     setRunScore(0);
     setCollectedItemIds([]);
     setDecodeResults([]);
+    setEarnedAchievements([]);
     setScreen("BRIEFING");
   }, []);
 
@@ -163,9 +176,28 @@ export function Game() {
       setRunScore(state.score);
       setCollectedPotato(state.potato?.collected ?? false);
       setCollectedItemIds(state.collectedItems);
+      setRunElapsed(state.elapsed);
+
+      // Check achievements immediately so they're available on gate screen
+      const correctCount = result.matches.filter(m => m.correct).length;
+      const levelData = currentLevel.levelData;
+      const stats = {
+        elapsed: state.elapsed,
+        collectedCount: state.collectedItems.length,
+        totalCollectibles: countTotalCollectibles(levelData),
+        visitedLandmarks: state.visitedLandmarks.size,
+        totalLandmarks: countTotalLandmarks(levelData),
+        vehicleHits: state.hitCount,
+        potatoCollected: state.potato?.collected ?? false,
+        correctItemCount: correctCount,
+        totalTargetCount: result.matches.length,
+        levelId: currentLevel.id,
+      };
+      setEarnedAchievements(checkAndAwardAchievements(stats, currentSkin.id, currentLevel.id));
+
       setScreen("GATE");
     },
-    [currentLevel, itemDefs]
+    [currentLevel, itemDefs, currentSkin.id]
   );
 
   const handleHeartLost = useCallback(() => {
@@ -191,6 +223,7 @@ export function Game() {
     setRunScore(0);
     setCollectedItemIds([]);
     setDecodeResults([]);
+    setEarnedAchievements([]);
     setScreen("BRIEFING");
   }, []);
 
@@ -210,6 +243,7 @@ export function Game() {
     setRunScore(0);
     setCollectedItemIds([]);
     setDecodeResults([]);
+    setEarnedAchievements([]);
     setScreen("BRIEFING");
   }, []);
 
@@ -241,8 +275,13 @@ export function Game() {
   const finalizeScore = useCallback((decode?: DecodeResult[]) => {
     if (!inferenceResult) return;
 
+    // Achievement bonus — only award points for newly earned (already computed in handleGateReached)
+    const achievementBonus = earnedAchievements
+      .filter(a => a.isNew)
+      .reduce((sum, a) => sum + a.def.points, 0);
+
     const dr = decode ?? decodeResults;
-    const score = calculateLevelScore(runScore, inferenceResult, collectedPotato, dr.length > 0 ? dr : undefined);
+    const score = calculateLevelScore(runScore, inferenceResult, collectedPotato, dr.length > 0 ? dr : undefined, achievementBonus);
     setLevelScore(score);
 
     setProgress(prev => {
@@ -269,7 +308,7 @@ export function Game() {
     }
 
     setScreen("REVEAL");
-  }, [inferenceResult, runScore, collectedPotato, decodeResults, currentSkin.id, currentLevel.id]);
+  }, [inferenceResult, runScore, collectedPotato, decodeResults, earnedAchievements, currentSkin.id, currentLevel.id]);
 
   const handleSortingComplete = useCallback((attempts: Map<string, number>) => {
     setSortingAttempts(attempts);
@@ -297,6 +336,7 @@ export function Game() {
       setRunScore(0);
       setCollectedItemIds([]);
       setDecodeResults([]);
+      setEarnedAchievements([]);
       setScreen("BRIEFING");
     }
   }, [currentLevelIndex, currentSkin.levels.length]);
@@ -375,135 +415,151 @@ export function Game() {
     );
   }
 
-  switch (screen) {
-    case "BOOT":
-      return <BootScreen onComplete={() => setScreen("COUNTRY_SELECT")} />;
-    case "COUNTRY_SELECT":
-      return (
-        <SkinSelectScreen
-          skins={ALL_SKINS}
-          onSelectSkin={handleSelectSkin}
-        />
-      );
-    case "LEVEL_SELECT":
-      return (
-        <LevelSelectScreen
-          levels={currentSkin.levels}
-          progress={skinProgress}
-          onSelectLevel={handleSelectLevel}
-          skinName={currentSkin.name}
-          onBackToSkins={handleBackToSkins}
-        />
-      );
-    case "BRIEFING":
-      return (
-        <BriefingScreen
-          briefing={currentLevel.briefing}
-          vocabPack={currentLevel.vocabPack}
-          onComplete={handleBriefingComplete}
-          mentorName={currentSkin.mentorName}
-          mentorAvatar={currentSkin.mentorAvatar}
-          mentorColor={currentSkin.mentorColor}
-        />
-      );
-    case "RUN":
-      if (isDead) {
+  const screenContent = (() => {
+    switch (screen) {
+      case "BOOT":
+        return <BootScreen onComplete={() => setScreen("COUNTRY_SELECT")} />;
+      case "COUNTRY_SELECT":
         return (
-          <DeathScreen
-            deathText={currentSkin.deathText}
-            quip={currentSkin.deathQuips[deathQuipIndex % currentSkin.deathQuips.length] ?? "..."}
+          <SkinSelectScreen
+            skins={ALL_SKINS}
+            onSelectSkin={handleSelectSkin}
+          />
+        );
+      case "LEVEL_SELECT":
+        return (
+          <LevelSelectScreen
+            levels={currentSkin.levels}
+            progress={skinProgress}
+            onSelectLevel={handleSelectLevel}
+            skinName={currentSkin.name}
+            onBackToSkins={handleBackToSkins}
+            achievements={loadAllAchievements(
+              currentSkin.id,
+              currentSkin.levels.map(l => l.id),
+            )}
+          />
+        );
+      case "BRIEFING":
+        return (
+          <BriefingScreen
+            briefing={currentLevel.briefing}
+            vocabPack={currentLevel.vocabPack}
+            onComplete={handleBriefingComplete}
+            mentorName={currentSkin.mentorName}
+            mentorAvatar={currentSkin.mentorAvatar}
+            mentorColor={currentSkin.mentorColor}
+          />
+        );
+      case "RUN":
+        if (isDead) {
+          return (
+            <DeathScreen
+              deathText={currentSkin.deathText}
+              quip={currentSkin.deathQuips[deathQuipIndex % currentSkin.deathQuips.length] ?? "..."}
+              mentorAvatar={currentSkin.mentorAvatar}
+              mentorColor={currentSkin.mentorColor}
+              messageColor={currentSkin.messageColor}
+              onRestart={handleDeathRestart}
+            />
+          );
+        }
+        return (
+          <RunPhase
+            key={`${currentSkin.id}-${currentLevel.id}`}
+            level={currentLevel.levelData}
+            itemDefs={itemDefs}
+            environment={currentSkin.environment}
+            onGateReached={handleGateReached}
+            onHeartLost={handleHeartLost}
+            hearts={hearts}
+            maxHearts={maxHearts}
+            checkGateResult={checkGateResult}
+            learnedWords={learnedWordsForSkin}
+            vocabWords={currentLevel.vocabPack.words}
+            timeOfDay={currentLevel.timeOfDay}
+          />
+        );
+      case "GATE":
+        return inferenceResult ? (
+          <GateScreen
+            result={inferenceResult}
+            vocabPack={currentLevel.vocabPack}
+            gateFailText={currentLevel.gateFailText}
+            gateFailQuiet={currentLevel.gateFailQuiet}
+            mentorName={currentSkin.mentorName}
+            skinId={currentSkin.id}
+            achievements={earnedAchievements}
+            onRestart={handleRestart}
+            onReveal={handleReveal}
+          />
+        ) : null;
+      case "SORTING":
+        return inferenceResult ? (
+          <SortingScreen
+            vocabPack={currentLevel.vocabPack}
+            collectedItemIds={collectedItemIds}
+            itemDefs={itemDefs}
+            revealLines={currentLevel.revealLines}
+            mentorName={currentSkin.mentorName}
             mentorAvatar={currentSkin.mentorAvatar}
             mentorColor={currentSkin.mentorColor}
             messageColor={currentSkin.messageColor}
-            onRestart={handleDeathRestart}
+            onComplete={handleSortingComplete}
+          />
+        ) : null;
+      case "DECODE":
+        return collectedMysteryCans.length > 0 ? (
+          <DecodeScreen
+            mysteryCans={collectedMysteryCans}
+            mentorName={currentSkin.mentorName}
+            mentorAvatar={currentSkin.mentorAvatar}
+            mentorColor={currentSkin.mentorColor}
+            messageColor={currentSkin.messageColor}
+            scoldNo={currentSkin.scoldNo}
+            onComplete={handleDecodeComplete}
+          />
+        ) : null;
+      case "REVEAL":
+        return inferenceResult && levelScore ? (
+          <RevealScreen
+            vocabPack={currentLevel.vocabPack}
+            inferenceResult={inferenceResult}
+            revealLines={currentLevel.revealLines}
+            itemDefs={itemDefs}
+            score={levelScore}
+            collectedPotato={collectedPotato}
+            hasNextLevel={hasNextLevel}
+            onNextLevel={handleNextLevel}
+            onBackToLevels={handleBackToLevels}
+            hearts={hearts}
+            maxHearts={maxHearts}
+            sacredItemName={currentSkin.sacredItemName}
+            onHeartsRefilled={handleHeartsRefilled}
+            sortingAttempts={sortingAttempts}
+            runElapsed={runElapsed}
+          />
+        ) : null;
+      case "WIN":
+        return (
+          <WinScreen
+            totalScore={totalScore}
+            mentorAvatar={currentSkin.mentorAvatar}
+            mentorColor={currentSkin.mentorColor}
+            messageColor={currentSkin.messageColor}
+            winMessage={currentSkin.winMessage}
+            wordsLearned={currentSkin.wordsLearned}
+            sacredItemLine={currentSkin.sacredItemLine}
+            onBackToLevels={handleBackToLevels}
           />
         );
-      }
-      return (
-        <RunPhase
-          key={`${currentSkin.id}-${currentLevel.id}`}
-          level={currentLevel.levelData}
-          itemDefs={itemDefs}
-          environment={currentSkin.environment}
-          onGateReached={handleGateReached}
-          onHeartLost={handleHeartLost}
-          hearts={hearts}
-          maxHearts={maxHearts}
-          checkGateResult={checkGateResult}
-          learnedWords={learnedWordsForSkin}
-          vocabWords={currentLevel.vocabPack.words}
-          timeOfDay={currentLevel.timeOfDay}
-        />
-      );
-    case "GATE":
-      return inferenceResult ? (
-        <GateScreen
-          result={inferenceResult}
-          vocabPack={currentLevel.vocabPack}
-          gateFailText={currentLevel.gateFailText}
-          gateFailQuiet={currentLevel.gateFailQuiet}
-          mentorName={currentSkin.mentorName}
-          onRestart={handleRestart}
-          onReveal={handleReveal}
-        />
-      ) : null;
-    case "SORTING":
-      return inferenceResult ? (
-        <SortingScreen
-          vocabPack={currentLevel.vocabPack}
-          collectedItemIds={collectedItemIds}
-          itemDefs={itemDefs}
-          revealLines={currentLevel.revealLines}
-          mentorName={currentSkin.mentorName}
-          mentorAvatar={currentSkin.mentorAvatar}
-          mentorColor={currentSkin.mentorColor}
-          messageColor={currentSkin.messageColor}
-          onComplete={handleSortingComplete}
-        />
-      ) : null;
-    case "DECODE":
-      return collectedMysteryCans.length > 0 ? (
-        <DecodeScreen
-          mysteryCans={collectedMysteryCans}
-          mentorName={currentSkin.mentorName}
-          mentorAvatar={currentSkin.mentorAvatar}
-          mentorColor={currentSkin.mentorColor}
-          messageColor={currentSkin.messageColor}
-          scoldNo={currentSkin.scoldNo}
-          onComplete={handleDecodeComplete}
-        />
-      ) : null;
-    case "REVEAL":
-      return inferenceResult && levelScore ? (
-        <RevealScreen
-          vocabPack={currentLevel.vocabPack}
-          inferenceResult={inferenceResult}
-          revealLines={currentLevel.revealLines}
-          itemDefs={itemDefs}
-          score={levelScore}
-          collectedPotato={collectedPotato}
-          hasNextLevel={hasNextLevel}
-          onNextLevel={handleNextLevel}
-          onBackToLevels={handleBackToLevels}
-          hearts={hearts}
-          maxHearts={maxHearts}
-          sacredItemName={currentSkin.sacredItemName}
-          onHeartsRefilled={handleHeartsRefilled}
-          sortingAttempts={sortingAttempts}
-        />
-      ) : null;
-    case "WIN":
-      return (
-        <WinScreen
-          totalScore={totalScore}
-          mentorAvatar={currentSkin.mentorAvatar}
-          mentorColor={currentSkin.mentorColor}
-          messageColor={currentSkin.messageColor}
-          winMessage={currentSkin.winMessage}
-          wordsLearned={currentSkin.wordsLearned}
-          sacredItemLine={currentSkin.sacredItemLine}
-          onBackToLevels={handleBackToLevels}
-        />
-      );
-  }
+    }
+  })();
+
+  return (
+    <>
+      {screenContent}
+      <AudioControls />
+    </>
+  );
 }

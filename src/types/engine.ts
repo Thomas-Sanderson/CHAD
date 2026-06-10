@@ -122,6 +122,8 @@ export interface GameRunState {
   flagProgress: number;
   // Hearts system
   hitCount: number;
+  // Achievement tracking
+  visitedLandmarks: Set<string>;
   // Inventory
   inventoryOpen: boolean;
   // Shopkeeper conversation

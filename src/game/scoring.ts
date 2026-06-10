@@ -11,6 +11,7 @@ export interface LevelScore {
   inferenceScore: number;
   potatoBonus: number;
   decodeBonus: number;
+  achievementBonus: number;
   total: number;
 }
 
@@ -18,7 +19,8 @@ export function calculateLevelScore(
   runScore: number,
   inferenceResult: InferenceResult,
   collectedPotato: boolean,
-  decodeResults?: DecodeResult[]
+  decodeResults?: DecodeResult[],
+  achievementBonus: number = 0,
 ): LevelScore {
   const potatoBonus = collectedPotato ? 100 : 0;
 
@@ -29,13 +31,14 @@ export function calculateLevelScore(
     }
   }
 
-  const total = runScore + inferenceResult.score + potatoBonus + decodeBonus;
+  const total = runScore + inferenceResult.score + potatoBonus + decodeBonus + achievementBonus;
 
   return {
     runScore,
     inferenceScore: inferenceResult.score,
     potatoBonus,
     decodeBonus,
+    achievementBonus,
     total,
   };
 }

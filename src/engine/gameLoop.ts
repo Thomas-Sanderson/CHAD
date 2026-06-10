@@ -147,6 +147,8 @@ export function createGameRunState(level: LevelData, scoldings?: string[], headB
     flagProgress: 0,
     // Hearts system
     hitCount: 0,
+    // Achievement tracking
+    visitedLandmarks: new Set<string>(),
     // Inventory
     inventoryOpen: false,
     // Shopkeeper conversation
@@ -461,7 +463,7 @@ export function updateGameState(
         const isLocked = door.locked && !state.unlockedDoors.includes(door.id);
         if (input.shout && isLocked) {
           // P key — say "please" then open shout menu
-          speakAsChad("пожалуйста");
+          speakAsChad(state.pointPhrase);
           state.shoutMenuOpen = true;
           state.shoutTarget = door.id;
           input.shout = false;
@@ -479,16 +481,10 @@ export function updateGameState(
       }
       if (input.interact) input.interact = false;
       if (input.shout) {
-        speakAsChad("пожалуйста");
+        speakAsChad(state.pointPhrase);
         input.shout = false;
       }
     }
-  }
-
-  // P key anywhere else — Chad says please even though nobody's listening
-  if (input.shout) {
-    speakAsChad("пожалуйста");
-    input.shout = false;
   }
 
   // --- Shopkeeper conversation ---
@@ -582,8 +578,15 @@ export function updateGameState(
       speakAsChad(state.pointPhrase);
       const label = pointLabel;
       setTimeout(() => speakScold(label), 1200);
+      state.visitedLandmarks.add(label);
       input.shout = false;
     }
+  }
+
+  // P key anywhere else — Chad says please even though nobody's listening
+  if (input.shout) {
+    speakAsChad(state.pointPhrase);
+    input.shout = false;
   }
 
   // Shout response decay
