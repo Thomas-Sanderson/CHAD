@@ -206,32 +206,73 @@ export function RevealScreen({
         </div>
 
         <div className="reveal-right">
-          <div style={styles.progressText}>
-            {allRevealed
-              ? `${targetWords.filter((w) => (sortingAttempts?.get(w.id) ?? 1) === 1).length} of ${targetWords.length} first try`
-              : `Word ${revealedCount + 1} of ${targetWords.length}`}
-          </div>
-          <div style={styles.progressRow}>
-            {targetWords.map((word, i) => {
-              let bg = "#333";
-              if (i < revealedCount) {
-                const attempts = sortingAttempts?.get(word.id) ?? 1;
-                bg = attempts <= 1 ? "#4CAF50" : "#FF9800";
-              } else if (i === revealedCount) {
-                bg = "#FFD54F";
-              }
-              return (
-                <div
-                  key={i}
-                  style={{ ...styles.progressDot, background: bg }}
-                />
-              );
-            })}
+          <div className="reveal-right-scroll">
+            <div style={styles.progressText}>
+              {allRevealed
+                ? `${targetWords.filter((w) => (sortingAttempts?.get(w.id) ?? 1) === 1).length} of ${targetWords.length} first try`
+                : `Word ${revealedCount + 1} of ${targetWords.length}`}
+            </div>
+            <div style={styles.progressRow}>
+              {targetWords.map((word, i) => {
+                let bg = "#333";
+                if (i < revealedCount) {
+                  const attempts = sortingAttempts?.get(word.id) ?? 1;
+                  bg = attempts <= 1 ? "#4CAF50" : "#FF9800";
+                } else if (i === revealedCount) {
+                  bg = "#FFD54F";
+                }
+                return (
+                  <div
+                    key={i}
+                    style={{ ...styles.progressDot, background: bg }}
+                  />
+                );
+              })}
+            </div>
+
+            {allRevealed && (
+              <div style={styles.scoreSection}>
+                {collectedPotato && (
+                  <>
+                    <div style={styles.potatoLine}>
+                      {sacredItemName ?? "The Sacred Potato"} acknowledges your devotion. (+100)
+                    </div>
+                    <div style={styles.heartsRow}>
+                      {Array.from({ length: maxHearts }, (_, i) => (
+                        <HeartSprite key={i} full={i < heartsFilled} />
+                      ))}
+                      {showExtraLife && (
+                        <span style={styles.extraLife}>+1 Extra Life!</span>
+                      )}
+                      {showRefilled && (
+                        <span style={styles.extraLife}>Lives refilled!</span>
+                      )}
+                    </div>
+                  </>
+                )}
+                <div style={styles.scoreBreakdown}>
+                  <div>Run score: {score.runScore}</div>
+                  <div>Vocab score: {score.inferenceScore}</div>
+                  {runElapsed > 0 && (
+                    <div>Time: {Math.floor(runElapsed / 60000)}:{String(Math.floor((runElapsed / 1000) % 60)).padStart(2, "0")}</div>
+                  )}
+                  {score.potatoBonus > 0 && (
+                    <div>{(sacredItemName ?? "The Sacred Potato").replace("The Sacred ", "")} bonus: {score.potatoBonus}</div>
+                  )}
+                  {score.decodeBonus > 0 && (
+                    <div>Mystery can bonus: {score.decodeBonus}</div>
+                  )}
+                  {score.achievementBonus > 0 && (
+                    <div>Achievement bonus: {score.achievementBonus}</div>
+                  )}
+                  <div style={styles.totalScore}>Total: {score.total}</div>
+                </div>
+              </div>
+            )}
           </div>
 
-          {!allRevealed ? (
-            <>
-              <div style={{ flex: 1 }} />
+          <div className="reveal-right-actions">
+            {!allRevealed ? (
               <button
                 className="reveal-action-btn"
                 style={styles.nextButton}
@@ -239,45 +280,7 @@ export function RevealScreen({
               >
                 Next word &rarr;
               </button>
-            </>
-          ) : (
-            <div style={styles.scoreSection}>
-              {collectedPotato && (
-                <>
-                  <div style={styles.potatoLine}>
-                    {sacredItemName ?? "The Sacred Potato"} acknowledges your devotion. (+100)
-                  </div>
-                  <div style={styles.heartsRow}>
-                    {Array.from({ length: maxHearts }, (_, i) => (
-                      <HeartSprite key={i} full={i < heartsFilled} />
-                    ))}
-                    {showExtraLife && (
-                      <span style={styles.extraLife}>+1 Extra Life!</span>
-                    )}
-                    {showRefilled && (
-                      <span style={styles.extraLife}>Lives refilled!</span>
-                    )}
-                  </div>
-                </>
-              )}
-              <div style={styles.scoreBreakdown}>
-                <div>Run score: {score.runScore}</div>
-                <div>Vocab score: {score.inferenceScore}</div>
-                {runElapsed > 0 && (
-                  <div>Time: {Math.floor(runElapsed / 60000)}:{String(Math.floor((runElapsed / 1000) % 60)).padStart(2, "0")}</div>
-                )}
-                {score.potatoBonus > 0 && (
-                  <div>{(sacredItemName ?? "The Sacred Potato").replace("The Sacred ", "")} bonus: {score.potatoBonus}</div>
-                )}
-                {score.decodeBonus > 0 && (
-                  <div>Mystery can bonus: {score.decodeBonus}</div>
-                )}
-                {score.achievementBonus > 0 && (
-                  <div>Achievement bonus: {score.achievementBonus}</div>
-                )}
-                <div style={styles.totalScore}>Total: {score.total}</div>
-              </div>
-
+            ) : (
               <div style={{ ...styles.buttonRow, opacity: navReady ? 1 : 0.4, pointerEvents: navReady ? "auto" : "none", transition: "opacity 0.3s" }}>
                 {hasNextLevel ? (
                   <button style={styles.nextLevelButton} onClick={onNextLevel}>
@@ -289,8 +292,8 @@ export function RevealScreen({
                   </button>
                 )}
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
@@ -328,6 +331,24 @@ const revealCSS = `
     align-items: center;
     gap: var(--game-gap, 12px);
     min-width: 0;
+    min-height: 0;
+  }
+  .reveal-right-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--game-gap, 12px);
+  }
+  .reveal-right-actions {
+    flex-shrink: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-top: 8px;
   }
 
   @media (orientation: landscape) and (max-height: 500px) {
