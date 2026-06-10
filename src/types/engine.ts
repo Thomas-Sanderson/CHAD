@@ -1,4 +1,4 @@
-export type Phase = "BRIEFING" | "RUN" | "GATE" | "SORTING" | "REVEAL";
+export type Phase = "BRIEFING" | "RUN" | "GATE" | "SORTING" | "DECODE" | "REVEAL";
 
 export interface Vec2 {
   x: number;
@@ -109,6 +109,7 @@ export interface GameRunState {
   segmentCollectibles: Record<string, CollectedInfo[]>;
   unlockedDoors: string[];
   nearDoor: string | null;
+  nearLandmark: string | null; // landmark label when player is near one
   transition: DoorTransition | null;
   // Shout mechanic
   shoutMenuOpen: boolean;

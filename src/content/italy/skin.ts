@@ -37,6 +37,7 @@ export const italySkin: SkinConfig = {
 
   environment: {
     skyColor: "#5B8DB8",
+    latitude: 42,
     flagColors: ["#009246", "#ffffff", "#ce2b37"],
     showStars: false,
     groundTile: cobblestoneGround,
@@ -96,6 +97,7 @@ export const italySkin: SkinConfig = {
 
   sacredItemName: "The Sacred Olive",
   sacredItemLine: "The Sacred Olive judges you. It always has.",
+  scoldNo: "NO!",
   deathText: "MORTO!",
   deathQuips: [
     "The Vespa does not stop. I told you this.",

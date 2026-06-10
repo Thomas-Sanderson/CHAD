@@ -621,6 +621,103 @@ export const mysteryCanSprite: SpriteData = [
   [_, _, _, _, DG, DG, DG, DG, DG, DG, DG, DG, _, _, _, _],
 ];
 
+// Revealed mystery can foods — shown after decode
+const _BD = "#4a1e40"; // Beet dark purple
+const MR = "#6b2d5b"; // Beet medium purple
+const _BL = "#8b3d7b"; // Beet light purple
+const PV = "#55aa44"; // Pea vegetal green
+const DPG = "#448833"; // Dark pea green
+const LPG = "#77cc66"; // Light pea green
+const CY = "#eebb33"; // Corn yellow
+const DCY = "#cc9922"; // Dark corn yellow
+const LCY = "#ffdd55"; // Light corn yellow
+const LT = "#bb7733"; // Lentil brown
+const DLN = "#995522"; // Dark lentil
+const LLN = "#dd9944"; // Light lentil
+const CHP = "#ddbb88"; // Chickpea beige
+const DHP = "#bb9966"; // Dark chickpea
+const LHP = "#eedd99"; // Light chickpea
+
+export const beetRevealSprite: SpriteData = [
+  [_, _, _, _, _, _, GN, _, GN, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, GN, GN, GN, _, _, _, _, _, _, _],
+  [_, _, _, _, _, GN, GN, GN, GN, GN, _, _, _, _, _, _],
+  [_, _, _, _, _BD, MR, GN, GN, MR, _BD, _, _, _, _, _, _],
+  [_, _, _, _BD, MR, _BL, MR, MR, _BL, MR, _BD, _, _, _, _, _],
+  [_, _, _BD, MR, MR, MR, _BL, MR, MR, MR, MR, _BD, _, _, _, _],
+  [_, _, _BD, MR, _BL, MR, MR, MR, MR, _BL, MR, _BD, _, _, _, _],
+  [_, _, _BD, MR, MR, MR, MR, MR, _BL, MR, MR, _BD, _, _, _, _],
+  [_, _, _, _BD, MR, MR, _BL, MR, MR, MR, _BD, _, _, _, _, _],
+  [_, _, _, _, _BD, _BD, MR, MR, _BD, _BD, _, _, _, _, _, _],
+  [_, _, _, _, _, _BD, _BD, _BD, _BD, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _BD, BN, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, BN, _, _, _, _, _, _, _, _],
+];
+
+export const peaRevealSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, DPG, PV, DPG, _, _, _, _, _, _, _, _],
+  [_, _, _, _, DPG, PV, LPG, PV, DPG, _, _, _, _, _, _, _],
+  [_, _, _, _, DPG, PV, PV, PV, DPG, _, _, _, _, _, _, _],
+  [_, _, _, _, _, DPG, DPG, DPG, _, DPG, PV, DPG, _, _, _, _],
+  [_, _, DPG, PV, DPG, _, _, _, DPG, PV, LPG, PV, DPG, _, _, _],
+  [_, DPG, PV, LPG, PV, DPG, _, _, DPG, PV, PV, PV, DPG, _, _, _],
+  [_, DPG, PV, PV, PV, DPG, _, _, _, DPG, DPG, DPG, _, _, _, _],
+  [_, _, DPG, DPG, DPG, _, DPG, PV, DPG, _, _, _, _, _, _, _],
+  [_, _, _, _, _, DPG, PV, LPG, PV, DPG, _, _, _, _, _, _],
+  [_, _, _, _, _, DPG, PV, PV, PV, DPG, _, _, _, _, _, _],
+  [_, _, _, _, _, _, DPG, DPG, DPG, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+];
+
+export const cornRevealSprite: SpriteData = [
+  [_, _, _, _, _, _, _, GN, GN, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, GN, GN, GN, GN, _, _, _, _, _, _],
+  [_, _, _, _, _, GN, DCY, CY, CY, GN, _, _, _, _, _, _],
+  [_, _, _, _, _, GN, CY, LCY, CY, DCY, GN, _, _, _, _, _],
+  [_, _, _, _, GN, CY, LCY, CY, LCY, CY, GN, _, _, _, _, _],
+  [_, _, _, _, GN, CY, CY, LCY, CY, CY, GN, _, _, _, _, _],
+  [_, _, _, _, GN, DCY, CY, CY, LCY, CY, GN, _, _, _, _, _],
+  [_, _, _, _, GN, CY, LCY, CY, CY, DCY, GN, _, _, _, _, _],
+  [_, _, _, _, GN, CY, CY, CY, CY, CY, GN, _, _, _, _, _],
+  [_, _, _, _, _, GN, DCY, CY, DCY, GN, _, _, _, _, _, _],
+  [_, _, _, _, _, _, GN, GN, GN, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, GN, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+];
+
+export const lentilRevealSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, DLN, LT, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, DLN, LT, LLN, LT, _, _, _, _, _, _, _, _],
+  [_, _, _, _, DLN, LT, LT, DLN, _, DLN, LT, _, _, _, _, _],
+  [_, _, _, _, _, DLN, DLN, _, DLN, LT, LLN, LT, _, _, _, _],
+  [_, _, DLN, LT, _, _, _, _, DLN, LT, LT, DLN, _, _, _, _],
+  [_, DLN, LT, LLN, LT, _, _, _, _, DLN, DLN, _, _, _, _, _],
+  [_, DLN, LT, LT, DLN, _, _, DLN, LT, _, _, _, _, _, _, _],
+  [_, _, DLN, DLN, _, _, DLN, LT, LLN, LT, _, _, _, _, _, _],
+  [_, _, _, _, _, _, DLN, LT, LT, DLN, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, DLN, DLN, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+];
+
+export const chickpeaRevealSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, DHP, CHP, DHP, _, _, _, _, _, _, _, _],
+  [_, _, _, _, DHP, CHP, LHP, CHP, DHP, _, _, _, _, _, _, _],
+  [_, _, _, _, DHP, CHP, CHP, CHP, DHP, _, _, _, _, _, _, _],
+  [_, _, _, _, _, DHP, DHP, DHP, _, DHP, CHP, DHP, _, _, _, _],
+  [_, _, DHP, CHP, DHP, _, _, _, DHP, CHP, LHP, CHP, DHP, _, _, _],
+  [_, DHP, CHP, LHP, CHP, DHP, _, _, DHP, CHP, CHP, CHP, DHP, _, _, _],
+  [_, DHP, CHP, CHP, CHP, DHP, _, _, _, DHP, DHP, DHP, _, _, _, _],
+  [_, _, DHP, DHP, DHP, _, DHP, CHP, DHP, _, _, _, _, _, _, _],
+  [_, _, _, _, _, DHP, CHP, LHP, CHP, DHP, _, _, _, _, _, _],
+  [_, _, _, _, _, DHP, CHP, CHP, CHP, DHP, _, _, _, _, _, _],
+  [_, _, _, _, _, _, DHP, DHP, DHP, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+];
+
 export const sunflowerSeedsSprite: SpriteData = [
   [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
   [_, _, _, _, _, _, RD, RD, RD, RD, _, _, _, _, _, _],
@@ -1650,6 +1747,11 @@ const itemSpriteMap: Record<string, SpriteData> = {
   pickle_jar: pickleJarSprite,
   bread_loaf: breadLoafSprite,
   mystery_can: mysteryCanSprite,
+  beet_reveal: beetRevealSprite,
+  pea_reveal: peaRevealSprite,
+  corn_reveal: cornRevealSprite,
+  lentil_reveal: lentilRevealSprite,
+  chickpea_reveal: chickpeaRevealSprite,
   sunflower_seeds: sunflowerSeedsSprite,
   moloko_carton: molokoCartonSprite,
   chai_box: chaiBoxSprite,

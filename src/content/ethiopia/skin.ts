@@ -23,6 +23,7 @@ export const ethiopiaSkin: SkinConfig = {
 
   environment: {
     skyColor: "#4a90c4",
+    latitude: 9,
     flagColors: ["#33aa55", "#ffcc33", "#cc2222"],
     showStars: false,
     groundTile: cobblestoneGround,
@@ -70,6 +71,7 @@ export const ethiopiaSkin: SkinConfig = {
 
   sacredItemName: "The Sacred Coffee Bean",
   sacredItemLine: "The Sacred Coffee Bean knows. It always knew.",
+  scoldNo: "አይ!",
   deathText: "ሞተ!",
   deathQuips: [
     "The taxi does not slow down. I said this.",

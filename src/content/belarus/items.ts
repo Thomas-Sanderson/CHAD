@@ -46,11 +46,19 @@ export const level1Items: CollectibleItem[] = [
   },
   {
     id: "mystery_can",
-    name: "Canned Beets",
+    name: "Mystery Can",
+    revealName: "Beetroot",
     script: "СВЁКЛА",
-    description: "A tin of beets. Nobody asked for beets.",
+    description: "A dented grey tin. The label fell off.",
     isDecoy: true,
     color: "#9E9E9E",
+    pronunciation: "SVYOK-la",
+    revealSpriteId: "beet_reveal",
+    hints: [
+      "I wonder what makes borscht that color...",
+      "It's a root vegetable. Very purple. Think.",
+      "I may have removed the label. For educational purposes.",
+    ],
   },
   {
     id: "sunflower_seeds",
@@ -100,11 +108,19 @@ export const level2Items: CollectibleItem[] = [
   },
   {
     id: "mystery_can",
-    name: "Canned Peas",
+    name: "Mystery Can",
+    revealName: "Green Peas",
     script: "ГОРОШЕК",
-    description: "A tin of green peas. Not on the list.",
+    description: "A dented grey tin. The label fell off.",
     isDecoy: true,
     color: "#9E9E9E",
+    pronunciation: "ga-RO-shek",
+    revealSpriteId: "pea_reveal",
+    hints: [
+      "Small. Green. Round. Like your attention span.",
+      "They grow in pods, Chad. Pods.",
+      "The label didn't fall off. I peeled it. You're learning.",
+    ],
   },
   {
     id: "vodka_bottle",
@@ -256,11 +272,19 @@ export const level4Items: CollectibleItem[] = [
   },
   {
     id: "mystery_can",
-    name: "Canned Corn",
+    name: "Mystery Can",
+    revealName: "Corn",
     script: "КУКУРУЗА",
-    description: "A tin of sweet corn. Wrong aisle, wrong list.",
+    description: "A dented grey tin. The label fell off.",
     isDecoy: true,
     color: "#9E9E9E",
+    pronunciation: "ku-ku-RU-za",
+    revealSpriteId: "corn_reveal",
+    hints: [
+      "Yellow. On a cob. Americans drown it in butter.",
+      "It's the tall plant. With the husks. Come on.",
+      "I put this can here on purpose. You will learn.",
+    ],
   },
 ];
 

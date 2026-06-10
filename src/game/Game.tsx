@@ -5,7 +5,7 @@ import { belarusSkin } from "../content/belarus";
 import { ethiopiaSkin } from "../content/ethiopia";
 import { italySkin } from "../content/italy";
 import { checkInference, calculateLevelScore } from "./index";
-import type { LevelScore } from "./scoring";
+import type { LevelScore, DecodeResult } from "./scoring";
 import { buildShoutWords } from "./shoutWords";
 import { SkinSelectScreen } from "./SkinSelectScreen";
 import { BootScreen } from "./BootScreen";
@@ -14,6 +14,7 @@ import { RunPhase } from "./RunPhase";
 import { GateScreen } from "./GateScreen";
 import { RevealScreen } from "./RevealScreen";
 import { SortingScreen } from "./SortingScreen";
+import { DecodeScreen } from "./DecodeScreen";
 import { LevelSelectScreen } from "./LevelSelectScreen";
 import { WinScreen } from "./WinScreen";
 import { DeathScreen } from "./DeathScreen";
@@ -71,6 +72,12 @@ export function Game() {
 
   // Collected items for sorting screen
   const [collectedItemIds, setCollectedItemIds] = useState<string[]>([]);
+
+  // Per-word sorting attempts (vocabWordId → number of picks)
+  const [sortingAttempts, setSortingAttempts] = useState<Map<string, number>>(new Map());
+
+  // Decode screen results
+  const [decodeResults, setDecodeResults] = useState<DecodeResult[]>([]);
 
   // Hearts system
   const [hearts, setHearts] = useState(3);
@@ -137,6 +144,7 @@ export function Game() {
     setCollectedPotato(false);
     setRunScore(0);
     setCollectedItemIds([]);
+    setDecodeResults([]);
     setScreen("BRIEFING");
   }, []);
 
@@ -182,6 +190,7 @@ export function Game() {
     setCollectedPotato(false);
     setRunScore(0);
     setCollectedItemIds([]);
+    setDecodeResults([]);
     setScreen("BRIEFING");
   }, []);
 
@@ -200,37 +209,19 @@ export function Game() {
     setCollectedPotato(false);
     setRunScore(0);
     setCollectedItemIds([]);
+    setDecodeResults([]);
     setScreen("BRIEFING");
   }, []);
 
+  // Collected mystery cans for the current level
+  const collectedMysteryCans = useMemo(() => {
+    return collectedItemIds
+      .filter((id) => id === "mystery_can")
+      .map((id) => itemDefs.get(id))
+      .filter((item): item is CollectibleItem => item !== undefined && item.isDecoy);
+  }, [collectedItemIds, itemDefs]);
+
   const handleReveal = useCallback(() => {
-    if (inferenceResult) {
-      const score = calculateLevelScore(runScore, inferenceResult, collectedPotato);
-      setLevelScore(score);
-
-      setProgress(prev => {
-        const next = new Map(prev);
-        const key = progressKey(currentSkin.id, currentLevel.id);
-        const existing = next.get(key);
-        next.set(key, {
-          completed: true,
-          score: Math.max(score.total, existing?.score ?? 0),
-        });
-        return next;
-      });
-
-      // Merge correctly-matched words into learned vocab
-      const correctWordIds = inferenceResult.matches
-        .filter(m => m.correct)
-        .map(m => m.vocabWordId);
-      if (correctWordIds.length > 0) {
-        setLearnedVocab(prev => {
-          const existing = prev[currentSkin.id] ?? [];
-          const merged = [...new Set([...existing, ...correctWordIds])];
-          return { ...prev, [currentSkin.id]: merged };
-        });
-      }
-    }
     // Heart refill: sacred item delivery refills hearts; extra life if at max
     if (collectedPotato) {
       if (hearts === maxHearts && maxHearts < 5) {
@@ -244,11 +235,55 @@ export function Game() {
     }
 
     setScreen("SORTING");
-  }, [inferenceResult, runScore, collectedPotato, currentSkin.id, currentLevel.id, hearts, maxHearts]);
+  }, [collectedPotato, hearts, maxHearts]);
 
-  const handleSortingComplete = useCallback(() => {
+  /** Compute final score and save progress — called when transitioning to REVEAL. */
+  const finalizeScore = useCallback((decode?: DecodeResult[]) => {
+    if (!inferenceResult) return;
+
+    const dr = decode ?? decodeResults;
+    const score = calculateLevelScore(runScore, inferenceResult, collectedPotato, dr.length > 0 ? dr : undefined);
+    setLevelScore(score);
+
+    setProgress(prev => {
+      const next = new Map(prev);
+      const key = progressKey(currentSkin.id, currentLevel.id);
+      const existing = next.get(key);
+      next.set(key, {
+        completed: true,
+        score: Math.max(score.total, existing?.score ?? 0),
+      });
+      return next;
+    });
+
+    // Merge correctly-matched words into learned vocab
+    const correctWordIds = inferenceResult.matches
+      .filter(m => m.correct)
+      .map(m => m.vocabWordId);
+    if (correctWordIds.length > 0) {
+      setLearnedVocab(prev => {
+        const existing = prev[currentSkin.id] ?? [];
+        const merged = [...new Set([...existing, ...correctWordIds])];
+        return { ...prev, [currentSkin.id]: merged };
+      });
+    }
+
     setScreen("REVEAL");
-  }, []);
+  }, [inferenceResult, runScore, collectedPotato, decodeResults, currentSkin.id, currentLevel.id]);
+
+  const handleSortingComplete = useCallback((attempts: Map<string, number>) => {
+    setSortingAttempts(attempts);
+    if (collectedMysteryCans.length > 0) {
+      setScreen("DECODE");
+    } else {
+      finalizeScore();
+    }
+  }, [collectedMysteryCans.length, finalizeScore]);
+
+  const handleDecodeComplete = useCallback((results: DecodeResult[]) => {
+    setDecodeResults(results);
+    finalizeScore(results);
+  }, [finalizeScore]);
 
   const handleNextLevel = useCallback(() => {
     const nextIndex = currentLevelIndex + 1;
@@ -261,6 +296,7 @@ export function Game() {
       setCollectedPotato(false);
       setRunScore(0);
       setCollectedItemIds([]);
+      setDecodeResults([]);
       setScreen("BRIEFING");
     }
   }, [currentLevelIndex, currentSkin.levels.length]);
@@ -396,6 +432,7 @@ export function Game() {
           checkGateResult={checkGateResult}
           learnedWords={learnedWordsForSkin}
           vocabWords={currentLevel.vocabPack.words}
+          timeOfDay={currentLevel.timeOfDay}
         />
       );
     case "GATE":
@@ -424,6 +461,18 @@ export function Game() {
           onComplete={handleSortingComplete}
         />
       ) : null;
+    case "DECODE":
+      return collectedMysteryCans.length > 0 ? (
+        <DecodeScreen
+          mysteryCans={collectedMysteryCans}
+          mentorName={currentSkin.mentorName}
+          mentorAvatar={currentSkin.mentorAvatar}
+          mentorColor={currentSkin.mentorColor}
+          messageColor={currentSkin.messageColor}
+          scoldNo={currentSkin.scoldNo}
+          onComplete={handleDecodeComplete}
+        />
+      ) : null;
     case "REVEAL":
       return inferenceResult && levelScore ? (
         <RevealScreen
@@ -440,6 +489,7 @@ export function Game() {
           maxHearts={maxHearts}
           sacredItemName={currentSkin.sacredItemName}
           onHeartsRefilled={handleHeartsRefilled}
+          sortingAttempts={sortingAttempts}
         />
       ) : null;
     case "WIN":

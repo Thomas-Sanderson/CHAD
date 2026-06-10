@@ -1,5 +1,6 @@
 import type { VocabPack, BriefingScript, RevealLine, LevelData, CollectibleItem } from "./content";
 import type { SpriteData } from "../engine/sprites";
+import type { TimeOfDay } from "../engine/sky";
 
 export interface LevelConfig {
   id: string;
@@ -11,11 +12,13 @@ export interface LevelConfig {
   levelData: LevelData;
   gateFailText: string;
   gateFailQuiet: boolean;
+  timeOfDay?: TimeOfDay;
 }
 
 export interface SkinEnvironment {
   skyColor: string;
   showStars: boolean;
+  latitude?: number; // degrees N — drives sky hue/saturation shifts per skin
   flagColors: string[]; // horizontal stripes top→bottom
   groundTile: SpriteData;
   platformTile: SpriteData;
@@ -58,6 +61,7 @@ export interface SkinConfig {
   wordsLearned: { script: string; translation: string }[];
   sacredItemName: string; // "The Sacred Potato" / "The Sacred Coffee Bean"
   sacredItemLine: string; // end-screen potato/bean line
+  scoldNo: string; // sharp "No!" in target language for decode screen
   deathText: string; // "УБИТ!" / "ሞተ!" — big heading on death screen
   deathQuips: string[]; // rotating mentor lines for death screen
 }

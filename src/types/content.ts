@@ -5,6 +5,7 @@ export interface VocabWord {
   matchesItemId: string | null; // null for meta-words like "produkty"
   pronunciation?: string; // phonetic hint, e.g. "smeh-TAH-nah"
   ipa?: string; // IPA transcription, e.g. "/smʲɪˈtanə/"
+  hint?: string; // funny contextual clue for briefing screen (never the translation)
   audioSlow?: string; // path to slow audio file (future)
   audioNormal?: string; // path to normal-speed audio file (future)
 }
@@ -37,10 +38,14 @@ export interface RevealLine {
 export interface CollectibleItem {
   id: string;
   name: string;
+  revealName?: string; // fresh English name shown on reveal card (mystery cans)
   script: string; // native script name, spoken on collection
   description: string;
   isDecoy: boolean;
   color: string; // placeholder color for rectangle rendering
+  pronunciation?: string; // Latin-script pronunciation for reveal
+  revealSpriteId?: string; // sprite ID to show after decode (mystery cans)
+  hints?: string[]; // mentor hints after repeated wrong guesses (mystery cans)
 }
 
 export interface PlatformDef {

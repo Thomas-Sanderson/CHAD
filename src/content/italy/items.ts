@@ -46,11 +46,19 @@ export const level1Items: CollectibleItem[] = [
   },
   {
     id: "mystery_can",
-    name: "Canned Lentils",
+    name: "Mystery Can",
+    revealName: "Lentils",
     script: "LENTICCHIE",
-    description: "A dented tin of lentils. Not on the list.",
+    description: "A dented grey tin. The label fell off.",
     isDecoy: true,
     color: "#9E9E9E",
+    pronunciation: "len-TIK-kye",
+    revealSpriteId: "lentil_reveal",
+    hints: [
+      "Tiny. Flat. You put them in soup. Every nonna knows.",
+      "They're a legume, Chad. Brown. Earthy. Think.",
+      "The label is in my pocket. You're spelling it yourself.",
+    ],
   },
   {
     id: "vinegar_bottle",
@@ -256,11 +264,19 @@ export const level4Items: CollectibleItem[] = [
   },
   {
     id: "mystery_can",
-    name: "Canned Chickpeas",
+    name: "Mystery Can",
+    revealName: "Chickpeas",
     script: "CECI",
-    description: "A tin of chickpeas. Nobody asked for these.",
+    description: "A dented grey tin. The label fell off.",
     isDecoy: true,
     color: "#9E9E9E",
+    pronunciation: "CHEH-chee",
+    revealSpriteId: "chickpea_reveal",
+    hints: [
+      "Round. Beige. You mash them into hummus.",
+      "Four letters, Chad. Only four. You can do this.",
+      "I hid the label under the olive oil. Spell it.",
+    ],
   },
 ];
 

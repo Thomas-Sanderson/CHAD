@@ -29,9 +29,9 @@ export function speakText(text: string): void {
   doSpeak(text);
 }
 
-/** Chad's voice: low pitch, slightly fast — bad robot attempting Russian */
+/** Chad's voice: default pitch/rate, English lang so TTS butchers the Cyrillic naturally */
 export function speakAsChad(text: string): void {
-  doSpeak(text, undefined, { pitch: 0.5, rate: 1.15 });
+  doSpeak(text, undefined, { lang: "en-US", male: true });
 }
 
 export function speakScold(text: string): void {
@@ -41,6 +41,8 @@ export function speakScold(text: string): void {
 interface VoiceOpts {
   pitch?: number;
   rate?: number;
+  lang?: string; // force a specific lang code (e.g. "en-US" for Chad's bad accent)
+  male?: boolean; // try to pick a male voice
 }
 
 function doSpeak(text: string, pronunciation?: string, opts?: VoiceOpts): void {
@@ -55,20 +57,20 @@ function doSpeak(text: string, pronunciation?: string, opts?: VoiceOpts): void {
   // If currently speaking, cancel and wait before re-speaking.
   // If idle, speak immediately.
   // For scripts without browser TTS support (Amharic), use pronunciation (Latin) with English voice
-  const lang = detectLang(text);
-  const needsFallback = lang === "am-ET" && pronunciation;
+  const detectedLang = detectLang(text);
+  const needsFallback = detectedLang === "am-ET" && pronunciation;
   const speakable = needsFallback ? pronunciation : text;
-  const speakLang = needsFallback ? "en-US" : lang;
+  const speakLang = opts?.lang ?? (needsFallback ? "en-US" : detectedLang);
 
   if (speaking) {
     speechSynthesis.cancel();
     speaking = false;
     pendingSpeech = setTimeout(() => {
       pendingSpeech = null;
-      fireSpeak(speakable, speakLang, opts?.pitch, opts?.rate);
+      fireSpeak(speakable, speakLang, opts?.pitch, opts?.rate, opts?.male);
     }, 80);
   } else {
-    fireSpeak(speakable, speakLang, opts?.pitch, opts?.rate);
+    fireSpeak(speakable, speakLang, opts?.pitch, opts?.rate, opts?.male);
   }
 }
 
@@ -81,11 +83,45 @@ function detectLang(text: string): string {
   return "it-IT";
 }
 
+// Cache male voice per lang so async getVoices() quirks don't cause reversion
+const maleVoiceCache = new Map<string, SpeechSynthesisVoice>();
+
+function findMaleVoice(lang: string): SpeechSynthesisVoice | null {
+  const cached = maleVoiceCache.get(lang);
+  if (cached) return cached;
+
+  const voices = speechSynthesis.getVoices();
+  if (voices.length === 0) return null; // voices not loaded yet, try next time
+
+  const langPrefix = lang.split("-")[0]!;
+  const matching = voices.filter((v) => v.lang.startsWith(langPrefix));
+  // Common male voice name patterns across platforms
+  const male = matching.find((v) =>
+    /\b(male|daniel|james|tom|fred|alex|aaron|rishi|jorge|luca)\b/i.test(v.name)
+  );
+  if (male) { maleVoiceCache.set(lang, male); return male; }
+  // On macOS, non-"enhanced" voices with no gender hint — pick one that isn't Samantha/Karen/etc.
+  const notFemale = matching.find((v) =>
+    !/\b(samantha|karen|victoria|fiona|moira|tessa|susan|kate|zoe|allison)\b/i.test(v.name)
+  );
+  if (notFemale) { maleVoiceCache.set(lang, notFemale); return notFemale; }
+  return null;
+}
+
+// Pre-warm voice cache when voices become available
+if (typeof speechSynthesis !== "undefined") {
+  speechSynthesis.addEventListener("voiceschanged", () => {
+    maleVoiceCache.clear(); // re-resolve on voice list changes
+    findMaleVoice("en-US");
+  });
+}
+
 function fireSpeak(
   text: string,
   lang?: string,
   pitch?: number,
   rate?: number,
+  male?: boolean,
 ): void {
   if (typeof speechSynthesis === "undefined") return;
 
@@ -93,6 +129,10 @@ function fireSpeak(
   utterance.lang = lang ?? detectLang(text);
   utterance.rate = rate ?? 0.8;
   if (pitch !== undefined) utterance.pitch = pitch;
+  if (male) {
+    const voice = findMaleVoice(utterance.lang);
+    if (voice) utterance.voice = voice;
+  }
   utterance.onstart = () => { speaking = true; };
   utterance.onend = () => { speaking = false; };
   utterance.onerror = () => { speaking = false; };

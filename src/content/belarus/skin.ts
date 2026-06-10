@@ -36,6 +36,7 @@ export const belarusSkin: SkinConfig = {
   environment: {
     skyColor: "#1a1a2e",
     showStars: true,
+    latitude: 55,
     flagColors: ["#cc2222", "#33aa55"],
     groundTile,
     platformTile,
@@ -65,6 +66,7 @@ export const belarusSkin: SkinConfig = {
   winMessage: "You survived grocery shopping in Belarus. ...I suppose you can stay.",
   sacredItemName: "The Sacred Potato",
   sacredItemLine: "The Sacred Potato is proud. Probably.",
+  scoldNo: "НЕТ!",
   deathText: "УБИТ!",
   deathQuips: [
     "Good. Maybe now he'll stop.",
