@@ -12,8 +12,7 @@ import {
   breadLoafSprite,
 } from "../engine/sprites";
 import { speakScold } from "../engine/audio";
-import { getAudioContext, sfxJump, sfxCollect } from "../engine/sfx";
-import { startMusic } from "../engine/music";
+import { sfxJump, sfxCollect } from "../engine/sfx";
 
 interface Props {
   onComplete: () => void;
@@ -48,6 +47,7 @@ export function BootScreen({ onComplete }: Props) {
   const [phase, setPhase] = useState<"typing" | "scene" | "ready">("typing");
   const [blink, setBlink] = useState(true);
   const cancelled = useRef(false);
+  const skippedAt = useRef(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Cursor blink
@@ -95,25 +95,6 @@ export function BootScreen({ onComplete }: Props) {
     return () => { active = false; };
   }, []);
 
-  // Initialize AudioContext on first user gesture
-  useEffect(() => {
-    const initAudio = () => {
-      getAudioContext();
-      startMusic("title");
-      window.removeEventListener("click", initAudio);
-      window.removeEventListener("keydown", initAudio);
-      window.removeEventListener("touchstart", initAudio);
-    };
-    window.addEventListener("click", initAudio);
-    window.addEventListener("keydown", initAudio);
-    window.addEventListener("touchstart", initAudio);
-    return () => {
-      window.removeEventListener("click", initAudio);
-      window.removeEventListener("keydown", initAudio);
-      window.removeEventListener("touchstart", initAudio);
-    };
-  }, []);
-
   // Skip typing on click/key
   useEffect(() => {
     if (phase === "ready") return;
@@ -122,7 +103,11 @@ export function BootScreen({ onComplete }: Props) {
         cancelled.current = true;
         setDisplay("Chad Rescues Nobody");
         setPhase("scene");
+        skippedAt.current = Date.now();
       } else if (phase === "scene") {
+        // Guard: a single tap fires both touchstart and click — ignore
+        // the synthetic click from the same gesture that skipped typing.
+        if (Date.now() - skippedAt.current < 500) return;
         if (e instanceof KeyboardEvent && e.code !== "Enter" && e.code !== "Space") return;
         onComplete();
       }
