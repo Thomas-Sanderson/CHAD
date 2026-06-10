@@ -1,14 +1,17 @@
 import type { LevelConfig } from "../../types/skin";
-import { level1VocabPack, level2VocabPack, level3VocabPack, level4VocabPack, level5VocabPack, level6VocabPack } from "./vocabPack";
-import { level1Briefing, level2Briefing, level3Briefing, level4Briefing, level5Briefing, level6Briefing } from "./briefing";
-import { level1Items, level2Items, level3Items, level4Items, level5Items, level6Items } from "./items";
-import { level1RevealLines, level2RevealLines, level3RevealLines, level4RevealLines, level5RevealLines, level6RevealLines } from "./revealLines";
+import { level1VocabPack, level2VocabPack, level3VocabPack, level4VocabPack, level5VocabPack, level6VocabPack, level7VocabPack, level8VocabPack, level9VocabPack } from "./vocabPack";
+import { level1Briefing, level2Briefing, level3Briefing, level4Briefing, level5Briefing, level6Briefing, level7Briefing, level8Briefing, level9Briefing } from "./briefing";
+import { level1Items, level2Items, level3Items, level4Items, level5Items, level6Items, level7Items, level8Items, level9Items } from "./items";
+import { level1RevealLines, level2RevealLines, level3RevealLines, level4RevealLines, level5RevealLines, level6RevealLines, level7RevealLines, level8RevealLines, level9RevealLines } from "./revealLines";
 import { level1Data } from "./level1";
 import { level2Data } from "./level2";
 import { level3Data } from "./level3";
 import { level4Data } from "./level4";
 import { level5Data } from "./level5";
 import { level6Data } from "./level6";
+import { level7Data } from "./level7";
+import { level8Data } from "./level8";
+import { level9Data } from "./level9";
 
 export const allLevels: LevelConfig[] = [
   {
@@ -82,5 +85,41 @@ export const allLevels: LevelConfig[] = [
     gateFailText: "НЕ ХВАТАЕТ.",
     gateFailQuiet: false,
     timeOfDay: "morning",
+  },
+  {
+    id: "up-the-street",
+    name: "Up the Street",
+    vocabPack: level7VocabPack,
+    briefing: level7Briefing,
+    items: level7Items,
+    revealLines: level7RevealLines,
+    levelData: level7Data,
+    gateFailText: "ГДЕ МОЙ БОРЩ?!",
+    gateFailQuiet: false,
+    timeOfDay: "afternoon",
+  },
+  {
+    id: "the-intersection",
+    name: "The Intersection",
+    vocabPack: level8VocabPack,
+    briefing: level8Briefing,
+    items: level8Items,
+    revealLines: level8RevealLines,
+    levelData: level8Data,
+    gateFailText: "ОПЯТЬ?!",
+    gateFailQuiet: false,
+    timeOfDay: "morning",
+  },
+  {
+    id: "the-other-side",
+    name: "The Other Side",
+    vocabPack: level9VocabPack,
+    briefing: level9Briefing,
+    items: level9Items,
+    revealLines: level9RevealLines,
+    levelData: level9Data,
+    gateFailText: "Ты потерялся.",
+    gateFailQuiet: true,
+    timeOfDay: "evening",
   },
 ];

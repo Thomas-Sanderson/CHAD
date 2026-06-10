@@ -17,7 +17,11 @@ export function TouchControls({ inputRef, canvasScale }: Props) {
 
   const setInput = useCallback((key: keyof InputState, value: boolean) => {
     const input = inputRef.current;
-    if (input) input[key] = value;
+    if (input) {
+      input[key] = value;
+      // Track jumpHeld alongside jump for variable jump height
+      if (key === "jump") input.jumpHeld = value;
+    }
   }, [inputRef]);
 
   const onDown = useCallback((key: keyof InputState, id: string) => (e: React.TouchEvent | React.MouseEvent) => {

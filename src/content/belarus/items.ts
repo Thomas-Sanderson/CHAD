@@ -419,3 +419,193 @@ export const level6Items: CollectibleItem[] = [
     color: "#FFC107",
   },
 ];
+
+// === Level 7 items ===
+export const level7Items: CollectibleItem[] = [
+  // Targets — returning words in vertical city
+  {
+    id: "sveokla_beet",
+    name: "Beetroot",
+    script: "СВЁКЛА",
+    description: "A dark purple-red beetroot with a stubby green top.",
+    isDecoy: false,
+    color: "#6B1F3A",
+    pronunciation: "SVYOK-la",
+  },
+  {
+    id: "smetana_tub",
+    name: "White Tub",
+    script: "СМЕТАНА",
+    description: "A plastic tub of something white and creamy.",
+    isDecoy: false,
+    color: "#FFFAF0",
+  },
+  {
+    id: "hleb_rye",
+    name: "Dark Bread",
+    script: "ХЛЕБ",
+    description: "A dark rye loaf with seeds on top.",
+    isDecoy: false,
+    color: "#5a3a1a",
+  },
+  {
+    id: "maslo_butter",
+    name: "Butter Block",
+    script: "МАСЛО",
+    description: "A yellow block wrapped in foil.",
+    isDecoy: false,
+    color: "#ffcc44",
+  },
+  // Decoys
+  {
+    id: "pickle_jar",
+    name: "Pickle Jar",
+    script: "ОГУРЦЫ",
+    description: "A jar of pickled cucumbers.",
+    isDecoy: true,
+    color: "#4CAF50",
+  },
+  {
+    id: "sunflower_seeds",
+    name: "Seed Bag",
+    script: "СЕМЕЧКИ",
+    description: "A rustling bag of sunflower seeds.",
+    isDecoy: true,
+    color: "#FFC107",
+  },
+  {
+    id: "kvass_bottle",
+    name: "Brown Bottle",
+    script: "КВАС",
+    description: "A brown bottle of something fizzy.",
+    isDecoy: true,
+    color: "#8B5E3C",
+  },
+];
+
+// === Level 8 items ===
+export const level8Items: CollectibleItem[] = [
+  // Targets
+  {
+    id: "ukrop_bunch",
+    name: "Green Bunch",
+    script: "УКРОП",
+    description: "A feathery bunch of bright green herbs.",
+    isDecoy: false,
+    color: "#4CAF50",
+    pronunciation: "oo-KROP",
+  },
+  {
+    id: "ryba_smoked",
+    name: "Smoked Fish",
+    script: "РЫБА",
+    description: "A golden-brown smoked fish.",
+    isDecoy: false,
+    color: "#cc7733",
+  },
+  {
+    id: "grib_basket",
+    name: "Mushroom Basket",
+    script: "ГРИБ",
+    description: "A basket of forest mushrooms.",
+    isDecoy: false,
+    color: "#cc9933",
+  },
+  // Decoys
+  {
+    id: "kvass_bottle",
+    name: "Brown Bottle",
+    script: "КВАС",
+    description: "A brown bottle of something fizzy.",
+    isDecoy: true,
+    color: "#8B5E3C",
+  },
+  {
+    id: "kolbasa_ring",
+    name: "Sausage Ring",
+    script: "КОЛБАСА",
+    description: "A ring of dried sausage.",
+    isDecoy: true,
+    color: "#991111",
+  },
+  {
+    id: "pickle_jar",
+    name: "Pickle Jar",
+    script: "ОГУРЦЫ",
+    description: "A jar of pickled cucumbers.",
+    isDecoy: true,
+    color: "#4CAF50",
+  },
+];
+
+// === Level 9 items ===
+export const level9Items: CollectibleItem[] = [
+  // Targets
+  {
+    id: "tvorog_tub",
+    name: "White Tub",
+    script: "ТВОРОГ",
+    description: "A green-labeled tub of something white and grainy.",
+    isDecoy: false,
+    color: "#e8f5e9",
+    pronunciation: "TVOH-rog",
+  },
+  {
+    id: "sosiski_pack",
+    name: "Sausage Pack",
+    script: "СОСИСКИ",
+    description: "A vacuum-sealed package of thin sausages.",
+    isDecoy: false,
+    color: "#e08080",
+    pronunciation: "sah-SEES-kee",
+  },
+  {
+    id: "sveokla_beet",
+    name: "Beetroot",
+    script: "СВЁКЛА",
+    description: "A dark purple-red beetroot with a stubby green top.",
+    isDecoy: false,
+    color: "#6B1F3A",
+  },
+  {
+    id: "kefir_bottle",
+    name: "Tall Bottle",
+    script: "КЕФИР",
+    description: "A tall bottle of some fermented drink.",
+    isDecoy: false,
+    color: "#E8F5E9",
+  },
+  // Decoys
+  {
+    id: "vodka_bottle",
+    name: "Tall Frosted Bottle",
+    script: "ВОДКА",
+    description: "A frosted bottle with a red stripe label.",
+    isDecoy: true,
+    color: "#eeeeee",
+  },
+  {
+    id: "bread_loaf",
+    name: "Bread Loaf",
+    script: "БАТОН",
+    description: "A round loaf of golden bread.",
+    isDecoy: true,
+    color: "#c4a882",
+  },
+  {
+    id: "sunflower_seeds",
+    name: "Seed Bag",
+    script: "СЕМЕЧКИ",
+    description: "A rustling bag of sunflower seeds.",
+    isDecoy: true,
+    color: "#FFC107",
+  },
+  {
+    id: "pickle_jar",
+    name: "Pickle Jar",
+    script: "ОГУРЦЫ",
+    description: "A jar of pickled cucumbers.",
+    isDecoy: true,
+    color: "#4CAF50",
+  },
+];

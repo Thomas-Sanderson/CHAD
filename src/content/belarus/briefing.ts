@@ -186,6 +186,120 @@ export const level6Briefing: BriefingScript = {
   ],
 };
 
+export const level7Briefing: BriefingScript = {
+  levelId: "up-the-street",
+  messages: [
+    {
+      id: "l7-msg-1",
+      sender: "mentor",
+      text: "The neighborhood goes up now. Literally. СВЁКЛА is at the bakery on the lower street.",
+      vocabWordIds: ["sveokla"],
+    },
+    {
+      id: "l7-msg-2",
+      sender: "mentor",
+      text: "I also need СМЕТАНА and МАСЛО from the dairy. It's upstairs. You'll have to climb.",
+      vocabWordIds: ["smetana_street", "maslo_street"],
+    },
+    {
+      id: "l7-msg-3",
+      sender: "mentor",
+      text: "And ХЛЕБ. Obviously. The dark one. Don't bring me the wrong kind again.",
+      vocabWordIds: ["hleb_street"],
+    },
+    {
+      id: "l7-msg-4",
+      sender: "chad",
+      text: "How do I get upstairs",
+      vocabWordIds: [],
+    },
+    {
+      id: "l7-msg-5",
+      sender: "mentor",
+      text: "With your legs, Chad. There are stairs. Read the signs.",
+      vocabWordIds: [],
+    },
+  ],
+};
+
+export const level8Briefing: BriefingScript = {
+  levelId: "the-intersection",
+  messages: [
+    {
+      id: "l8-msg-1",
+      sender: "mentor",
+      text: "Three floors this time. I need УКРОП. It's a green herb. Goes on fish.",
+      vocabWordIds: ["ukrop"],
+    },
+    {
+      id: "l8-msg-2",
+      sender: "mentor",
+      text: "And РЫБА from the fish shop. You know what fish looks like by now.",
+      vocabWordIds: ["ryba_intersection"],
+    },
+    {
+      id: "l8-msg-3",
+      sender: "mentor",
+      text: "ГРИБ from the produce stall. She locked the door again. You know what to do.",
+      vocabWordIds: ["grib_intersection"],
+    },
+    {
+      id: "l8-msg-4",
+      sender: "chad",
+      text: "I know what to do",
+      vocabWordIds: [],
+    },
+    {
+      id: "l8-msg-5",
+      sender: "mentor",
+      text: "You absolutely do not.",
+      vocabWordIds: [],
+    },
+  ],
+};
+
+export const level9Briefing: BriefingScript = {
+  levelId: "the-other-side",
+  messages: [
+    {
+      id: "l9-msg-1",
+      sender: "mentor",
+      text: "Four levels. The whole neighborhood. I need ТВОРОГ from the dairy. Third floor.",
+      vocabWordIds: ["tvorog"],
+    },
+    {
+      id: "l9-msg-2",
+      sender: "mentor",
+      text: "СОСИСКИ from the butcher. Second floor. Locked, obviously.",
+      vocabWordIds: ["sosiski"],
+    },
+    {
+      id: "l9-msg-3",
+      sender: "mentor",
+      text: "СВЁКЛА from the produce. Ground floor. You just learned this word.",
+      vocabWordIds: ["sveokla_return"],
+    },
+    {
+      id: "l9-msg-4",
+      sender: "mentor",
+      text: "And КЕФИР. You remember КЕФИР from day one, right? ...right?",
+      vocabWordIds: ["kefir_return"],
+    },
+    {
+      id: "l9-msg-5",
+      sender: "chad",
+      text: "The fizzy milk",
+      vocabWordIds: [],
+    },
+    {
+      id: "l9-msg-6",
+      sender: "mentor",
+      text: "...okay. Maybe there's hope for you. Maybe.",
+      vocabWordIds: [],
+    },
+  ],
+};
+
 export const level4Briefing: BriefingScript = {
   levelId: "the-apology",
   messages: [

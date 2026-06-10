@@ -16,7 +16,7 @@ export function buildShoutWords(
   // Words from completed levels
   for (const level of skin.levels) {
     for (const word of level.vocabPack.words) {
-      if (learnedIds.includes(word.id) && word.matchesItemId !== null) {
+      if (learnedIds.includes(word.id) && word.matchesItemId !== null && !words.some(w => w.script === word.script)) {
         words.push(word);
       }
     }
@@ -25,7 +25,7 @@ export function buildShoutWords(
   // Current level's vocab — player learned these in the briefing
   const currentLevel = skin.levels[currentLevelIndex]!;
   for (const word of currentLevel.vocabPack.words) {
-    if (word.matchesItemId !== null && !words.some(w => w.id === word.id)) {
+    if (word.matchesItemId !== null && !words.some(w => w.script === word.script)) {
       words.push(word);
     }
   }
