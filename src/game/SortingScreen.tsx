@@ -271,69 +271,69 @@ export function SortingScreen({
           })}
         </div>
 
-        {/* Right: progress + picked flash + mentor feedback + button */}
+        {/* Right: progress + picked flash + mentor feedback (scrollable) + pinned button */}
         <div className="sorting-right">
-          <div className="sorting-progress" style={styles.progressRow}>
-            {targetWords.map((word, i) => {
-              let bg = "#333";
-              if (i < currentIndex) {
-                const picks = results.filter((r) => r.vocabWordId === word.id).length;
-                bg = picks <= 1 ? "#4CAF50" : "#FF9800";
-              } else if (i === currentIndex) {
-                bg = "#FFD54F";
-              }
-              return (
-                <div key={i} style={{ ...styles.dot, background: bg }} />
-              );
-            })}
-          </div>
+          <div className="sorting-right-scroll">
+            <div className="sorting-progress" style={styles.progressRow}>
+              {targetWords.map((word, i) => {
+                let bg = "#333";
+                if (i < currentIndex) {
+                  const picks = results.filter((r) => r.vocabWordId === word.id).length;
+                  bg = picks <= 1 ? "#4CAF50" : "#FF9800";
+                } else if (i === currentIndex) {
+                  bg = "#FFD54F";
+                }
+                return (
+                  <div key={i} style={{ ...styles.dot, background: bg }} />
+                );
+              })}
+            </div>
 
-          {picked !== null && (() => {
-            const pickedItem = itemDefs.get(picked);
-            return pickedItem ? (
-              <div className="sorting-picked-flash" style={{
-                ...styles.wordPrompt,
-                borderColor: isCorrect ? "#4CAF50" : "#f44336",
-                border: "2px solid",
-                gap: 4,
-                padding: "6px 10px",
-                animation: "flash-in 0.25s ease-out",
-              }}>
-                <ItemSpriteThumb itemId={picked} />
-                <span style={{ ...styles.wordScript, fontSize: "clamp(12px, 2.5vw, 22px)" }}>
-                  {pickedItem.script}
-                </span>
-                <span style={styles.itemName}>{pickedItem.name}</span>
+            {picked !== null && (() => {
+              const pickedItem = itemDefs.get(picked);
+              return pickedItem ? (
+                <div className="sorting-picked-flash" style={{
+                  ...styles.wordPrompt,
+                  borderColor: isCorrect ? "#4CAF50" : "#f44336",
+                  border: "2px solid",
+                  gap: 4,
+                  padding: "6px 10px",
+                  animation: "flash-in 0.25s ease-out",
+                }}>
+                  <ItemSpriteThumb itemId={picked} />
+                  <span style={{ ...styles.wordScript, fontSize: "clamp(12px, 2.5vw, 22px)" }}>
+                    {pickedItem.script}
+                  </span>
+                  <span style={styles.itemName}>{pickedItem.name}</span>
+                </div>
+              ) : null;
+            })()}
+
+            <div className="sorting-feedback" style={styles.feedbackArea}>
+              <div
+                style={{
+                  ...styles.avatar,
+                  background: mentorColor,
+                }}
+              >
+                {mentorAvatar}
               </div>
-            ) : null;
-          })()}
-
-          <div className="sorting-feedback" style={styles.feedbackArea}>
-            <div
-              style={{
-                ...styles.avatar,
-                background: mentorColor,
-              }}
-            >
-              {mentorAvatar}
-            </div>
-            <div
-              style={{
-                ...styles.mentorBubble,
-                color: feedback.color,
-              }}
-            >
-              {isCorrect && picked !== null && (
-                <span style={styles.feedbackIcon}>&#10003; </span>
-              )}
-              {isCorrect === false && picked !== null && (
-                <span style={styles.feedbackIcon}>&#10007; </span>
-              )}
-              {feedback.text}
+              <div
+                style={{
+                  ...styles.mentorBubble,
+                  color: feedback.color,
+                }}
+              >
+                {isCorrect && picked !== null && (
+                  <span style={styles.feedbackIcon}>&#10003; </span>
+                )}
+                {isCorrect === false && picked !== null && (
+                  <span style={styles.feedbackIcon}>&#10007; </span>
+                )}
+                {feedback.text}
+              </div>
             </div>
           </div>
-
-          <div style={{ flex: 1 }} />
 
           {picked !== null && (
             <button
@@ -395,17 +395,28 @@ const sortingCSS = `
     justify-content: center;
   }
   .sorting-bag {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     min-width: 0;
   }
   .sorting-right {
-    flex: 0 0 22%;
+    flex: 1 1 0%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .sorting-right-scroll {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--game-gap, 12px);
-    min-width: 0;
-    overflow: hidden;
+    padding-bottom: 4px;
   }
 
   @media (orientation: landscape) and (max-height: 500px) {
@@ -436,7 +447,7 @@ const sortingCSS = `
       min-width: auto !important;
     }
     .sorting-bag {
-      grid-template-columns: repeat(4, 1fr) !important;
+      grid-template-columns: repeat(3, 1fr) !important;
       gap: 6px !important;
     }
     .sorting-feedback {
@@ -522,7 +533,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   bagGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(4, 1fr)",
+    gridTemplateColumns: "repeat(3, 1fr)",
     gap: "var(--game-list-gap, 8px)",
     overflowY: "auto",
     minHeight: 0,
@@ -589,6 +600,8 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 16,
     fontWeight: "bold",
     cursor: "pointer",
+    flexShrink: 0,
+    marginTop: 8,
   },
   retryButton: {
     background: "#f44336",
@@ -599,6 +612,8 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 16,
     fontWeight: "bold",
     cursor: "pointer",
+    flexShrink: 0,
+    marginTop: 8,
   },
   completeButton: {
     background: "#4CAF50",
