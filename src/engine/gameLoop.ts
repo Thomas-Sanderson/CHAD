@@ -627,10 +627,13 @@ export function updateGameState(
   const camLerp = 1 - Math.pow(0.001, dt); // ~0.92 at 60fps — smooth but responsive
   state.camera.x += (targetCamX - state.camera.x) * camLerp;
 
-  // Camera Y — player at 40% from top, clamped to bounds
+  // Camera Y — on lowest avenue, ground sits at 1/4 from bottom (offset 0.75);
+  // as Chad climbs, smoothly transitions to mid-screen (offset 0.5).
   const maxCamY = Math.max(0, activeBounds.height - CANVAS_HEIGHT);
+  const heightRatio = maxCamY > 0 ? state.player.position.y / activeBounds.height : 0;
+  const camVertOffset = CANVAS_HEIGHT * (0.5 + heightRatio * 0.25);
   const targetCamY = Math.max(0, Math.min(
-    state.player.position.y - CANVAS_HEIGHT * 0.4,
+    state.player.position.y - camVertOffset,
     maxCamY
   ));
   state.camera.y += (targetCamY - state.camera.y) * camLerp;
