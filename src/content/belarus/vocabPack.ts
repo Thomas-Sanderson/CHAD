@@ -10,6 +10,7 @@ export const level1VocabPack: VocabPack = {
       matchesItemId: "smetana_tub",
       pronunciation: "smeh-TAH-nah",
       ipa: "/smʲɪˈtanə/",
+      hint: "The white goop. Goes on everything here.",
     },
     {
       id: "kefir",
@@ -18,6 +19,7 @@ export const level1VocabPack: VocabPack = {
       matchesItemId: "kefir_bottle",
       pronunciation: "keh-FEER",
       ipa: "/kʲɪˈfʲir/",
+      hint: "Angry milk in a tall bottle. It fizzes.",
     },
     {
       id: "kolbasa",
@@ -26,6 +28,7 @@ export const level1VocabPack: VocabPack = {
       matchesItemId: "kolbasa_link",
       pronunciation: "kahl-bah-SAH",
       ipa: "/kəlbɐˈsa/",
+      hint: "The big meat tube. You know what it is.",
     },
     {
       id: "produkty",
@@ -48,6 +51,7 @@ export const level2VocabPack: VocabPack = {
       matchesItemId: "chai_box",
       pronunciation: "CHAY",
       ipa: "/tɕaj/",
+      hint: "The warm leaf water. A whole crisis over this.",
     },
     {
       id: "moloko",
@@ -56,6 +60,7 @@ export const level2VocabPack: VocabPack = {
       matchesItemId: "moloko_carton",
       pronunciation: "mah-lah-KOH",
       ipa: "/məlɐˈko/",
+      hint: "Comes from a cow. Goes in the leaf water.",
     },
     {
       id: "sakhar",
@@ -64,6 +69,7 @@ export const level2VocabPack: VocabPack = {
       matchesItemId: "sakhar_bag",
       pronunciation: "SAH-khar",
       ipa: "/ˈsaxər/",
+      hint: "The sweet stuff ants march in for.",
     },
   ],
 };
@@ -78,6 +84,7 @@ export const level3VocabPack: VocabPack = {
       matchesItemId: "ryba_fish",
       pronunciation: "RIH-bah",
       ipa: "/ˈrɨbə/",
+      hint: "It swims. It smells. She wants you to cook it.",
     },
     {
       id: "maslo",
@@ -86,6 +93,7 @@ export const level3VocabPack: VocabPack = {
       matchesItemId: "maslo_butter",
       pronunciation: "MAHS-lah",
       ipa: "/ˈmaslə/",
+      hint: "The yellow slab. Makes everything better, apparently.",
     },
     {
       id: "kartoshka",
@@ -94,6 +102,7 @@ export const level3VocabPack: VocabPack = {
       matchesItemId: "kartoshka",
       pronunciation: "kar-TOSH-kah",
       ipa: "/kɐrˈtoʂkə/",
+      hint: "Grows underground. Half of Belarusian cuisine.",
     },
     {
       id: "hleb",
@@ -102,6 +111,7 @@ export const level3VocabPack: VocabPack = {
       matchesItemId: "hleb_rye",
       pronunciation: "KHLYEB",
       ipa: "/xlʲep/",
+      hint: "The dark one. Not the bleached kind.",
     },
   ],
 };
@@ -116,6 +126,7 @@ export const level4VocabPack: VocabPack = {
       matchesItemId: "konfeta_candy",
       pronunciation: "kahn-FYEH-tah",
       ipa: "/kɐnˈfʲetə/",
+      hint: "The sweet bribe. In a shiny wrapper.",
     },
     {
       id: "syr",
@@ -124,6 +135,7 @@ export const level4VocabPack: VocabPack = {
       matchesItemId: "syr_cheese",
       pronunciation: "SIHR",
       ipa: "/sɨr/",
+      hint: "Holes optional. Smells intentional.",
     },
     {
       id: "yabloko",
@@ -132,6 +144,7 @@ export const level4VocabPack: VocabPack = {
       matchesItemId: "yabloko_apple",
       pronunciation: "YAH-blah-kah",
       ipa: "/ˈjabləkə/",
+      hint: "Grows on a tree. Newton got bonked by one.",
     },
   ],
 };
@@ -147,6 +160,7 @@ export const level5VocabPack: VocabPack = {
       matchesItemId: "tarelka_plate",
       pronunciation: "tah-RYEL-kah",
       ipa: "/tɐˈrʲelkə/",
+      hint: "The flat round thing you eat off of.",
     },
     {
       id: "lozhka",
@@ -155,6 +169,7 @@ export const level5VocabPack: VocabPack = {
       matchesItemId: "lozhka_spoon",
       pronunciation: "LOSH-kah",
       ipa: "/ˈloʂkə/",
+      hint: "Scoops soup. Not a fork, Chad.",
     },
     {
       id: "chashka",
@@ -163,6 +178,7 @@ export const level5VocabPack: VocabPack = {
       matchesItemId: "chashka_cup",
       pronunciation: "CHASH-kah",
       ipa: "/ˈtɕaʂkə/",
+      hint: "You drink from it. Has a handle.",
     },
     {
       id: "zavtrak",
@@ -186,6 +202,7 @@ export const level6VocabPack: VocabPack = {
       matchesItemId: "syr_wheel",
       pronunciation: "SIHR",
       ipa: "/sɨr/",
+      hint: "The big wheel kind this time. Fancy.",
     },
     {
       id: "ryba_market",
@@ -194,6 +211,7 @@ export const level6VocabPack: VocabPack = {
       matchesItemId: "ryba_smoked",
       pronunciation: "RIH-bah",
       ipa: "/ˈrɨbə/",
+      hint: "Smoked this time. Still smells.",
     },
     {
       id: "slivki",
@@ -202,6 +220,7 @@ export const level6VocabPack: VocabPack = {
       matchesItemId: "slivki_jar",
       pronunciation: "SLEEF-kee",
       ipa: "/ˈslʲifkʲi/",
+      hint: "Rich, white, comes in a jar. For fancy people.",
     },
     {
       id: "grib",
@@ -210,6 +229,7 @@ export const level6VocabPack: VocabPack = {
       matchesItemId: "grib_basket",
       pronunciation: "GREEB",
       ipa: "/grʲip/",
+      hint: "Grows in the forest. Comes in a basket. Don't eat the wrong one.",
     },
   ],
 };

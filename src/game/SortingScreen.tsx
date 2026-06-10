@@ -41,7 +41,7 @@ interface Props {
   mentorAvatar: string;
   mentorColor: string;
   messageColor: string;
-  onComplete: () => void;
+  onComplete: (attempts: Map<string, number>) => void;
 }
 
 interface SortResult {
@@ -105,16 +105,16 @@ export function SortingScreen({
     setPicked(itemId);
     setIsCorrect(correct);
 
-    if (correct) {
-      setResults((prev) => [
-        ...prev,
-        { vocabWordId: currentWord!.id, pickedItemId: itemId, correct: true },
-      ]);
-    } else {
+    setResults((prev) => [
+      ...prev,
+      { vocabWordId: currentWord!.id, pickedItemId: itemId, correct },
+    ]);
+
+    if (!correct) {
       setShaking(true);
       setTimeout(() => setShaking(false), 500);
-      // Scold after the item speech finishes
-      if (item) setTimeout(() => speakScold(item.name), 600);
+      // Scold after the item speech finishes (1.2s lets the script pronunciation land)
+      if (item) setTimeout(() => speakScold(item.name), 1200);
     }
   };
 
@@ -159,6 +159,11 @@ export function SortingScreen({
 
   if (done) {
     const correctCount = results.filter((r) => r.correct).length;
+    // Count total picks per word (wrong + correct = attempts)
+    const attempts = new Map<string, number>();
+    for (const r of results) {
+      attempts.set(r.vocabWordId, (attempts.get(r.vocabWordId) ?? 0) + 1);
+    }
     return (
       <div className="sorting-screen" style={styles.container}>
         <h1 className="sorting-title" style={styles.title}>BAG SORTED!</h1>
@@ -180,7 +185,7 @@ export function SortingScreen({
               : `${mentorName} sighs but accepts your effort.`}
           </div>
         </div>
-        <button style={styles.completeButton} onClick={onComplete}>
+        <button style={styles.completeButton} onClick={() => onComplete(attempts)}>
           See results &rarr;
         </button>
         <style>{sortingCSS}</style>
@@ -263,20 +268,18 @@ export function SortingScreen({
 
           {/* Progress dots */}
           <div className="sorting-progress" style={styles.progressRow}>
-            {targetWords.map((_, i) => (
-              <div
-                key={i}
-                style={{
-                  ...styles.dot,
-                  background:
-                    i < currentIndex
-                      ? "#4CAF50"
-                      : i === currentIndex
-                        ? "#FFD54F"
-                        : "#333",
-                }}
-              />
-            ))}
+            {targetWords.map((word, i) => {
+              let bg = "#333";
+              if (i < currentIndex) {
+                const picks = results.filter((r) => r.vocabWordId === word.id).length;
+                bg = picks <= 1 ? "#4CAF50" : "#FF9800";
+              } else if (i === currentIndex) {
+                bg = "#FFD54F";
+              }
+              return (
+                <div key={i} style={{ ...styles.dot, background: bg }} />
+              );
+            })}
           </div>
 
           {/* Mentor feedback */}

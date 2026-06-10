@@ -21,6 +21,7 @@ export const allLevels: LevelConfig[] = [
     levelData: level1Data,
     gateFailText: "ГДЕ ПРОДУКТЫ?!",
     gateFailQuiet: false,
+    timeOfDay: "midday",
   },
   {
     id: "tea-emergency",
@@ -32,6 +33,7 @@ export const allLevels: LevelConfig[] = [
     levelData: level2Data,
     gateFailText: "ГДЕ МОЙ ЧАЙ?!",
     gateFailQuiet: false,
+    timeOfDay: "morning",
   },
   {
     id: "dinner-ingredients",
@@ -43,6 +45,7 @@ export const allLevels: LevelConfig[] = [
     levelData: level3Data,
     gateFailText: "ЭТО НЕ УЖИН!",
     gateFailQuiet: false,
+    timeOfDay: "afternoon",
   },
   {
     id: "the-apology",
@@ -54,6 +57,7 @@ export const allLevels: LevelConfig[] = [
     levelData: level4Data,
     gateFailText: "УХОДИ.",
     gateFailQuiet: true,
+    timeOfDay: "night",
   },
   {
     id: "saturday-morning",
@@ -65,6 +69,7 @@ export const allLevels: LevelConfig[] = [
     levelData: level5Data,
     gateFailText: "ЭТО НЕ ЗАВТРАК!",
     gateFailQuiet: false,
+    timeOfDay: "dawn",
   },
   {
     id: "the-market",
@@ -76,5 +81,6 @@ export const allLevels: LevelConfig[] = [
     levelData: level6Data,
     gateFailText: "НЕ ХВАТАЕТ.",
     gateFailQuiet: false,
+    timeOfDay: "morning",
   },
 ];

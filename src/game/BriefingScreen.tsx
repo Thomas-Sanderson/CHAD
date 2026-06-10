@@ -15,6 +15,12 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
   const [visibleCount, setVisibleCount] = useState(0);
   const [typing, setTyping] = useState(true);
 
+  // Which word is shown in the side panel, and whether the hint (translation) is visible
+  const [activeWord, setActiveWord] = useState<VocabWord | null>(null);
+  const [showHint, setShowHint] = useState(false);
+  // Key increments to re-trigger the flash animation even for the same word
+  const [flashKey, setFlashKey] = useState(0);
+
   const advanceMessage = useCallback(() => {
     if (typing) {
       setTyping(false);
@@ -45,14 +51,24 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
 
   const allShown = visibleCount >= briefing.messages.length && !typing;
 
-  const [phoneticHint, setPhoneticHint] = useState<{ word: string; pronunciation?: string; ipa?: string; until: number } | null>(null);
+  // Build a map of script words for highlighting
+  const cyrillicWordMap = new Map(vocabPack.words.map((w) => [w.script, w]));
 
-  // Clear phonetic hint after 3s
+  // Auto-force the word from the most recent visible message
   useEffect(() => {
-    if (!phoneticHint) return;
-    const timer = setTimeout(() => setPhoneticHint(null), 3000);
-    return () => clearTimeout(timer);
-  }, [phoneticHint]);
+    if (visibleCount === 0 || typing) return;
+    // Walk backwards through visible messages to find the latest one with a vocab word
+    for (let i = visibleCount - 1; i >= 0; i--) {
+      const msg = briefing.messages[i]!;
+      for (const [, word] of cyrillicWordMap) {
+        if (msg.text.includes(word.script)) {
+          setActiveWord(word);
+          setShowHint(false); // forced word shows pronunciation/IPA but not hint
+          return;
+        }
+      }
+    }
+  }, [visibleCount, typing]);
 
   // Auto-scroll messages to bottom
   const messagesRef = useRef<HTMLDivElement>(null);
@@ -63,18 +79,14 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
     }
   }, [visibleCount, typing]);
 
-  // Build a map of cyrillic words for highlighting
-  const cyrillicWordMap = new Map(vocabPack.words.map((w) => [w.script, w]));
-
-  function handleCyrillicClick(word: VocabWord) {
+  function handleInlineClick(word: VocabWord) {
+    setActiveWord(word);
+    setShowHint(true);
+    setFlashKey((k) => k + 1);
     pronounceWord(word);
-    if (word.pronunciation || word.ipa) {
-      setPhoneticHint({ word: word.script, pronunciation: word.pronunciation, ipa: word.ipa, until: Date.now() + 3000 });
-    }
   }
 
   function highlightCyrillic(text: string): React.ReactNode[] {
-    // Split on Cyrillic word boundaries
     const parts: React.ReactNode[] = [];
     let remaining = text;
     let key = 0;
@@ -89,7 +101,7 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
               <span
                 key={`cyr-${key++}`}
                 style={styles.script}
-                onClick={(e) => { e.stopPropagation(); handleCyrillicClick(word); }}
+                onClick={(e) => { e.stopPropagation(); handleInlineClick(word); }}
               >
                 {cyr}
               </span>
@@ -97,7 +109,6 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
           }
           result.push(<span key={`txt-${key++}`}>{seg}</span>);
         });
-        // Since each message has at most one Cyrillic word, return early
         return result;
       }
     }
@@ -107,93 +118,157 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.phone}>
-        <div style={styles.phoneHeader}>
-          <div style={styles.statusBar}>
-            <span>9:41</span>
-            <span>●●●○ 📶</span>
-          </div>
-          <div style={styles.contactBar}>
-            <div style={{ ...styles.avatar, background: mentorColor }}>{mentorAvatar}</div>
-            <div>
-              <div style={styles.contactName}>{mentorName}</div>
-              <div style={styles.contactStatus}>online</div>
+    <div className="briefing-screen" style={styles.container}>
+      <div className="briefing-body">
+        <div className="briefing-left">
+          {activeWord ? (
+            <div key={flashKey} className="briefing-word-panel" style={styles.wordPanel}>
+              <div style={styles.wordScript}>{activeWord.script}</div>
+              {activeWord.pronunciation && (
+                <div style={styles.wordPronunciation}>{activeWord.pronunciation}</div>
+              )}
+              {activeWord.ipa && (
+                <div style={styles.wordIpa}>{activeWord.ipa}</div>
+              )}
+              {showHint && activeWord.hint && (
+                <div className="briefing-hint-reveal" style={styles.wordHintLine}>
+                  {activeWord.hint}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div style={styles.wordPanelEmpty}>
+              Tap a highlighted word
+            </div>
+          )}
+        </div>
+
+        <div className="briefing-right">
+          <div style={styles.phone}>
+            <div style={styles.phoneHeader}>
+              <div style={styles.statusBar}>
+                <span>9:41</span>
+                <span>●●●○ 📶</span>
+              </div>
+              <div style={styles.contactBar}>
+                <div style={{ ...styles.avatar, background: mentorColor }}>{mentorAvatar}</div>
+                <div>
+                  <div style={styles.contactName}>{mentorName}</div>
+                  <div style={styles.contactStatus}>online</div>
+                </div>
+              </div>
+            </div>
+
+            <div ref={messagesRef} style={styles.messages}>
+              {briefing.messages.slice(0, visibleCount).map((msg, i) => {
+                const isLast = i === visibleCount - 1;
+                const showTyping = isLast && typing;
+
+                return (
+                  <div
+                    key={msg.id}
+                    style={{
+                      ...styles.messageBubble,
+                      ...(msg.sender === "mentor"
+                        ? styles.anyaBubble
+                        : styles.chadBubble),
+                      opacity: showTyping ? 0.6 : 1,
+                    }}
+                  >
+                    {showTyping ? (
+                      <span style={styles.typingDots}>...</span>
+                    ) : (
+                      highlightCyrillic(msg.text)
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div style={styles.phoneFooter}>
+              {allShown ? (
+                <button style={styles.goButton} onClick={onComplete}>
+                  GO SHOPPING →
+                </button>
+              ) : (
+                <button style={styles.tapButton} onClick={advanceMessage}>
+                  {visibleCount === 0 ? "Read messages" : "Next message"}
+                </button>
+              )}
             </div>
           </div>
         </div>
-
-        <div ref={messagesRef} style={styles.messages}>
-          {briefing.messages.slice(0, visibleCount).map((msg, i) => {
-            const isLast = i === visibleCount - 1;
-            const showTyping = isLast && typing;
-
-            return (
-              <div
-                key={msg.id}
-                style={{
-                  ...styles.messageBubble,
-                  ...(msg.sender === "mentor"
-                    ? styles.anyaBubble
-                    : styles.chadBubble),
-                  opacity: showTyping ? 0.6 : 1,
-                }}
-              >
-                {showTyping ? (
-                  <span style={styles.typingDots}>...</span>
-                ) : (
-                  highlightCyrillic(msg.text)
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {phoneticHint && (
-          <div style={styles.phoneticHint}>
-            <div style={styles.hintCyrillic}>{phoneticHint.word}</div>
-            {phoneticHint.pronunciation && <div style={styles.hintPronunciation}>{phoneticHint.pronunciation}</div>}
-            {phoneticHint.ipa && <div style={styles.hintIpa}>{phoneticHint.ipa}</div>}
-          </div>
-        )}
-
-        <div style={styles.phoneFooter}>
-          {allShown ? (
-            <button style={styles.goButton} onClick={onComplete}>
-              GO SHOPPING →
-            </button>
-          ) : (
-            <button style={styles.tapButton} onClick={advanceMessage}>
-              {visibleCount === 0 ? "Read messages" : "Next message"}
-            </button>
-          )}
-        </div>
       </div>
+
+      <style>{briefingCSS}</style>
     </div>
   );
 }
 
+const briefingCSS = `
+  .briefing-body {
+    display: flex;
+    flex-direction: row;
+    gap: var(--game-gap, 12px);
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+  }
+  .briefing-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+  }
+  .briefing-right {
+    flex: 2;
+    display: flex;
+    min-height: 0;
+  }
+
+  @keyframes briefing-flash {
+    0% { background: rgba(255, 213, 79, 0.25); }
+    100% { background: transparent; }
+  }
+  @keyframes briefing-hint-in {
+    0% { opacity: 0; transform: translateY(-4px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .briefing-word-panel {
+    animation: briefing-flash 0.5s ease-out;
+  }
+  .briefing-hint-reveal {
+    animation: briefing-hint-in 0.25s ease-out;
+  }
+
+  @media (orientation: landscape) and (max-height: 500px) {
+    .briefing-screen {
+      padding: 8px 16px !important;
+    }
+  }
+`;
+
 const styles: Record<string, React.CSSProperties> = {
   container: {
     display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: "column",
     height: "100dvh",
     padding: "var(--game-pad)",
     background: "#1a1a2e",
     fontFamily: "'SF Pro', -apple-system, sans-serif",
+    overflow: "hidden",
   },
   phone: {
-    width: 380,
-    maxWidth: "95vw",
-    height: "clamp(400px, 85vh, 600px)",
-    maxHeight: "95vh",
+    flex: 1,
     background: "#0f0f1a",
     borderRadius: "clamp(16px, 3vw, 24px)",
     overflow: "hidden",
     boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
     display: "flex",
     flexDirection: "column",
+    minHeight: 0,
   },
   phoneHeader: {
     background: "#1a1a2e",
@@ -271,31 +346,6 @@ const styles: Record<string, React.CSSProperties> = {
     textDecorationStyle: "dotted" as const,
     textUnderlineOffset: 3,
   },
-  phoneticHint: {
-    textAlign: "center" as const,
-    padding: "8px 16px",
-    display: "flex",
-    flexDirection: "column" as const,
-    alignItems: "center",
-    gap: 2,
-  },
-  hintCyrillic: {
-    color: "#FFD54F",
-    fontSize: 16,
-    fontWeight: "bold",
-    letterSpacing: 1,
-  },
-  hintPronunciation: {
-    color: "#FFD54F",
-    fontSize: 14,
-    opacity: 0.8,
-  },
-  hintIpa: {
-    color: "#aaa",
-    fontSize: 12,
-    fontFamily: "monospace",
-    opacity: 0.7,
-  },
   typingDots: {
     letterSpacing: 3,
     animation: "pulse 1s infinite",
@@ -327,5 +377,41 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
     letterSpacing: 1,
     width: "100%",
+  },
+  wordPanel: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 4,
+    padding: 16,
+    borderRadius: 12,
+  },
+  wordPanelEmpty: {
+    color: "#555",
+    fontSize: 14,
+    fontStyle: "italic",
+    textAlign: "center" as const,
+  },
+  wordScript: {
+    fontWeight: "bold",
+    color: "#FFD54F",
+    fontSize: "clamp(24px, 5vw, 36px)",
+    letterSpacing: 2,
+  },
+  wordPronunciation: {
+    color: "#FFD54F",
+    fontSize: 14,
+    opacity: 0.7,
+  },
+  wordIpa: {
+    color: "#888",
+    fontSize: 12,
+    fontFamily: "monospace",
+  },
+  wordHintLine: {
+    color: "#ce93d8",
+    fontSize: 14,
+    fontStyle: "italic",
+    marginTop: 8,
   },
 };

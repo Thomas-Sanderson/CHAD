@@ -19,6 +19,7 @@ export const allLevels: LevelConfig[] = [
     levelData: level1Data,
     gateFailText: "ቡናዬ የት ነው?!",
     gateFailQuiet: false,
+    timeOfDay: "morning",
   },
   {
     id: "market-day",
@@ -30,6 +31,7 @@ export const allLevels: LevelConfig[] = [
     levelData: level2Data,
     gateFailText: "ምን ይዘህ መጣህ?!",
     gateFailQuiet: false,
+    timeOfDay: "midday",
   },
   {
     id: "the-dinner",
@@ -41,6 +43,7 @@ export const allLevels: LevelConfig[] = [
     levelData: level3Data,
     gateFailText: "እራት የለም።",
     gateFailQuiet: true,
+    timeOfDay: "evening",
   },
   {
     id: "buna-ceremony",
@@ -52,5 +55,6 @@ export const allLevels: LevelConfig[] = [
     levelData: level4Data,
     gateFailText: "ይሂዱ።",
     gateFailQuiet: true,
+    timeOfDay: "afternoon",
   },
 ];

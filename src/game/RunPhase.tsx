@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback, useState, useMemo } from "react";
 import type { LevelData, GameRunState, InputState, SkinEnvironment, VocabWord } from "../types";
+import type { TimeOfDay } from "../engine/sky";
 import type { CollectibleItem, ConvoPhrase } from "../types/content";
 import { isEmbedded } from "../engine/embed";
 import { isTouchDevice } from "../engine/touch";
@@ -32,12 +33,13 @@ interface Props {
   checkGateResult: (state: GameRunState) => boolean;
   learnedWords?: VocabWord[];
   vocabWords?: VocabWord[];
+  timeOfDay?: TimeOfDay;
 }
 
 export function RunPhase({
   level, itemDefs, environment, onGateReached,
   onHeartLost, hearts, maxHearts, checkGateResult,
-  learnedWords = [], vocabWords = [],
+  learnedWords = [], vocabWords = [], timeOfDay,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<GameRunState | null>(null);
@@ -113,7 +115,7 @@ export function RunPhase({
           maxHearts: maxHeartsRef.current,
           muted: mutedRef.current,
         };
-        renderFrame(ctx, gameState, level, itemDefs, environment, hud);
+        renderFrame(ctx, gameState, level, itemDefs, environment, hud, timeOfDay);
         if (gameState.flagProgress >= 1) {
           flagAnimatingRef.current = false;
           onGateReachedRef.current(gameState);
@@ -195,7 +197,7 @@ export function RunPhase({
         maxHearts: maxHeartsRef.current,
         muted: mutedRef.current,
       };
-      renderFrame(ctx, gameState, level, itemDefs, environment, hud);
+      renderFrame(ctx, gameState, level, itemDefs, environment, hud, timeOfDay);
 
       // Gate reached — check if passed for flag animation
       if (gameState.reachedGate) {
@@ -222,7 +224,7 @@ export function RunPhase({
       cleanupKeyboard();
       cleanupTouch();
     };
-  }, [level, itemDefs, environment]);
+  }, [level, itemDefs, environment, timeOfDay]);
 
   useEffect(() => {
     const cleanup = initAndRun();

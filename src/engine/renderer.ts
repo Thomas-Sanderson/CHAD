@@ -28,22 +28,14 @@ import {
   speakerOnSprite,
   speakerOffSprite,
 } from "./sprites";
+import type { TimeOfDay } from "./sky";
+import { getSkyPhase, renderSky, renderGroundTint, renderSceneBrightness, renderWarmthOverlay } from "./sky";
 
 const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 450;
 const TRANSITION_MS = 150;
 
 export { CANVAS_WIDTH, CANVAS_HEIGHT };
-
-// Star field — generated once, drawn every frame
-const stars: { x: number; y: number; opacity: number }[] = [];
-for (let i = 0; i < 80; i++) {
-  stars.push({
-    x: Math.random() * 3200,
-    y: Math.random() * 350,
-    opacity: 0.2 + Math.random() * 0.6,
-  });
-}
 
 // Chad animation constants
 const WALK_FRAME_MS = 200;
@@ -69,7 +61,8 @@ export function renderFrame(
   level: LevelData,
   itemDefs: Map<string, CollectibleItem>,
   env: SkinEnvironment,
-  hud?: HudData
+  hud?: HudData,
+  timeOfDay?: TimeOfDay
 ): void {
   // Resolve current segment
   let currentSegment: LevelSegment | null = null;
@@ -130,20 +123,14 @@ export function renderFrame(
       ctx.fillRect(0, 0, CANVAS_WIDTH, 20);
     }
   } else {
-    // Sky
-    ctx.fillStyle = env.skyColor;
-    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-    // Stars (only for night sky skins)
-    if (env.showStars) {
-      ctx.fillStyle = "#ffffff";
-      for (const star of stars) {
-        const sx = star.x - cam * 0.3;
-        const wrappedX = ((sx % CANVAS_WIDTH) + CANVAS_WIDTH) % CANVAS_WIDTH;
-        ctx.globalAlpha = star.opacity;
-        ctx.fillRect(wrappedX, star.y, 2, 2);
-      }
-      ctx.globalAlpha = 1;
+    // Sky — use sky engine if timeOfDay is set, otherwise fall back to flat fill
+    const skyPhase = timeOfDay ? getSkyPhase(timeOfDay, env.latitude) : null;
+    const skyH = activePlatforms[0]?.y ?? CANVAS_HEIGHT - 40;
+    if (skyPhase) {
+      renderSky(ctx, skyPhase, CANVAS_WIDTH, skyH, cam);
+    } else {
+      ctx.fillStyle = env.skyColor;
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     }
 
     // Ground tiles (first platform is ground)
@@ -477,6 +464,15 @@ export function renderFrame(
     drawSprite(ctx, frame, px, py, 2, flipH);
   }
 
+  // --- Sky overlays (outdoor only, before HUD) ---
+  if (!isInterior && timeOfDay) {
+    const skyPhase = getSkyPhase(timeOfDay, env.latitude);
+    const groundY = activePlatforms[0]?.y ?? CANVAS_HEIGHT - 40;
+    renderGroundTint(ctx, skyPhase, groundY, CANVAS_WIDTH, CANVAS_HEIGHT);
+    renderSceneBrightness(ctx, skyPhase, CANVAS_WIDTH, CANVAS_HEIGHT);
+    renderWarmthOverlay(ctx, skyPhase, CANVAS_WIDTH, CANVAS_HEIGHT);
+  }
+
   // --- HUD ---
   ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
   ctx.fillRect(0, 0, CANVAS_WIDTH, 30);
@@ -531,6 +527,16 @@ export function renderFrame(
         CANVAS_HEIGHT - 36
       );
     }
+  }
+
+  // --- Landmark [P] Point prompt ---
+  if (state.nearLandmark && !state.nearDoor) {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+    ctx.fillRect(CANVAS_WIDTH / 2 - 55, CANVAS_HEIGHT - 55, 110, 28);
+    ctx.fillStyle = "#ce93d8";
+    ctx.font = "bold 13px monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("[P] Point", CANVAS_WIDTH / 2, CANVAS_HEIGHT - 36);
   }
 
   // --- Gate interact prompt ---

@@ -5,3 +5,4 @@ export type { HudData } from "./renderer";
 export { createGameRunState, updateGameState } from "./gameLoop";
 export { drawSprite, getItemSprite } from "./sprites";
 export type { SpriteData } from "./sprites";
+export type { TimeOfDay } from "./sky";

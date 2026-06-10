@@ -72,6 +72,7 @@ interface Props {
   maxHearts?: number;
   sacredItemName?: string;
   onHeartsRefilled?: () => void;
+  sortingAttempts?: Map<string, number>;
 }
 
 export function RevealScreen({
@@ -88,6 +89,7 @@ export function RevealScreen({
   maxHearts = 3,
   sacredItemName,
   onHeartsRefilled,
+  sortingAttempts,
 }: Props) {
   const [revealedCount, setRevealedCount] = useState(0);
   const prevRevealedCount = useRef(0);
@@ -99,6 +101,14 @@ export function RevealScreen({
 
   const targetWords = vocabPack.words.filter((w) => w.matchesItemId !== null);
   const allRevealed = revealedCount >= targetWords.length;
+
+  // Prevent accidental tap-through from "Next word" to "Next Level"
+  const [navReady, setNavReady] = useState(false);
+  useEffect(() => {
+    if (!allRevealed) { setNavReady(false); return; }
+    const timer = setTimeout(() => setNavReady(true), 600);
+    return () => clearTimeout(timer);
+  }, [allRevealed]);
 
   // Heart refill animation when all words revealed and potato collected
   useEffect(() => {
@@ -144,104 +154,202 @@ export function RevealScreen({
   }, [revealedCount, targetWords]);
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>WHAT YOU LEARNED</h1>
-      <div style={styles.subtitle}>(whether you wanted to or not)</div>
-
-      <div ref={listRef} style={styles.revealList}>
-        {targetWords.slice(0, revealedCount).map((word) => {
-          const result = inferenceResult.matches.find(
-            (m) => m.vocabWordId === word.id
-          );
-          const reveal = revealLines.find((r) => r.vocabWordId === word.id);
-          const item = word.matchesItemId
-            ? itemDefs.get(word.matchesItemId)
-            : null;
-
-          return (
-            <div key={word.id} style={styles.revealCard}>
-              <div style={styles.wordRow}>
-                <div style={styles.wordStack}>
-                  <span style={styles.scriptWord}>{word.script}</span>
-                  {word.pronunciation && <span style={styles.pronunciation}>{word.pronunciation}</span>}
-                  {word.ipa && <span style={styles.ipa}>{word.ipa}</span>}
-                </div>
-                <span style={styles.arrow}>&rarr;</span>
-                <span style={styles.translation}>{word.translation}</span>
-              </div>
-              {item && (
-                <div style={styles.itemRow}>
-                  <ItemSpriteThumb itemId={item.id} />
-                  <span style={styles.itemName}>{item.name}</span>
-                  {result?.correct && (
-                    <span style={styles.checkmark}>&#10003;</span>
-                  )}
-                </div>
-              )}
-              <div style={styles.anyaLine}>
-                {reveal
-                  ? result?.correct
-                    ? reveal.correct
-                    : reveal.wrong
-                  : ""}
-              </div>
-            </div>
-          );
-        })}
+    <div className="reveal-screen" style={styles.container}>
+      <div className="reveal-header">
+        <h1 className="reveal-title" style={styles.title}>WHAT YOU LEARNED</h1>
+        <div className="reveal-subtitle" style={styles.subtitle}>(whether you wanted to or not)</div>
       </div>
 
-      {!allRevealed ? (
-        <button
-          style={styles.nextButton}
-          onClick={() => setRevealedCount((c) => c + 1)}
-        >
-          Next word &rarr;
-        </button>
-      ) : (
-        <div style={styles.scoreSection}>
-          {collectedPotato && (
-            <>
-              <div style={styles.potatoLine}>
-                {sacredItemName ?? "The Sacred Potato"} acknowledges your devotion. (+100)
-              </div>
-              <div style={styles.heartsRow}>
-                {Array.from({ length: maxHearts }, (_, i) => (
-                  <HeartSprite key={i} full={i < heartsFilled} />
-                ))}
-                {showExtraLife && (
-                  <span style={styles.extraLife}>+1 Extra Life!</span>
+      <div className="reveal-body">
+        <div className="reveal-left" ref={listRef}>
+          {targetWords.slice(0, revealedCount).map((word) => {
+            const result = inferenceResult.matches.find(
+              (m) => m.vocabWordId === word.id
+            );
+            const reveal = revealLines.find((r) => r.vocabWordId === word.id);
+            const item = word.matchesItemId
+              ? itemDefs.get(word.matchesItemId)
+              : null;
+
+            return (
+              <div key={word.id} style={styles.revealCard}>
+                <div style={styles.wordRow}>
+                  <div style={styles.wordStack}>
+                    <span style={styles.scriptWord}>{word.script}</span>
+                    {word.pronunciation && <span style={styles.pronunciation}>{word.pronunciation}</span>}
+                    {word.ipa && <span style={styles.ipa}>{word.ipa}</span>}
+                  </div>
+                  <span style={styles.arrow}>&rarr;</span>
+                  <span style={styles.translation}>{word.translation}</span>
+                </div>
+                {item && (
+                  <div style={styles.itemRow}>
+                    <ItemSpriteThumb itemId={item.id} />
+                    <span style={styles.itemName}>{item.name}</span>
+                    {result?.correct && (
+                      <span style={styles.checkmark}>&#10003;</span>
+                    )}
+                  </div>
                 )}
-                {showRefilled && (
-                  <span style={styles.extraLife}>Lives refilled!</span>
-                )}
+                <div style={styles.anyaLine}>
+                  {reveal
+                    ? result?.correct
+                      ? reveal.correct
+                      : reveal.wrong
+                    : ""}
+                </div>
               </div>
-            </>
-          )}
-          <div style={styles.scoreBreakdown}>
-            <div>Run score: {score.runScore}</div>
-            <div>Vocab score: {score.inferenceScore}</div>
-            {score.potatoBonus > 0 && (
-              <div>{(sacredItemName ?? "The Sacred Potato").replace("The Sacred ", "")} bonus: {score.potatoBonus}</div>
-            )}
-            <div style={styles.totalScore}>Total: {score.total}</div>
+            );
+          })}
+        </div>
+
+        <div className="reveal-right">
+          <div style={styles.progressText}>
+            {allRevealed
+              ? `${targetWords.filter((w) => (sortingAttempts?.get(w.id) ?? 1) === 1).length} of ${targetWords.length} first try`
+              : `Word ${revealedCount + 1} of ${targetWords.length}`}
+          </div>
+          <div style={styles.progressRow}>
+            {targetWords.map((word, i) => {
+              let bg = "#333";
+              if (i < revealedCount) {
+                const attempts = sortingAttempts?.get(word.id) ?? 1;
+                bg = attempts <= 1 ? "#4CAF50" : "#FF9800";
+              } else if (i === revealedCount) {
+                bg = "#FFD54F";
+              }
+              return (
+                <div
+                  key={i}
+                  style={{ ...styles.progressDot, background: bg }}
+                />
+              );
+            })}
           </div>
 
-          <div style={styles.buttonRow}>
-            {hasNextLevel ? (
-              <button style={styles.nextLevelButton} onClick={onNextLevel}>
-                Next Level &rarr;
+          {!allRevealed ? (
+            <>
+              <div style={{ flex: 1 }} />
+              <button
+                className="reveal-action-btn"
+                style={styles.nextButton}
+                onClick={() => setRevealedCount((c) => c + 1)}
+              >
+                Next word &rarr;
               </button>
-            ) : (
-              <button style={styles.nextLevelButton} onClick={onBackToLevels}>
-                Back to Levels
-              </button>
-            )}
-          </div>
+            </>
+          ) : (
+            <div style={styles.scoreSection}>
+              {collectedPotato && (
+                <>
+                  <div style={styles.potatoLine}>
+                    {sacredItemName ?? "The Sacred Potato"} acknowledges your devotion. (+100)
+                  </div>
+                  <div style={styles.heartsRow}>
+                    {Array.from({ length: maxHearts }, (_, i) => (
+                      <HeartSprite key={i} full={i < heartsFilled} />
+                    ))}
+                    {showExtraLife && (
+                      <span style={styles.extraLife}>+1 Extra Life!</span>
+                    )}
+                    {showRefilled && (
+                      <span style={styles.extraLife}>Lives refilled!</span>
+                    )}
+                  </div>
+                </>
+              )}
+              <div style={styles.scoreBreakdown}>
+                <div>Run score: {score.runScore}</div>
+                <div>Vocab score: {score.inferenceScore}</div>
+                {score.potatoBonus > 0 && (
+                  <div>{(sacredItemName ?? "The Sacred Potato").replace("The Sacred ", "")} bonus: {score.potatoBonus}</div>
+                )}
+                {score.decodeBonus > 0 && (
+                  <div>Mystery can bonus: {score.decodeBonus}</div>
+                )}
+                <div style={styles.totalScore}>Total: {score.total}</div>
+              </div>
+
+              <div style={{ ...styles.buttonRow, opacity: navReady ? 1 : 0.4, pointerEvents: navReady ? "auto" : "none", transition: "opacity 0.3s" }}>
+                {hasNextLevel ? (
+                  <button style={styles.nextLevelButton} onClick={onNextLevel}>
+                    Next Level &rarr;
+                  </button>
+                ) : (
+                  <button style={styles.nextLevelButton} onClick={onBackToLevels}>
+                    Back to Levels
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
+
+      <style>{revealCSS}</style>
     </div>
   );
 }
+
+const revealCSS = `
+  .reveal-header {
+    text-align: center;
+    flex-shrink: 0;
+    width: 100%;
+  }
+  .reveal-body {
+    display: flex;
+    flex-direction: row;
+    gap: var(--game-gap, 12px);
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+  }
+  .reveal-left {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    gap: var(--game-list-gap, 8px);
+    overflow-y: auto;
+    min-height: 0;
+  }
+  .reveal-right {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--game-gap, 12px);
+    min-width: 0;
+  }
+
+  @media (orientation: landscape) and (max-height: 500px) {
+    .reveal-screen {
+      padding: 8px 16px !important;
+      gap: 6px !important;
+    }
+    .reveal-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 8px;
+    }
+    .reveal-title {
+      font-size: 16px !important;
+      margin: 0 !important;
+    }
+    .reveal-subtitle {
+      font-size: 11px !important;
+      margin: 0 !important;
+    }
+    .reveal-right {
+      gap: 8px;
+    }
+    .reveal-action-btn {
+      padding: 8px 20px !important;
+      font-size: 14px !important;
+    }
+  }
+`;
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
@@ -254,28 +362,19 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: "'SF Pro', -apple-system, sans-serif",
     padding: "var(--game-pad)",
     overflow: "hidden",
+    gap: "var(--game-gap, 12px)",
   },
   title: {
     fontSize: "var(--game-font-lg)",
     fontWeight: "bold",
     color: "#FFD54F",
     letterSpacing: 2,
-    marginBottom: 4,
+    marginBottom: 0,
   },
   subtitle: {
     fontSize: "var(--game-font-sm)",
     color: "#555",
-    marginBottom: "var(--game-gap)",
-  },
-  revealList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "var(--game-list-gap)",
-    width: "100%",
-    maxWidth: 500,
-    flex: 1,
-    overflowY: "auto",
-    minHeight: 0,
+    marginBottom: 0,
   },
   revealCard: {
     background: "#1a1a2e",
@@ -296,7 +395,7 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "column" as const,
     gap: 2,
   },
-  cyrillicWord: {
+  scriptWord: {
     fontWeight: "bold",
     color: "#FFD54F",
     fontSize: 24,
@@ -342,8 +441,23 @@ const styles: Record<string, React.CSSProperties> = {
     borderLeft: "3px solid #6C3483",
     paddingLeft: 12,
   },
+  progressText: {
+    fontSize: 14,
+    color: "#888",
+    fontWeight: "bold",
+  },
+  progressRow: {
+    display: "flex",
+    gap: 6,
+    justifyContent: "center",
+  },
+  progressDot: {
+    width: 10,
+    height: 10,
+    borderRadius: "50%",
+    transition: "background 0.3s",
+  },
   nextButton: {
-    marginTop: 24,
     background: "#FFD54F",
     color: "#000",
     border: "none",
@@ -354,7 +468,6 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
   },
   scoreSection: {
-    marginTop: 32,
     display: "flex",
     flexDirection: "column",
     alignItems: "center",

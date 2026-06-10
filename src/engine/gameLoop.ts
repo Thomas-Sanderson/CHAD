@@ -133,6 +133,7 @@ export function createGameRunState(level: LevelData, scoldings?: string[], headB
     segmentCollectibles,
     unlockedDoors: [],
     nearDoor: null,
+    nearLandmark: null,
     transition: null,
     // Shout mechanic
     shoutMenuOpen: false,
@@ -160,7 +161,7 @@ export function updateGameState(
   input: InputState,
   level: LevelData,
   hazards: PlacedHazard[],
-  _itemDefs: Map<string, CollectibleItem>,
+  itemDefs: Map<string, CollectibleItem>,
   dt: number
 ): void {
   state.elapsed += dt * 1000;
@@ -550,17 +551,37 @@ export function updateGameState(
     state.nearGate = false;
   }
 
-  // Landmark audio — E near a landmark speaks its label
-  if (input.interact && currentSegment?.type !== "interior") {
-    const landmarks: LandmarkDef[] = currentSegment?.landmarks ?? level.landmarks ?? [];
-    for (const lm of landmarks) {
-      const dist = Math.abs(state.player.position.x - lm.x);
-      if (dist < 60) {
-        speakText(lm.label);
-        break;
+  // [P] Point — Chad says please, then proper pronunciation after delay
+  // Works near street landmarks AND near shop items
+  {
+    let pointLabel: string | null = null;
+
+    // Street landmarks
+    if (currentSegment?.type !== "interior") {
+      const landmarks: LandmarkDef[] = currentSegment?.landmarks ?? level.landmarks ?? [];
+      for (const lm of landmarks) {
+        const dist = Math.abs(state.player.position.x - lm.x);
+        if (dist < 60) {
+          pointLabel = lm.label;
+          break;
+        }
       }
     }
-    input.interact = false;
+
+    // Shop items — use nearItem (already tracked above)
+    if (!pointLabel && state.nearItem) {
+      const item = itemDefs.get(state.nearItem);
+      if (item) pointLabel = item.script;
+    }
+
+    state.nearLandmark = pointLabel;
+
+    if (input.shout && pointLabel) {
+      speakAsChad("пожалуйста");
+      const label = pointLabel;
+      setTimeout(() => speakText(label), 1200);
+      input.shout = false;
+    }
   }
 
   // Shout response decay

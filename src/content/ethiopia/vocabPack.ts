@@ -10,6 +10,7 @@ export const level1VocabPack: VocabPack = {
       matchesItemId: "buna_bag",
       pronunciation: "BOO-nah",
       ipa: "/ˈbuna/",
+      hint: "The sacred bean. Ethiopia invented it, actually.",
     },
     {
       id: "wetet",
@@ -18,6 +19,7 @@ export const level1VocabPack: VocabPack = {
       matchesItemId: "wetet_jug",
       pronunciation: "wuh-TET",
       ipa: "/wəˈtət/",
+      hint: "White. From a cow. In a jug.",
     },
     {
       id: "dabo",
@@ -26,6 +28,7 @@ export const level1VocabPack: VocabPack = {
       matchesItemId: "dabo_round",
       pronunciation: "DAH-bo",
       ipa: "/ˈdabo/",
+      hint: "Round and golden. Fresh from the oven.",
     },
     {
       id: "sukwar",
@@ -34,6 +37,7 @@ export const level1VocabPack: VocabPack = {
       matchesItemId: "sukwar_bag_eth",
       pronunciation: "suh-KWAR",
       ipa: "/sɨˈkʷar/",
+      hint: "The sweet crystals. Three spoonfuls minimum.",
     },
   ],
 };
@@ -48,6 +52,7 @@ export const level2VocabPack: VocabPack = {
       matchesItemId: "shiro_bag",
       pronunciation: "SHEE-ro",
       ipa: "/ˈʃiro/",
+      hint: "Powdery. Makes stew. Not flour-flour.",
     },
     {
       id: "berbere",
@@ -56,6 +61,7 @@ export const level2VocabPack: VocabPack = {
       matchesItemId: "berbere_tin",
       pronunciation: "ber-beh-RAY",
       ipa: "/bərˈbɛre/",
+      hint: "Red and fiery. The spice that spices.",
     },
     {
       id: "qibe",
@@ -64,6 +70,7 @@ export const level2VocabPack: VocabPack = {
       matchesItemId: "qibe_jar",
       pronunciation: "kuh-BAY",
       ipa: "/kɨˈbe/",
+      hint: "Golden fat in a jar. Not regular butter.",
     },
     {
       id: "timatim",
@@ -72,6 +79,7 @@ export const level2VocabPack: VocabPack = {
       matchesItemId: "timatim_tomato",
       pronunciation: "tee-mah-TEEM",
       ipa: "/timaˈtim/",
+      hint: "Red, round, squishy. Say it — you almost know this one.",
     },
   ],
 };
@@ -86,6 +94,7 @@ export const level3VocabPack: VocabPack = {
       matchesItemId: "injera_roll",
       pronunciation: "in-JEH-rah",
       ipa: "/ɨnˈdʒɛra/",
+      hint: "Spongy, tangy, you eat WITH it not OFF it.",
     },
     {
       id: "miser",
@@ -94,6 +103,7 @@ export const level3VocabPack: VocabPack = {
       matchesItemId: "miser_bag",
       pronunciation: "muh-SIR",
       ipa: "/mɨˈsɨr/",
+      hint: "Tiny legumes. In a bag. Makes stew thick.",
     },
     {
       id: "qey_sir",
@@ -102,6 +112,7 @@ export const level3VocabPack: VocabPack = {
       matchesItemId: "qey_sir_beet",
       pronunciation: "KAY sir",
       ipa: "/kʼəj sɨr/",
+      hint: "Red root vegetable. Stains everything it touches.",
     },
     {
       id: "karya",
@@ -110,6 +121,7 @@ export const level3VocabPack: VocabPack = {
       matchesItemId: "karya_pepper",
       pronunciation: "KAH-ree-yah",
       ipa: "/ˈkʼarija/",
+      hint: "Green, crunchy, hollow inside. Not spicy.",
     },
   ],
 };
@@ -124,6 +136,7 @@ export const level4VocabPack: VocabPack = {
       matchesItemId: "jebena_pot",
       pronunciation: "jeh-BEH-nah",
       ipa: "/dʒəˈbɛna/",
+      hint: "Clay vessel. The coffee lives here during the ceremony.",
     },
     {
       id: "rekbot",
@@ -132,6 +145,7 @@ export const level4VocabPack: VocabPack = {
       matchesItemId: "rekbot_cup",
       pronunciation: "ruh-KOOB",
       ipa: "/rɨˈkub/",
+      hint: "Tiny, handleless. You drink from it three times.",
     },
     {
       id: "itan",
@@ -140,6 +154,7 @@ export const level4VocabPack: VocabPack = {
       matchesItemId: "itan_incense",
       pronunciation: "uh-TAHN",
       ipa: "/ʔɨˈtʼan/",
+      hint: "Makes the smoke. The whole room smells like ceremony.",
     },
     {
       id: "kolo",
@@ -148,6 +163,7 @@ export const level4VocabPack: VocabPack = {
       matchesItemId: "kolo_bowl",
       pronunciation: "KO-lo",
       ipa: "/ˈkʼolo/",
+      hint: "Crunchy roasted grain. You snack on it between sips.",
     },
   ],
 };
