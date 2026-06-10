@@ -75,7 +75,7 @@ export const level6Data: LevelData = {
   collectibles: [],
   hazards: [],
   npcs: [],
-  startPosition: { x: 50, y: GROUND_Y - 48 },
+  startPosition: { x: 120, y: GROUND_Y - 48 },
   gatePosition: { x: 3200, y: GROUND_Y - 80 },
   bounds: { width: LEVEL_WIDTH, height: 450 },
   segments: [

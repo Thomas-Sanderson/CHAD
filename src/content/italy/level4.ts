@@ -50,7 +50,7 @@ export const level4Data: LevelData = {
     // The Sacred Olive — high platform
     { type: "potato", x: 2240, y: 170 },
   ],
-  startPosition: { x: 50, y: GROUND_Y - 48 },
+  startPosition: { x: 120, y: GROUND_Y - 48 },
   gatePosition: { x: 2850, y: GROUND_Y - 80 },
   bounds: { width: LEVEL_WIDTH, height: 450 },
   landmarks: [
