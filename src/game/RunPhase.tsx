@@ -496,8 +496,8 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: isTouchDevice ? "center" : "flex-start",
-    paddingTop: isTouchDevice ? 0 : 16,
+    justifyContent: "center",
+    paddingTop: 0,
     minHeight: "100dvh",
     background: "#0a0a1a",
     overflow: "hidden",
@@ -508,9 +508,9 @@ const styles: Record<string, React.CSSProperties> = {
     display: "block",
   },
   controls: {
-    marginTop: 12,
-    color: "#666",
-    fontSize: 13,
+    marginTop: 4,
+    color: "#555",
+    fontSize: 11,
     fontFamily: "monospace",
   },
 };
