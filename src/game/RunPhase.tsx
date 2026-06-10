@@ -227,14 +227,19 @@ export function RunPhase({
     return cleanup;
   }, [initAndRun]);
 
-  // Dynamic canvas scaling on resize
+  // Dynamic canvas scaling on resize — use container bounds when constrained
   useEffect(() => {
     const onResize = () => {
+      const el = containerRef.current;
+      const w = el?.clientWidth ?? window.innerWidth;
+      const h = el?.clientHeight ?? window.innerHeight;
       const pad = isEmbedded || isTouchDevice ? 0 : 32;
-      const scaleX = (window.innerWidth - pad) / CANVAS_WIDTH;
-      const scaleY = (window.innerHeight - pad) / CANVAS_HEIGHT;
+      const scaleX = (w - pad) / CANVAS_WIDTH;
+      const scaleY = (h - pad) / CANVAS_HEIGHT;
       setCanvasScale(Math.min(scaleX, scaleY, 3));
     };
+    // Initial scale after mount (container may be constrained)
+    onResize();
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
@@ -426,7 +431,7 @@ export function RunPhase({
   const scaledH = CANVAS_HEIGHT * canvasScale;
 
   return (
-    <div style={styles.container} ref={containerRef}>
+    <div className="run-phase" style={styles.container} ref={containerRef}>
       <div style={{
         position: "relative",
         width: scaledW,

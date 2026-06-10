@@ -34,12 +34,18 @@ html, body {
     transform: translateY(-50%);
     overflow: hidden;
   }
-  /* Override 100dvh on screen containers to fill #root instead */
-  #root > * {
+  /* Override 100dvh on screen containers to fill #root instead.
+     Exclude .run-phase — canvas handles its own scaling. */
+  #root > *:not(.run-phase) {
     min-height: 100% !important;
     max-height: 100% !important;
     height: 100% !important;
     overflow-y: auto;
+  }
+  #root > .run-phase {
+    min-height: 100% !important;
+    height: 100% !important;
+    overflow: hidden;
   }
 }
 
