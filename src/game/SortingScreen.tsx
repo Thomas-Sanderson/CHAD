@@ -201,7 +201,55 @@ export function SortingScreen({
       </div>
 
       <div className="sorting-body">
-        {/* Left 2/3: bag grid */}
+        {/* Left: word prompt + picked flash + progress */}
+        <div className="sorting-left">
+          <div className="sorting-word" style={styles.wordPrompt}>
+            <span style={styles.wordScript}>{currentWord?.script}</span>
+            {currentWord?.pronunciation && (
+              <span style={styles.wordPronunciation}>
+                {currentWord.pronunciation}
+              </span>
+            )}
+          </div>
+
+          {picked !== null && (() => {
+            const pickedItem = itemDefs.get(picked);
+            return pickedItem ? (
+              <div className="sorting-picked-flash" style={{
+                ...styles.wordPrompt,
+                borderColor: isCorrect ? "#4CAF50" : "#f44336",
+                border: "2px solid",
+                flexDirection: "row" as const,
+                gap: 10,
+                padding: "8px 16px",
+                animation: "flash-in 0.25s ease-out",
+              }}>
+                <ItemSpriteThumb itemId={picked} />
+                <span style={{ ...styles.wordScript, fontSize: "clamp(20px, 4vw, 28px)" }}>
+                  {pickedItem.script}
+                </span>
+                <span style={styles.itemName}>{pickedItem.name}</span>
+              </div>
+            ) : null;
+          })()}
+
+          <div className="sorting-progress" style={styles.progressRow}>
+            {targetWords.map((word, i) => {
+              let bg = "#333";
+              if (i < currentIndex) {
+                const picks = results.filter((r) => r.vocabWordId === word.id).length;
+                bg = picks <= 1 ? "#4CAF50" : "#FF9800";
+              } else if (i === currentIndex) {
+                bg = "#FFD54F";
+              }
+              return (
+                <div key={i} style={{ ...styles.dot, background: bg }} />
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Center: bag grid */}
         <div className="sorting-bag" style={styles.bagGrid}>
           {bagItems.map((item) => {
             const isPickedItem = picked === item.id;
@@ -232,57 +280,8 @@ export function SortingScreen({
           })}
         </div>
 
-        {/* Right 1/3: word prompt + picked flash + progress + feedback + button */}
+        {/* Right: mentor feedback + button */}
         <div className="sorting-right">
-          {/* Current word prompt */}
-          <div className="sorting-word" style={styles.wordPrompt}>
-            <span style={styles.wordScript}>{currentWord?.script}</span>
-            {currentWord?.pronunciation && (
-              <span style={styles.wordPronunciation}>
-                {currentWord.pronunciation}
-              </span>
-            )}
-          </div>
-
-          {/* Picked item flash */}
-          {picked !== null && (() => {
-            const pickedItem = itemDefs.get(picked);
-            return pickedItem ? (
-              <div className="sorting-picked-flash" style={{
-                ...styles.wordPrompt,
-                borderColor: isCorrect ? "#4CAF50" : "#f44336",
-                border: "2px solid",
-                flexDirection: "row" as const,
-                gap: 10,
-                padding: "8px 16px",
-                animation: "flash-in 0.25s ease-out",
-              }}>
-                <ItemSpriteThumb itemId={picked} />
-                <span style={{ ...styles.wordScript, fontSize: "clamp(20px, 4vw, 28px)" }}>
-                  {pickedItem.script}
-                </span>
-                <span style={styles.itemName}>{pickedItem.name}</span>
-              </div>
-            ) : null;
-          })()}
-
-          {/* Progress dots */}
-          <div className="sorting-progress" style={styles.progressRow}>
-            {targetWords.map((word, i) => {
-              let bg = "#333";
-              if (i < currentIndex) {
-                const picks = results.filter((r) => r.vocabWordId === word.id).length;
-                bg = picks <= 1 ? "#4CAF50" : "#FF9800";
-              } else if (i === currentIndex) {
-                bg = "#FFD54F";
-              }
-              return (
-                <div key={i} style={{ ...styles.dot, background: bg }} />
-              );
-            })}
-          </div>
-
-          {/* Mentor feedback */}
           <div className="sorting-feedback" style={styles.feedbackArea}>
             <div
               style={{
@@ -308,10 +307,8 @@ export function SortingScreen({
             </div>
           </div>
 
-          {/* Spacer pushes button to bottom */}
           <div style={{ flex: 1 }} />
 
-          {/* Action button pinned at bottom of right column */}
           {picked !== null && (
             <button
               className="sorting-action-btn"
@@ -347,7 +344,6 @@ const sortingCSS = `
     100% { opacity: 1; transform: scale(1); }
   }
 
-  /* Default: 2/3 bag + 1/3 text side-by-side */
   .sorting-header {
     text-align: center;
     flex-shrink: 0;
@@ -360,6 +356,15 @@ const sortingCSS = `
     flex: 1;
     min-height: 0;
     width: 100%;
+  }
+  .sorting-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--game-gap, 12px);
+    min-width: 0;
+    justify-content: center;
   }
   .sorting-bag {
     flex: 2;
@@ -374,7 +379,6 @@ const sortingCSS = `
     min-width: 0;
   }
 
-  /* Landscape on short viewports (mobile landscape) */
   @media (orientation: landscape) and (max-height: 500px) {
     .sorting-screen {
       padding: 8px 16px !important;
@@ -395,7 +399,7 @@ const sortingCSS = `
       font-size: 11px !important;
       margin: 0 !important;
     }
-    .sorting-right {
+    .sorting-left, .sorting-right {
       gap: 8px;
     }
     .sorting-word {
