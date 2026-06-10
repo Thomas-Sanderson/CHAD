@@ -46,6 +46,10 @@ function finishUnlock(): void {
   if (onUnlockCallback) { onUnlockCallback(); onUnlockCallback = null; }
 }
 
+// Exported so other audio paths (speech synthesis) can piggyback the unlock
+// during confirmed user gestures.
+export function tryUnlockAudio(): void { unlockAudio(); }
+
 function unlockAudio(): void {
   if (unlocked) return;
   const ctx = getAudioContext();
