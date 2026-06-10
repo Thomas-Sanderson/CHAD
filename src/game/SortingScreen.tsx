@@ -206,9 +206,19 @@ export function SortingScreen({
       </div>
 
       <div className="sorting-body">
-        {/* Left: word prompt */}
+        {/* Left: word prompt with speaker */}
         <div className="sorting-left">
           <div className="sorting-word" style={styles.wordPrompt}>
+            <button
+              style={styles.speakerBtn}
+              onClick={() => currentWord && pronounceWord(currentWord)}
+              aria-label="Pronounce word"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M2 6h2.5L8 3v10L4.5 10H2a1 1 0 01-1-1V7a1 1 0 011-1z" fill="#FFD54F" />
+                <path d="M10 5.5c.8.7 1.3 1.7 1.3 2.8s-.5 2.1-1.3 2.8" stroke="#FFD54F" strokeWidth="1.2" strokeLinecap="round" />
+              </svg>
+            </button>
             <span style={styles.wordScript}>{currentWord?.script}</span>
             {currentWord?.pronunciation && (
               <span style={styles.wordPronunciation}>
@@ -456,13 +466,23 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: 4,
-    padding: "10px 12px",
+    justifyContent: "center",
+    gap: 6,
+    padding: "16px 12px",
     background: "#1a1a2e",
     borderRadius: 12,
     width: "100%",
     maxWidth: "100%",
     boxSizing: "border-box" as const,
+    flex: 1,
+  },
+  speakerBtn: {
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    padding: 4,
+    opacity: 0.7,
+    transition: "opacity 0.15s",
   },
   wordScript: {
     fontSize: "clamp(14px, 3vw, 32px)",
