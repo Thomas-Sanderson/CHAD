@@ -104,6 +104,7 @@ export interface GameRunState {
   elapsed: number;
   scoldings: string[];
   headBounceCurse: string;
+  pointPhrase: string; // what Chad says when pointing ("пожалуйста" / "per favore")
   // Segment state
   currentSegmentId: string | null;
   segmentCollectibles: Record<string, CollectedInfo[]>;

@@ -49,6 +49,7 @@ export const italySkin: SkinConfig = {
     sacredItemSprite: sacredOliveSprite,
     scoldings: ["ATTENZIONE!", "MA CHE FAI?!", "VAI VIA!", "MALEDUCATO!", "MADONNA MIA!"],
     headBounceCurse: "CAZZO!",
+    pointPhrase: "per favore",
     interiorWallTile,
     interiorFloorTile,
     interiorCeilingTile,

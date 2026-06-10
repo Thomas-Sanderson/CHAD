@@ -6,7 +6,7 @@ import type {
   CollectedInfo,
 } from "../types";
 import type { CollectibleItem, LevelSegment, PlatformDef, LandmarkDef } from "../types/content";
-import { speakText, speakScold, speakAsChad } from "./audio";
+import { speakScold, speakAsChad } from "./audio";
 import {
   applyGravity,
   applyMovement,
@@ -43,9 +43,10 @@ const DEFAULT_SCOLDINGS = [
   "ИДИ ОТСЮДА!",
 ];
 
-export function createGameRunState(level: LevelData, scoldings?: string[], headBounceCurse?: string): GameRunState {
+export function createGameRunState(level: LevelData, scoldings?: string[], headBounceCurse?: string, pointPhrase?: string): GameRunState {
   const _scoldings = scoldings ?? DEFAULT_SCOLDINGS;
   const _curse = headBounceCurse ?? "блять!";
+  const _pointPhrase = pointPhrase ?? "пожалуйста";
   const hasSegments = !!level.segments?.length;
   const firstSegment = hasSegments ? level.segments![0]! : null;
 
@@ -128,6 +129,7 @@ export function createGameRunState(level: LevelData, scoldings?: string[], headB
     elapsed: 0,
     scoldings: _scoldings,
     headBounceCurse: _curse,
+    pointPhrase: _pointPhrase,
     // Segment state
     currentSegmentId: firstSegment?.id ?? null,
     segmentCollectibles,
@@ -577,9 +579,9 @@ export function updateGameState(
     state.nearLandmark = pointLabel;
 
     if (input.shout && pointLabel) {
-      speakAsChad("пожалуйста");
+      speakAsChad(state.pointPhrase);
       const label = pointLabel;
-      setTimeout(() => speakText(label), 1200);
+      setTimeout(() => speakScold(label), 1200);
       input.shout = false;
     }
   }

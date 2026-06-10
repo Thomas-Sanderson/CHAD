@@ -84,7 +84,7 @@ export function RunPhase({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const gameState = createGameRunState(level, environment.scoldings, environment.headBounceCurse);
+    const gameState = createGameRunState(level, environment.scoldings, environment.headBounceCurse, environment.pointPhrase);
     stateRef.current = gameState;
     prevHitCountRef.current = 0;
 

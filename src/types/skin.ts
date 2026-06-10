@@ -29,6 +29,7 @@ export interface SkinEnvironment {
   sacredItemSprite: SpriteData;
   scoldings: string[];
   headBounceCurse: string; // profanity when player jumps on NPC's head
+  pointPhrase: string; // what Chad says when pointing at landmark ("пожалуйста")
   shopExteriorSprite?: SpriteData;
   shopInteriorBg?: SpriteData;
   shopShelfSprite?: SpriteData;

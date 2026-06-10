@@ -35,6 +35,7 @@ export const ethiopiaSkin: SkinConfig = {
     sacredItemSprite: coffeeBeanSprite,
     scoldings: ["ቀጭን ነህ!", "ተው!", "ወዴት!", "ጠንቀቅ!", "ኧረ!"],
     headBounceCurse: "ወይ ጉድ!",
+    pointPhrase: "እባክህ",
   },
 
   winMessage:
