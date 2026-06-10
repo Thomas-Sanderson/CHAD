@@ -19,16 +19,27 @@ html, body {
 }
 
 /* On desktop, constrain to a landscape-ish aspect ratio so UI
-   doesn't stretch vertically on tall monitors. */
+   doesn't stretch vertically on tall monitors.
+   Screens set height/min-height: 100dvh inline, which refers to the
+   browser viewport. Override to fill the constrained container instead. */
 @media (min-width: 800px) and (min-height: 600px) {
   #root {
     max-width: 1200px;
+    height: 520px;
     max-height: 520px;
     margin: auto;
     border-radius: 12px;
     position: relative;
     top: 50%;
     transform: translateY(-50%);
+    overflow: hidden;
+  }
+  /* Override 100dvh on screen containers to fill #root instead */
+  #root > * {
+    min-height: 100% !important;
+    max-height: 100% !important;
+    height: 100% !important;
+    overflow-y: auto;
   }
 }
 
