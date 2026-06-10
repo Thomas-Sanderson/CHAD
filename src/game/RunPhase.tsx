@@ -16,8 +16,7 @@ import {
 } from "../engine";
 import type { HudData } from "../engine";
 import { pronounceWord, speakText, speakQueued } from "../engine/audio";
-import { sfxJump, sfxCollect, sfxHeartLost, sfxDoorEnter, sfxShout, sfxGateSuccess, isMuted, setMuted } from "../engine/sfx";
-import { setMusicVolume } from "../engine/music";
+import { sfxJump, sfxCollect, sfxHeartLost, sfxDoorEnter, sfxShout, sfxGateSuccess } from "../engine/sfx";
 import { ShoutMenu } from "./ShoutMenu";
 import { InventoryPanel } from "./InventoryPanel";
 import { TouchControls } from "./TouchControls";
@@ -74,7 +73,6 @@ export function RunPhase({
   const prevHitCountRef = useRef(0);
   const prevOnGroundRef = useRef(true);
   const prevTransitionRef = useRef<boolean>(false);
-  const mutedRef = useRef(isMuted());
   const flagAnimatingRef = useRef(false);
 
   const initAndRun = useCallback(() => {
@@ -113,7 +111,6 @@ export function RunPhase({
         const hud: HudData = {
           hearts: heartsRef.current,
           maxHearts: maxHeartsRef.current,
-          muted: mutedRef.current,
         };
         renderFrame(ctx, gameState, level, itemDefs, environment, hud, timeOfDay);
         if (gameState.flagProgress >= 1) {
@@ -195,7 +192,6 @@ export function RunPhase({
       const hud: HudData = {
         hearts: heartsRef.current,
         maxHearts: maxHeartsRef.current,
-        muted: mutedRef.current,
       };
       renderFrame(ctx, gameState, level, itemDefs, environment, hud, timeOfDay);
 
@@ -252,15 +248,6 @@ export function RunPhase({
     const scaleY = CANVAS_HEIGHT / rect.height;
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
-
-    // Mute icon region (top-right, ~30px area)
-    if (x > CANVAS_WIDTH - 40 && y < 30) {
-      const newMuted = !mutedRef.current;
-      mutedRef.current = newMuted;
-      setMuted(newMuted);
-      setMusicVolume(newMuted ? 0 : 0.08);
-      return;
-    }
 
     // Bag icon region (center-right of HUD)
     const bagX = CANVAS_WIDTH / 2 + 60;

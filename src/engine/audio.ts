@@ -1,4 +1,5 @@
 import type { VocabWord } from "../types";
+import { isMuted } from "./sfx";
 
 // Chrome's speechSynthesis corrupts when cancel() and speak() are
 // called in rapid succession. We avoid cancel() entirely — instead
@@ -47,6 +48,7 @@ interface VoiceOpts {
 
 function doSpeak(text: string, pronunciation?: string, opts?: VoiceOpts): void {
   if (typeof speechSynthesis === "undefined") return;
+  if (isMuted()) return;
 
   // Clear any pending queued speech
   if (pendingSpeech !== null) {
@@ -142,6 +144,7 @@ function fireSpeak(
 /** Queue speech after the current utterance finishes — no cancel, no overlap. */
 export function speakQueued(text: string, opts?: VoiceOpts): void {
   if (typeof speechSynthesis === "undefined") return;
+  if (isMuted()) return;
   const lang = detectLang(text);
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = lang;
