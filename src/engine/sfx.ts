@@ -5,6 +5,17 @@ let audioCtx: AudioContext | null = null;
 let muted = false;
 let unlocked = false;
 
+export function isAudioUnlocked(): boolean {
+  return unlocked;
+}
+
+let onUnlockCallback: (() => void) | null = null;
+
+export function onAudioUnlocked(cb: () => void): void {
+  if (unlocked) { cb(); return; }
+  onUnlockCallback = cb;
+}
+
 export function getAudioContext(): AudioContext {
   if (!audioCtx) {
     audioCtx = new AudioContext();
@@ -34,6 +45,7 @@ function unlockAudio(): void {
     document.removeEventListener("touchend", unlockAudio);
     document.removeEventListener("click", unlockAudio);
     document.removeEventListener("keydown", unlockAudio);
+    if (onUnlockCallback) { onUnlockCallback(); onUnlockCallback = null; }
   });
 }
 

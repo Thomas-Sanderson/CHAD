@@ -2,7 +2,7 @@
 // Shares AudioContext from sfx.ts.
 // Supports dual-instance phase offset for harmonic interference.
 
-import { getAudioContext, isMuted } from "./sfx";
+import { getAudioContext, isMuted, isAudioUnlocked, onAudioUnlocked } from "./sfx";
 
 export type MusicMode = "title" | "level";
 
@@ -148,9 +148,22 @@ function scheduler(): void {
   schedulerTimer = setTimeout(scheduler, SCHEDULE_INTERVAL);
 }
 
+// Pending mode — if startMusic is called before audio is unlocked,
+// defer until the first user gesture unlocks the context.
+let pendingMode: MusicMode | null = null;
+
 export function startMusic(mode: MusicMode): void {
   if (currentMode === mode) return; // already playing this mode
+
+  // On iOS in iframes, AudioContext created before a gesture is permanently
+  // broken. Defer until unlockAudio has fired.
+  if (!isAudioUnlocked()) {
+    pendingMode = mode;
+    return;
+  }
+
   stopMusic();
+  pendingMode = null;
 
   const ctx = getAudioContext();
 
@@ -190,3 +203,12 @@ export function setMusicVolume(vol: number): void {
     }
   }
 }
+
+// When audio unlocks after a deferred startMusic, play the pending mode.
+onAudioUnlocked(() => {
+  if (pendingMode) {
+    const mode = pendingMode;
+    pendingMode = null;
+    startMusic(mode);
+  }
+});
