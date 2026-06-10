@@ -601,8 +601,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: "bold",
     cursor: "pointer",
     flexShrink: 0,
-    marginTop: "auto",
-    paddingBottom: 4,
   },
   retryButton: {
     background: "#f44336",
@@ -614,8 +612,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: "bold",
     cursor: "pointer",
     flexShrink: 0,
-    marginTop: "auto",
-    paddingBottom: 4,
   },
   completeButton: {
     background: "#4CAF50",

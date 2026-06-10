@@ -35,12 +35,16 @@ html, body {
     overflow: hidden;
   }
   /* Override 100dvh on screen containers to fill #root instead.
-     Exclude .run-phase — canvas handles its own scaling. */
-  #root > *:not(.run-phase) {
+     Exclude .run-phase — canvas handles its own scaling.
+     Exclude .audio-controls — floating overlay, not a screen. */
+  #root > *:not(.run-phase):not(.audio-controls) {
     min-height: 100% !important;
     max-height: 100% !important;
     height: 100% !important;
     overflow-y: auto;
+  }
+  #root > .audio-controls {
+    position: absolute !important;
   }
   #root > .run-phase {
     min-height: 100% !important;
