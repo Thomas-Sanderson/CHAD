@@ -50,7 +50,7 @@ export const level5Data: LevelData = {
     // The Sacred Potato
     { type: "potato", x: 2260, y: 170 },
   ],
-  startPosition: { x: 50, y: GROUND_Y - 48 },
+  startPosition: { x: 120, y: GROUND_Y - 48 },
   gatePosition: { x: 2800, y: GROUND_Y - 80 },
   bounds: { width: LEVEL_WIDTH, height: 450 },
   landmarks: [

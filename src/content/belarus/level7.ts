@@ -64,7 +64,7 @@ export const level7Data: LevelData = {
   collectibles: [],
   hazards: [],
   npcs: [],
-  startPosition: { x: 50, y: AVENUE_1_Y - 48 },
+  startPosition: { x: 120, y: AVENUE_1_Y - 48 },
   gatePosition: { x: 80, y: AVENUE_2_Y - 80 },
   bounds: { width: LEVEL_WIDTH, height: LEVEL_HEIGHT },
   skylineY: 100,

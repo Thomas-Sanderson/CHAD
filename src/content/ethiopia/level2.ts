@@ -48,7 +48,7 @@ export const level2Data: LevelData = {
     // Sacred Coffee Bean
     { type: "potato", x: 2810, y: 170 },
   ],
-  startPosition: { x: 50, y: GROUND_Y - 48 },
+  startPosition: { x: 120, y: GROUND_Y - 48 },
   gatePosition: { x: 3250, y: GROUND_Y - 80 },
   bounds: { width: LEVEL_WIDTH, height: 450 },
 };

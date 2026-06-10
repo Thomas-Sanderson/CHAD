@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import type { InputState } from "../types";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "../engine";
 
@@ -58,8 +58,34 @@ export function TouchControls({ inputRef, canvasScale }: Props) {
         zIndex: 50,
       }}
     >
-      {/* Left side: Joystick */}
-      <Joystick inputRef={inputRef} pad={pad} />
+      {/* Left side: compact L/R d-pad */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: pad + 8,
+          left: pad + 8,
+          pointerEvents: "auto",
+          display: "flex",
+          gap: 4,
+        }}
+      >
+        <DpadButton
+          size={btnSize}
+          label="&#9664;"
+          inputKey="left"
+          id="dpad-left"
+          onDown={onDown}
+          onUp={onUp}
+        />
+        <DpadButton
+          size={btnSize}
+          label="&#9654;"
+          inputKey="right"
+          id="dpad-right"
+          onDown={onDown}
+          onUp={onUp}
+        />
+      </div>
 
       {/* Right side: Action buttons — mid-height, above ground layer */}
       <div
@@ -110,118 +136,48 @@ export function TouchControls({ inputRef, canvasScale }: Props) {
   );
 }
 
-// ── Virtual joystick ──
+// ── D-pad button ──
 
-const WELL_SIZE = 56;
-const NUB_SIZE = 28;
-const DEAD_ZONE = 6;
-const MAX_TRAVEL = (WELL_SIZE - NUB_SIZE) / 2;
-
-function Joystick({
-  inputRef,
-  pad,
+function DpadButton({
+  size,
+  label,
+  inputKey,
+  id,
+  onDown,
+  onUp,
 }: {
-  inputRef: React.RefObject<InputState | null>;
-  pad: number;
+  size: number;
+  label: string;
+  inputKey: keyof InputState;
+  id: string;
+  onDown: (key: keyof InputState, id: string) => (e: React.TouchEvent | React.MouseEvent) => void;
+  onUp: (key: keyof InputState, id: string) => (e: React.TouchEvent | React.MouseEvent) => void;
 }) {
-  const wellRef = useRef<HTMLDivElement>(null);
-  const [nubX, setNubX] = useState(0);
-  const touchIdRef = useRef<number | null>(null);
-
-  const update = useCallback((clientX: number) => {
-    const well = wellRef.current;
-    if (!well) return;
-    const rect = well.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const dx = Math.max(-MAX_TRAVEL, Math.min(MAX_TRAVEL, clientX - centerX));
-    setNubX(dx);
-
-    const input = inputRef.current;
-    if (input) {
-      input.left = dx < -DEAD_ZONE;
-      input.right = dx > DEAD_ZONE;
-    }
-  }, [inputRef]);
-
-  const release = useCallback(() => {
-    touchIdRef.current = null;
-    setNubX(0);
-    const input = inputRef.current;
-    if (input) {
-      input.left = false;
-      input.right = false;
-    }
-  }, [inputRef]);
-
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const t = e.changedTouches[0];
-    if (!t) return;
-    touchIdRef.current = t.identifier;
-    update(t.clientX);
-  }, [update]);
-
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    e.preventDefault();
-    for (let i = 0; i < e.changedTouches.length; i++) {
-      const t = e.changedTouches[i]!;
-      if (t.identifier === touchIdRef.current) {
-        update(t.clientX);
-        return;
-      }
-    }
-  }, [update]);
-
-  const onTouchEnd = useCallback((e: React.TouchEvent) => {
-    e.preventDefault();
-    for (let i = 0; i < e.changedTouches.length; i++) {
-      if (e.changedTouches[i]!.identifier === touchIdRef.current) {
-        release();
-        return;
-      }
-    }
-  }, [release]);
-
   return (
     <div
-      ref={wellRef}
       style={{
-        position: "absolute",
-        bottom: pad + 8,
-        left: pad + 8,
-        width: WELL_SIZE,
-        height: WELL_SIZE,
-        borderRadius: WELL_SIZE / 2,
-        background: "rgba(255, 255, 255, 0.08)",
+        width: size,
+        height: size,
+        borderRadius: 10,
+        background: "rgba(255, 255, 255, 0.1)",
         border: "1.5px solid rgba(255, 255, 255, 0.15)",
-        pointerEvents: "auto",
-        touchAction: "none",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        fontSize: size * 0.4,
+        color: "rgba(255, 255, 255, 0.5)",
         userSelect: "none",
         WebkitUserSelect: "none",
-      } as React.CSSProperties}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
-      onTouchCancel={release as unknown as React.TouchEventHandler}
-    >
-      {/* Nub */}
-      <div
-        style={{
-          width: NUB_SIZE,
-          height: NUB_SIZE,
-          borderRadius: NUB_SIZE / 2,
-          background: "rgba(255, 255, 255, 0.35)",
-          border: "1px solid rgba(255, 255, 255, 0.4)",
-          transform: `translateX(${nubX}px)`,
-          transition: nubX === 0 ? "transform 0.1s ease-out" : "none",
-          pointerEvents: "none",
-        }}
-      />
-    </div>
+        touchAction: "none",
+      }}
+      onTouchStart={onDown(inputKey, id)}
+      onTouchEnd={onUp(inputKey, id)}
+      onTouchCancel={onUp(inputKey, id)}
+      onMouseDown={onDown(inputKey, id)}
+      onMouseUp={onUp(inputKey, id)}
+      onMouseLeave={onUp(inputKey, id)}
+      dangerouslySetInnerHTML={{ __html: label }}
+    />
   );
 }
 
