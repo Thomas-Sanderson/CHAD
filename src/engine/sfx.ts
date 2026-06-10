@@ -31,6 +31,21 @@ export function getAudioContext(): AudioContext {
 // iOS Safari (and most mobile browsers) require resume() + a silent buffer
 // played during a trusted user activation event to unlock the audio pipeline.
 // Register once at module load; listeners remove themselves after success.
+const UNLOCK_EVENTS = ["touchstart", "touchend", "click", "keydown"] as const;
+
+function removeUnlockListeners(): void {
+  for (const evt of UNLOCK_EVENTS) {
+    document.removeEventListener(evt, unlockAudio);
+  }
+}
+
+function finishUnlock(): void {
+  if (unlocked) return;
+  unlocked = true;
+  removeUnlockListeners();
+  if (onUnlockCallback) { onUnlockCallback(); onUnlockCallback = null; }
+}
+
 function unlockAudio(): void {
   if (unlocked) return;
   const ctx = getAudioContext();
@@ -40,19 +55,19 @@ function unlockAudio(): void {
   src.buffer = buf;
   src.connect(ctx.destination);
   src.start(0);
-  ctx.resume().then(() => {
-    unlocked = true;
-    document.removeEventListener("touchend", unlockAudio);
-    document.removeEventListener("click", unlockAudio);
-    document.removeEventListener("keydown", unlockAudio);
-    if (onUnlockCallback) { onUnlockCallback(); onUnlockCallback = null; }
-  });
+  const p = ctx.resume();
+  // Guard: older Safari may not return a Promise
+  if (p && typeof p.then === "function") {
+    p.then(finishUnlock);
+  }
+  // Fallback: poll context state in case the Promise never resolves
+  setTimeout(() => { if (ctx.state === "running") finishUnlock(); }, 200);
 }
 
 if (typeof document !== "undefined") {
-  document.addEventListener("touchend", unlockAudio);
-  document.addEventListener("click", unlockAudio);
-  document.addEventListener("keydown", unlockAudio);
+  for (const evt of UNLOCK_EVENTS) {
+    document.addEventListener(evt, unlockAudio);
+  }
 }
 
 export function setMuted(val: boolean): void {
