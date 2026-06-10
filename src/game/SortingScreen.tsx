@@ -201,7 +201,7 @@ export function SortingScreen({
       </div>
 
       <div className="sorting-body">
-        {/* Left: word prompt + picked flash + progress */}
+        {/* Left: word prompt */}
         <div className="sorting-left">
           <div className="sorting-word" style={styles.wordPrompt}>
             <span style={styles.wordScript}>{currentWord?.script}</span>
@@ -210,41 +210,6 @@ export function SortingScreen({
                 {currentWord.pronunciation}
               </span>
             )}
-          </div>
-
-          {picked !== null && (() => {
-            const pickedItem = itemDefs.get(picked);
-            return pickedItem ? (
-              <div className="sorting-picked-flash" style={{
-                ...styles.wordPrompt,
-                borderColor: isCorrect ? "#4CAF50" : "#f44336",
-                border: "2px solid",
-                gap: 4,
-                padding: "6px 10px",
-                animation: "flash-in 0.25s ease-out",
-              }}>
-                <ItemSpriteThumb itemId={picked} />
-                <span style={{ ...styles.wordScript, fontSize: "clamp(12px, 2.5vw, 22px)" }}>
-                  {pickedItem.script}
-                </span>
-                <span style={styles.itemName}>{pickedItem.name}</span>
-              </div>
-            ) : null;
-          })()}
-
-          <div className="sorting-progress" style={styles.progressRow}>
-            {targetWords.map((word, i) => {
-              let bg = "#333";
-              if (i < currentIndex) {
-                const picks = results.filter((r) => r.vocabWordId === word.id).length;
-                bg = picks <= 1 ? "#4CAF50" : "#FF9800";
-              } else if (i === currentIndex) {
-                bg = "#FFD54F";
-              }
-              return (
-                <div key={i} style={{ ...styles.dot, background: bg }} />
-              );
-            })}
           </div>
         </div>
 
@@ -279,8 +244,43 @@ export function SortingScreen({
           })}
         </div>
 
-        {/* Right: mentor feedback + button */}
+        {/* Right: progress + picked flash + mentor feedback + button */}
         <div className="sorting-right">
+          <div className="sorting-progress" style={styles.progressRow}>
+            {targetWords.map((word, i) => {
+              let bg = "#333";
+              if (i < currentIndex) {
+                const picks = results.filter((r) => r.vocabWordId === word.id).length;
+                bg = picks <= 1 ? "#4CAF50" : "#FF9800";
+              } else if (i === currentIndex) {
+                bg = "#FFD54F";
+              }
+              return (
+                <div key={i} style={{ ...styles.dot, background: bg }} />
+              );
+            })}
+          </div>
+
+          {picked !== null && (() => {
+            const pickedItem = itemDefs.get(picked);
+            return pickedItem ? (
+              <div className="sorting-picked-flash" style={{
+                ...styles.wordPrompt,
+                borderColor: isCorrect ? "#4CAF50" : "#f44336",
+                border: "2px solid",
+                gap: 4,
+                padding: "6px 10px",
+                animation: "flash-in 0.25s ease-out",
+              }}>
+                <ItemSpriteThumb itemId={picked} />
+                <span style={{ ...styles.wordScript, fontSize: "clamp(12px, 2.5vw, 22px)" }}>
+                  {pickedItem.script}
+                </span>
+                <span style={styles.itemName}>{pickedItem.name}</span>
+              </div>
+            ) : null;
+          })()}
+
           <div className="sorting-feedback" style={styles.feedbackArea}>
             <div
               style={{
