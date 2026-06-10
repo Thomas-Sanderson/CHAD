@@ -113,8 +113,8 @@ export function SortingScreen({
     if (!correct) {
       setShaking(true);
       setTimeout(() => setShaking(false), 500);
-      // Scold after the item speech finishes (1.2s lets the script pronunciation land)
-      if (item) setTimeout(() => speakScold(item.name), 1200);
+      // Scold after the item speech finishes — use script so language detection is correct
+      if (item) setTimeout(() => speakScold(item.script), 1200);
     }
   };
 
