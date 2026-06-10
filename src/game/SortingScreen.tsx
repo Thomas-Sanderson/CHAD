@@ -356,27 +356,30 @@ const sortingCSS = `
     flex: 1;
     min-height: 0;
     width: 100%;
+    overflow: hidden;
   }
   .sorting-left {
-    flex: 1;
+    flex: 0 0 22%;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--game-gap, 12px);
     min-width: 0;
+    overflow: hidden;
     justify-content: center;
   }
   .sorting-bag {
-    flex: 2;
+    flex: 1 1 auto;
     min-width: 0;
   }
   .sorting-right {
-    flex: 1;
+    flex: 0 0 22%;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--game-gap, 12px);
     min-width: 0;
+    overflow: hidden;
   }
 
   @media (orientation: landscape) and (max-height: 500px) {
@@ -450,16 +453,20 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "column",
     alignItems: "center",
     gap: 4,
-    padding: "12px 24px",
+    padding: "10px 12px",
     background: "#1a1a2e",
     borderRadius: 12,
-    minWidth: 160,
+    width: "100%",
+    maxWidth: "100%",
+    boxSizing: "border-box" as const,
   },
   wordScript: {
-    fontSize: "clamp(28px, 6vw, 40px)",
+    fontSize: "clamp(16px, 3.5vw, 32px)",
     fontWeight: "bold",
     color: "#FFD54F",
-    letterSpacing: 2,
+    letterSpacing: 1,
+    wordBreak: "break-word" as const,
+    textAlign: "center" as const,
   },
   wordPronunciation: {
     fontSize: "var(--game-font-sm, 13px)",
