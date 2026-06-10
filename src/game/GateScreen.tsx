@@ -118,33 +118,40 @@ export function GateScreen({
 
   if (result.passed) {
     return (
-      <div style={styles.container}>
-        <Building skinId={skinId} />
-        <div style={styles.successText}>&#10003; Correct!</div>
-        <div style={styles.subtitle}>
-          Chad somehow got the right groceries.
-        </div>
-
-        {achievements.length > 0 && (
-          <div style={styles.achievementList}>
-            {achievements.map(({ def, isNew }) => (
-              <div key={def.id} style={{
-                ...styles.achievementRow,
-                opacity: isNew ? 1 : 0.6,
-              }}>
-                <AchievementBadge icon={def.icon} color={def.iconColor} size={22} />
-                <span style={styles.achievementTitle}>{def.title}</span>
-                {def.points > 0 && (
-                  <span style={styles.achievementPts}>+{def.points}</span>
-                )}
-              </div>
-            ))}
+      <div className="gate-screen" style={styles.container}>
+        <div className="gate-success">
+          <div className="gate-left">
+            <Building skinId={skinId} />
+            <div style={styles.successText}>&#10003; Correct!</div>
+            <div style={styles.subtitle}>
+              Chad somehow got the right groceries.
+            </div>
           </div>
-        )}
 
-        <button style={styles.continueButton} onClick={onReveal}>
-          See what {mentorName} thinks &rarr;
-        </button>
+          <div className="gate-right">
+            {achievements.length > 0 && (
+              <div style={styles.achievementList}>
+                {achievements.map(({ def, isNew }) => (
+                  <div key={def.id} style={{
+                    ...styles.achievementRow,
+                    opacity: isNew ? 1 : 0.6,
+                  }}>
+                    <AchievementBadge icon={def.icon} color={def.iconColor} size={22} />
+                    <span style={styles.achievementTitle}>{def.title}</span>
+                    {def.points > 0 && (
+                      <span style={styles.achievementPts}>+{def.points}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <button style={styles.continueButton} onClick={onReveal}>
+              See what {mentorName} thinks &rarr;
+            </button>
+          </div>
+        </div>
+        <style>{gateCSS}</style>
       </div>
     );
   }
@@ -303,3 +310,37 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
   },
 };
+
+const gateCSS = `
+  .gate-success {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    width: 100%;
+    max-width: 600px;
+  }
+  .gate-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .gate-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  @media (orientation: portrait), (max-width: 500px) {
+    .gate-success {
+      flex-direction: column;
+      gap: 16px;
+    }
+    .gate-right {
+      align-items: center;
+    }
+  }
+`;
