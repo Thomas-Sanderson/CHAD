@@ -269,32 +269,36 @@ export function renderFrame(
       ctx.fillRect(0, 0, CANVAS_WIDTH, 20);
     }
   } else {
-    // Sky — use sky engine if timeOfDay is set, otherwise fall back to flat fill
+    // Sky — fills the entire canvas; ground tiles and corridor walls paint over it
     const skyPhase = timeOfDay ? getSkyPhase(timeOfDay, env.latitude) : null;
-    const skylineWorld = level.skylineY ?? (activePlatforms[0]?.y ?? CANVAS_HEIGHT - 40);
-    const skyScreenBottom = skylineWorld - camY;
-    if (skyScreenBottom > 0) {
-      const skyH = Math.min(skyScreenBottom, CANVAS_HEIGHT);
-      if (skyPhase) {
-        renderSky(ctx, skyPhase, CANVAS_WIDTH, skyH, camX);
-      } else {
-        ctx.fillStyle = env.skyColor;
-        ctx.fillRect(0, 0, CANVAS_WIDTH, skyH);
-      }
-      // Fill below sky with building backdrop for tall levels
-      if (skyH < CANVAS_HEIGHT && level.skylineY !== undefined) {
-        ctx.fillStyle = "#3a3040";
-        ctx.fillRect(0, skyH, CANVAS_WIDTH, CANVAS_HEIGHT - skyH);
-      }
+    if (skyPhase) {
+      renderSky(ctx, skyPhase, CANVAS_WIDTH, CANVAS_HEIGHT, camX);
     } else {
-      // Sky entirely above viewport — fill with building color
-      ctx.fillStyle = level.skylineY !== undefined ? "#3a3040" : env.skyColor;
+      ctx.fillStyle = env.skyColor;
       ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     }
 
     // Ground tiles — render all isGround platforms, or platform[0] as fallback
     const groundPlatforms = activePlatforms.filter(p => p.isGround);
     const groundTargets = groundPlatforms.length > 0 ? groundPlatforms : (activePlatforms[0] ? [activePlatforms[0]] : []);
+    // Earth fill below the lowest avenue — extends to canvas bottom
+    let lowestGroundY = -Infinity;
+    for (const gp of groundTargets) {
+      if (gp.y > lowestGroundY) lowestGroundY = gp.y;
+    }
+    if (lowestGroundY > -Infinity) {
+      const earthTop = lowestGroundY + 16 - camY; // just below the ground tile sprite
+      if (earthTop < CANVAS_HEIGHT) {
+        ctx.fillStyle = "#5a4a3a";
+        ctx.fillRect(0, Math.max(0, earthTop), CANVAS_WIDTH, CANVAS_HEIGHT - Math.max(0, earthTop));
+        // Darker sub-layer for depth
+        const deepTop = earthTop + 24;
+        if (deepTop < CANVAS_HEIGHT) {
+          ctx.fillStyle = "#4a3a2e";
+          ctx.fillRect(0, Math.max(0, deepTop), CANVAS_WIDTH, CANVAS_HEIGHT - Math.max(0, deepTop));
+        }
+      }
+    }
     for (const gp of groundTargets) {
       const gpScreenY = gp.y - camY;
       if (gpScreenY > CANVAS_HEIGHT + 32 || gpScreenY + 32 < -32) continue;
