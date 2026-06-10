@@ -219,13 +219,12 @@ export function SortingScreen({
                 ...styles.wordPrompt,
                 borderColor: isCorrect ? "#4CAF50" : "#f44336",
                 border: "2px solid",
-                flexDirection: "row" as const,
-                gap: 10,
-                padding: "8px 16px",
+                gap: 4,
+                padding: "6px 10px",
                 animation: "flash-in 0.25s ease-out",
               }}>
                 <ItemSpriteThumb itemId={picked} />
-                <span style={{ ...styles.wordScript, fontSize: "clamp(20px, 4vw, 28px)" }}>
+                <span style={{ ...styles.wordScript, fontSize: "clamp(12px, 2.5vw, 22px)" }}>
                   {pickedItem.script}
                 </span>
                 <span style={styles.itemName}>{pickedItem.name}</span>
@@ -461,12 +460,12 @@ const styles: Record<string, React.CSSProperties> = {
     boxSizing: "border-box" as const,
   },
   wordScript: {
-    fontSize: "clamp(16px, 3.5vw, 32px)",
+    fontSize: "clamp(14px, 3vw, 32px)",
     fontWeight: "bold",
     color: "#FFD54F",
     letterSpacing: 1,
-    wordBreak: "break-word" as const,
     textAlign: "center" as const,
+    whiteSpace: "nowrap" as const,
   },
   wordPronunciation: {
     fontSize: "var(--game-font-sm, 13px)",
