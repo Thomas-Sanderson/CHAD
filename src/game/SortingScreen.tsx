@@ -407,7 +407,7 @@ const sortingCSS = `
       min-width: auto !important;
     }
     .sorting-bag {
-      grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)) !important;
+      grid-template-columns: repeat(4, 1fr) !important;
       gap: 6px !important;
     }
     .sorting-feedback {
@@ -479,7 +479,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   bagGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))",
+    gridTemplateColumns: "repeat(4, 1fr)",
     gap: "var(--game-list-gap, 8px)",
     overflowY: "auto",
     minHeight: 0,
