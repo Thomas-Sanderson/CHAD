@@ -1,5 +1,5 @@
 import type { VocabWord } from "../types";
-import { isMuted } from "./sfx";
+import { isMuted, tryUnlockAudio } from "./sfx";
 
 // Chrome's speechSynthesis corrupts when cancel() and speak() are
 // called in rapid succession. We avoid cancel() entirely — instead
@@ -135,7 +135,12 @@ function fireSpeak(
     const voice = findMaleVoice(utterance.lang);
     if (voice) utterance.voice = voice;
   }
-  utterance.onstart = () => { speaking = true; };
+  utterance.onstart = () => {
+    speaking = true;
+    // Speech worked — piggyback Web Audio unlock in case AudioContext
+    // is still suspended (mobile Brave/Safari).
+    tryUnlockAudio();
+  };
   utterance.onend = () => { speaking = false; };
   utterance.onerror = () => { speaking = false; };
   speechSynthesis.speak(utterance);
