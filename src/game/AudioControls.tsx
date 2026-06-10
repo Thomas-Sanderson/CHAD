@@ -173,6 +173,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   slider: {
     flex: 1,
+    minWidth: 0,
     height: 4,
     accentColor: "#FFD54F",
     cursor: "pointer",
