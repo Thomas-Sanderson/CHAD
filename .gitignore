@@ -3,3 +3,5 @@ dist
 *.local
 .DS_Store
 desktop_visibility*
+.vercel/
+.claude/plans/
