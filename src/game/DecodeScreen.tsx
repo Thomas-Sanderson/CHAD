@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import type { CollectibleItem } from "../types/content";
 import type { DecodeResult } from "./scoring";
 import { getItemSprite, drawSprite } from "../engine/sprites";
-import { speakText, speakScold } from "../engine/audio";
+import { speakText, speakScold, stopAll } from "../engine/audio";
 import { sfxGateSuccess } from "../engine/sfx";
 import { isTouchDevice } from "../engine/touch";
 
@@ -103,6 +103,7 @@ export function DecodeScreen({
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const celebrateTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const feedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const unmounted = useRef(false);
   const quipIndex = useRef(Math.floor(Math.random() * CHAD_QUIPS.length));
 
@@ -131,11 +132,15 @@ export function DecodeScreen({
   const aLetter = options[1] ?? null;
   const dLetter = options[2] ?? null;
 
-  // Speak the target letter aloud in the target language
+  // Speak the target letter aloud in the target language.
+  // Cancel any lingering speech first so the word announcement
+  // and the next letter don't bleed together.
   useEffect(() => {
     const target = letters[letterIndex];
     if (!target) return;
-    const timer = setTimeout(() => speakText(target), 300);
+    stopAll();
+    const delay = letterIndex === 0 ? 1200 : 800;
+    const timer = setTimeout(() => speakText(target.toLowerCase()), delay);
     return () => clearTimeout(timer);
   }, [canIndex, letterIndex, letters]);
 
@@ -146,6 +151,7 @@ export function DecodeScreen({
       unmounted.current = true;
       for (const t of celebrateTimers.current) clearTimeout(t);
       celebrateTimers.current = [];
+      if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
     };
   }, []);
 
@@ -156,9 +162,11 @@ export function DecodeScreen({
 
     const nextLetterIndex = letterIndex + 1;
     if (nextLetterIndex >= letters.length) {
-      // Word complete — speak the full word
+      // Word complete — pause, then speak the full word
       setCelebrating(true);
-      speakText(currentCan!.script);
+      stopAll();
+      const wordTimer = setTimeout(() => speakText(currentCan!.script), 600);
+      celebrateTimers.current.push(wordTimer);
 
       const result: DecodeResult = {
         itemId: currentCan!.id,
@@ -202,6 +210,11 @@ export function DecodeScreen({
       setFeedback(`${mentorName}: "${scoldNo}"`);
     }
     setTimeout(() => setShaking(false), 500);
+    // Revert to pronunciation prompt after delay
+    if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
+    feedbackTimer.current = setTimeout(() => {
+      if (!unmounted.current) setFeedback(null);
+    }, 2000);
   }, [mentorName, scoldNo, wrongAttempts, currentCan]);
 
   // Keyboard handler for WASD — each key picks exactly one letter
@@ -269,7 +282,9 @@ export function DecodeScreen({
               {mentorAvatar}
             </div>
             <div style={{ ...styles.mentorBubble, color: feedback ? "#f44336" : messageColor }}>
-              {feedback ?? `${mentorName} is watching...`}
+              {feedback ?? (currentCan?.pronunciation
+                ? `${mentorName}: "Sound it out — ${currentCan.pronunciation}"`
+                : `${mentorName}: "Sound it out..."`)}
             </div>
           </div>
         </div>

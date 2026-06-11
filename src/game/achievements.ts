@@ -21,6 +21,7 @@ export interface RunStats {
   correctItemCount: number;
   totalTargetCount: number;
   levelId: string;
+  catTimeJumps: number;     // lifetime coyote-time jumps (КОШАЧЬЕ ВРЕМЯ)
 }
 
 export interface EarnedAchievement {
@@ -132,6 +133,19 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     iconColor: "#c4a035",
     points: 0, // 100 already awarded by collection
     check: (s) => s.potatoCollected,
+  },
+  {
+    id: "cat-time",
+    title: "КОШАЧЬЕ ВРЕМЯ",
+    subtitles: {
+      belarus: "The cats like you. I don't know why. Cats don't like anyone. \u2014 A.",
+      ethiopia: "The cats watch you jump. They've seen worse. They've seen better. \u2014 S.",
+      italy: "I gatti ti guardano. Non ti giudicano. ...sì, ti giudicano. \u2014 G.",
+    },
+    icon: "cat",
+    iconColor: "#cc8844",
+    points: 50,
+    check: (s) => s.catTimeJumps >= 50,
   },
 ];
 

@@ -1,3 +1,5 @@
+import type { PlatformDef } from "./content";
+
 export type Phase = "BRIEFING" | "RUN" | "GATE" | "SORTING" | "DECODE" | "REVEAL";
 
 export interface Vec2 {
@@ -106,6 +108,8 @@ export interface GameRunState {
   scoldings: string[];
   headBounceCurse: string;
   pointPhrase: string; // what Chad says when pointing ("пожалуйста" / "per favore")
+  // Rooftop platforms (generated from building geometry)
+  rooftopPlatforms: Record<string, PlatformDef[]>;
   // Segment state
   currentSegmentId: string | null;
   segmentCollectibles: Record<string, CollectedInfo[]>;
@@ -133,6 +137,21 @@ export interface GameRunState {
   shopConvo: ShopConvoState | null;
   shopConvoMenuOpen: boolean;
   shopBubble: { text: string; pronunciation?: string; translation?: string; until: number } | null;
+  // Street sign interaction
+  nearSign: string | null;
+  signMenuOpen: boolean;
+  signBubble: { text: string; lines?: string[]; pronunciation?: string; ipa?: string; until: number } | null;
+  // КОШАЧЬЕ ВРЕМЯ — coyote time cat
+  catTime: {
+    active: boolean;
+    edgeX: number;      // world X of platform edge where cat sits
+    edgeY: number;      // world Y of platform surface
+    variant: 0 | 1;     // 0 = Сиам, 1 = Полосатый
+    facingLeft: boolean; // cat faces the direction Chad walked off
+    jumpedDuring: boolean; // true if Chad jumped during the window
+    startedAt: number;  // elapsed when cat appeared
+  };
+  catTimeJumps: number; // lifetime count of successful coyote jumps (for achievement)
 }
 
 export interface InputState {

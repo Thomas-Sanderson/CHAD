@@ -354,6 +354,18 @@ export const heartEmptySprite: SpriteData = [
   [_, _, _, DG, _, _, _],
 ];
 
+// Note sprite (7×8) — folded letter/briefing
+export const noteSprite: SpriteData = [
+  [_, WE, WE, WE, WE, WE, _],
+  [WE, LB, LB, LB, LB, LB, WE],
+  [_, WE, LB, LB, LB, WE, _],
+  [_, _, WE, LB, WE, _, _],
+  [_, _, WE, WE, WE, _, _],
+  [_, WE, DG, DG, DG, WE, _],
+  [_, WE, DG, DG, DG, WE, _],
+  [_, WE, WE, WE, WE, WE, _],
+];
+
 // Bag sprite (7×8) — brown sack
 export const bagSprite: SpriteData = [
   [_, _, BN, BN, BN, _, _],
@@ -512,11 +524,57 @@ export const shopProduceSprite: SpriteData = buildLandmark(24, 24, [
   [19, 16, 1, 1, "#ccaa55"],  // handle
 ]);
 
+// ПЕКАРНЯ — Bakery (warm brown wood, golden awning, bread in window)
+export const shopBakerySprite: SpriteData = buildLandmark(24, 24, [
+  [0, 2, 24, 2, "#c8942a"],   // golden sign plate
+  [1, 2, 22, 1, "#b07e22"],   // sign inner
+  [0, 4, 24, 20, "#e8dcc8"],  // warm plaster body
+  [0, 4, 24, 1, "#ddccaa"],   // cornice
+  [0, 5, 24, 3, "#c8942a"],   // golden awning
+  [0, 5, 4, 3, "#b07e22"],    // awning dark
+  [8, 5, 4, 3, "#b07e22"],
+  [16, 5, 4, 3, "#b07e22"],
+  [2, 10, 10, 7, "#d4c4a8"],  // display window
+  [3, 11, 8, 5, "#e8ddd0"],   // glass
+  [4, 13, 3, 2, "#a07030"],   // loaf 1
+  [8, 13, 2, 2, "#b08040"],   // loaf 2
+  [5, 11, 1, 2, "#c8942a"],   // baguette
+  [15, 10, 6, 14, "#8b6b44"], // door
+  [16, 11, 4, 12, "#7a5a33"], // door inner
+  [19, 16, 1, 1, "#ccaa55"],  // handle
+  [16, 12, 3, 3, "#d4c4a8"],  // door window
+]);
+
+// МЯСНАЯ — Butcher (dark red awning, white tile, hanging hooks)
+export const shopButcherSprite: SpriteData = buildLandmark(24, 24, [
+  [0, 2, 24, 2, "#882222"],   // dark red sign plate
+  [1, 2, 22, 1, "#772020"],   // sign inner
+  [0, 4, 24, 20, "#f0ece8"],  // white tile body
+  [0, 4, 24, 1, "#ddd8d4"],   // cornice
+  [0, 5, 24, 3, "#882222"],   // dark red awning
+  [0, 5, 4, 3, "#772020"],    // awning dark
+  [8, 5, 4, 3, "#772020"],
+  [16, 5, 4, 3, "#772020"],
+  [2, 10, 10, 7, "#e8e4e0"],  // display area
+  [3, 10, 1, 2, "#888888"],   // hook 1
+  [3, 12, 2, 3, "#cc5544"],   // hanging meat 1
+  [7, 10, 1, 2, "#888888"],   // hook 2
+  [7, 12, 2, 3, "#bb4433"],   // hanging meat 2
+  [10, 14, 2, 3, "#cc8866"],  // sausage links
+  [0, 15, 12, 1, "#dddddd"],  // counter tile
+  [15, 10, 6, 14, "#664444"], // door
+  [16, 11, 4, 12, "#553333"], // door inner
+  [19, 16, 1, 1, "#ccaa88"],  // handle
+]);
+
 // Shop facade lookup by door label
 export const shopFacadeSprites: Record<string, SpriteData> = {
   "МОЛОЧНАЯ": shopDairySprite,
   "РЫБНАЯ": shopFishSprite,
   "ОВОЩИ-ФРУКТЫ": shopProduceSprite,
+  "ОВОЩИ": shopProduceSprite,
+  "ПЕКАРНЯ": shopBakerySprite,
+  "МЯСНАЯ": shopButcherSprite,
   // Italy shops
   "SALUMERIA": macelleriaSpriteIT,
   "PANETTERIA": panetteriaSpriteIT,
@@ -1367,6 +1425,31 @@ export const landmarkSprites: Record<string, SpriteData> = {
   "БИБЛИОТЕКА": landmarkBiblioteka,
 };
 
+// --- APARTMENT BLOCK SPRITE ---
+// Small Soviet apartment building for bare street sign intersections.
+// 12×22 logical, drawn at scale 4 = 48×88 display.
+export const apartmentBlockSprite: SpriteData = buildLandmark(12, 22, [
+  [0, 3, 12, 17, AT],   // building body
+  [0, 2, 12, 2, LW],    // cornice
+  [0, 0, 12, 2, BM],    // roof
+  // Windows — 3 columns × 4 rows
+  [2, 5, 2, 2, WN],     // row 1
+  [5, 5, 2, 2, WN],
+  [8, 5, 2, 2, WN],
+  [2, 9, 2, 2, WN],     // row 2
+  [5, 9, 2, 2, WN],
+  [8, 9, 2, 2, WN],
+  [2, 13, 2, 2, WN],    // row 3
+  [5, 13, 2, 2, WN],
+  [8, 13, 2, 2, WN],
+  [2, 17, 2, 2, WN],    // row 4
+  [8, 17, 2, 2, WN],
+  // Door
+  [5, 17, 2, 3, DB],
+  // Ground
+  [0, 20, 12, 2, GG],
+]);
+
 // Wood shelf (32×8 logical, drawn at 2x = 64×16)
 // Brown planks with L-brackets at edges. For dairy/bakery shops.
 export const shelfWoodSprite: SpriteData = [
@@ -1922,3 +2005,60 @@ const itemSpriteMap: Record<string, SpriteData> = {
 export function getItemSprite(itemId: string): SpriteData | undefined {
   return itemSpriteMap[itemId];
 }
+
+// ── КОШАЧЬЕ ВРЕМЯ (Cat Time) — coyote time cats ──
+
+const SC = "#f5e6d0"; // Сиам cream body
+const SP = "#5a4230"; // Сиам dark points
+const SE = "#4488cc"; // Сиам blue eyes
+const TB = "#cc8844"; // Полосатый orange body
+const TS2 = "#885522"; // Полосатый dark stripes (renamed to avoid TS conflict)
+const TE = "#44aa44"; // Полосатый green eyes
+
+// Сиам (Siamese) — 8×8 sitting cat, facing right
+export const catSiamSprite: SpriteData = [
+  [_, _, SP, _, _, SP, _, _],
+  [_, SP, SC, SP, SP, SC, SP, _],
+  [_, SC, SE, SC, SC, SE, SC, _],
+  [_, _, SC, SP, SP, SC, _, _],
+  [_, _, SC, SC, SC, SC, _, _],
+  [_, _, SC, SC, SC, SC, _, _],
+  [_, SP, SC, _, _, SC, SP, _],
+  [_, _, _, _, _, _, SP, SP],
+];
+
+// Сиам nod frame — 1px head dip
+export const catSiamNodSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _],
+  [_, _, SP, _, _, SP, _, _],
+  [_, SP, SC, SP, SP, SC, SP, _],
+  [_, SC, SE, SC, SC, SE, SC, _],
+  [_, _, SC, SC, SC, SC, _, _],
+  [_, _, SC, SC, SC, SC, _, _],
+  [_, SP, SC, _, _, SC, SP, _],
+  [_, _, _, _, _, _, SP, SP],
+];
+
+// Полосатый (Tabby) — 8×8 sitting cat, facing right
+export const catTabbySprite: SpriteData = [
+  [_, _, TS2, _, _, TS2, _, _],
+  [_, TS2, TB, TS2, TS2, TB, TS2, _],
+  [_, TB, TE, TB, TB, TE, TB, _],
+  [_, _, TB, TS2, TS2, TB, _, _],
+  [_, _, TS2, TB, TB, TS2, _, _],
+  [_, _, TB, TS2, TS2, TB, _, _],
+  [_, TS2, TB, _, _, TB, TS2, _],
+  [_, _, _, _, _, _, TS2, TB],
+];
+
+// Полосатый nod frame
+export const catTabbyNodSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _],
+  [_, _, TS2, _, _, TS2, _, _],
+  [_, TS2, TB, TS2, TS2, TB, TS2, _],
+  [_, TB, TE, TB, TB, TE, TB, _],
+  [_, _, TS2, TB, TB, TS2, _, _],
+  [_, _, TB, TS2, TS2, TB, _, _],
+  [_, TS2, TB, _, _, TB, TS2, _],
+  [_, _, _, _, _, _, TS2, TB],
+];

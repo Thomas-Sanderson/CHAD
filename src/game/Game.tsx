@@ -192,6 +192,7 @@ export function Game() {
         correctItemCount: correctCount,
         totalTargetCount: result.matches.length,
         levelId: currentLevel.id,
+        catTimeJumps: state.catTimeJumps,
       };
       setEarnedAchievements(checkAndAwardAchievements(stats, currentSkin.id, currentLevel.id));
 
@@ -478,6 +479,11 @@ export function Game() {
             learnedWords={learnedWordsForSkin}
             vocabWords={currentLevel.vocabPack.words}
             timeOfDay={currentLevel.timeOfDay}
+            briefing={currentLevel.briefing}
+            vocabPack={currentLevel.vocabPack}
+            mentorName={currentSkin.mentorName}
+            mentorAvatar={currentSkin.mentorAvatar}
+            mentorColor={currentSkin.mentorColor}
           />
         );
       case "GATE":

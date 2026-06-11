@@ -5,7 +5,8 @@ import type {
   PlacedHazard,
   CollectedInfo,
 } from "../types";
-import type { CollectibleItem, LevelSegment, PlatformDef, LandmarkDef } from "../types/content";
+import type { CollectibleItem, LevelSegment, PlatformDef, LandmarkDef, StreetSignDef } from "../types/content";
+import { STREET_SIGN_PRONUNCIATION } from "../types/content";
 import { speakScold, speakAsChad } from "./audio";
 import {
   applyGravity,
@@ -15,11 +16,14 @@ import {
   resolvePlatformCollisions,
   aabbOverlap,
   playerAABB,
+  COYOTE_MS,
   PLAYER_WIDTH,
   PLAYER_HEIGHT,
   GRAVITY,
 } from "./physics";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./renderer";
+import { generateRooftopPlatforms } from "./rooftops";
+import { shopFacadeSprites, landmarkSprites } from "./sprites";
 
 const MARSHRUTKA_WIDTH = 80;
 const MARSHRUTKA_HEIGHT = 40;
@@ -35,6 +39,9 @@ const DROP_SETTLE_THRESHOLD = 40; // vy below this → item settles
 const TRANSITION_MS = 150; // ms per fade phase
 const SHOPKEEPER_RANGE = 120; // px — interaction radius
 const NEAR_ITEM_RANGE = 60;   // px — "standing near" an item
+const SIGN_RANGE = 80;
+const SIGN_VERT_RANGE = 120;
+const SIGN_BUBBLE_MS = 4000;
 
 const DEFAULT_SCOLDINGS = [
   "КУДА?!",
@@ -89,6 +96,15 @@ export function createGameRunState(level: LevelData, scoldings?: string[], headB
     }
   }
 
+  // Rooftop platforms from building geometry
+  const rooftopPlatforms: Record<string, PlatformDef[]> = {};
+  if (hasSegments) {
+    for (const seg of level.segments!) {
+      const rooftops = generateRooftopPlatforms(seg, landmarkSprites, shopFacadeSprites);
+      if (rooftops.length > 0) rooftopPlatforms[seg.id] = rooftops;
+    }
+  }
+
   return {
     player: {
       position: { ...level.startPosition },
@@ -132,6 +148,8 @@ export function createGameRunState(level: LevelData, scoldings?: string[], headB
     scoldings: _scoldings,
     headBounceCurse: _curse,
     pointPhrase: _pointPhrase,
+    // Rooftop platforms
+    rooftopPlatforms,
     // Segment state
     currentSegmentId: firstSegment?.id ?? null,
     segmentCollectibles,
@@ -159,6 +177,16 @@ export function createGameRunState(level: LevelData, scoldings?: string[], headB
     shopConvo: null,
     shopConvoMenuOpen: false,
     shopBubble: null,
+    // Street sign interaction
+    nearSign: null,
+    signMenuOpen: false,
+    signBubble: null,
+    // КОШАЧЬЕ ВРЕМЯ
+    catTime: {
+      active: false, edgeX: 0, edgeY: 0, variant: 0,
+      facingLeft: false, jumpedDuring: false, startedAt: 0,
+    },
+    catTimeJumps: 0,
   };
 }
 
@@ -216,7 +244,10 @@ export function updateGameState(
   if (level.segments?.length && state.currentSegmentId) {
     currentSegment = level.segments.find(s => s.id === state.currentSegmentId) ?? null;
     if (currentSegment) {
-      activePlatforms = currentSegment.platforms;
+      const rooftops = state.rooftopPlatforms[currentSegment.id] ?? [];
+      activePlatforms = rooftops.length > 0
+        ? [...currentSegment.platforms, ...rooftops]
+        : currentSegment.platforms;
       activeCollectiblesKey = currentSegment.id;
       activeHazards = currentSegment.hazards;
       activeBounds = currentSegment.bounds;
@@ -230,11 +261,13 @@ export function updateGameState(
   const jumpPressed = input.jump;
 
   // Track last grounded time for coyote time
+  const wasOnGround = state.player.onGround;
   if (state.player.onGround) {
     state.player.lastGroundedTime = state.elapsed;
   }
 
   // Jump (consume the flag so it's one-shot)
+  const jumpedThisFrame = input.jump;
   if (input.jump) {
     tryJump(state.player, state.elapsed);
     input.jump = false;
@@ -268,6 +301,36 @@ export function updateGameState(
 
   // Platform collisions
   resolvePlatformCollisions(state.player, activePlatforms);
+
+  // КОШАЧЬЕ ВРЕМЯ — detect edge walk-off, spawn cat during coyote window
+  const inCoyoteWindow = !state.player.onGround &&
+    (state.elapsed - state.player.lastGroundedTime) < COYOTE_MS;
+  if (wasOnGround && !state.player.onGround && !jumpedThisFrame && state.player.velocity.y >= 0) {
+    // Walked off an edge — spawn a cat
+    const facingRight = state.player.facing === "right";
+    state.catTime = {
+      active: true,
+      edgeX: facingRight
+        ? state.player.position.x - 12  // cat sits behind Chad on the edge he left
+        : state.player.position.x + state.player.width + 4,
+      edgeY: state.player.lastGroundedTime === state.elapsed
+        ? state.player.position.y + state.player.height - 16
+        : state.player.position.y + state.player.height - 16,
+      variant: Math.random() < 0.5 ? 0 : 1,
+      facingLeft: facingRight, // cat faces direction Chad went (watches him)
+      jumpedDuring: false,
+      startedAt: state.elapsed,
+    };
+  }
+  // Track if Chad jumps during cat window
+  if (state.catTime.active && jumpedThisFrame && inCoyoteWindow) {
+    state.catTime.jumpedDuring = true;
+    state.catTimeJumps++;
+  }
+  // Expire cat after coyote window
+  if (state.catTime.active && (state.elapsed - state.catTime.startedAt) > COYOTE_MS + 200) {
+    state.catTime.active = false;
+  }
 
   // Collectible pickups (skip while invincible — prevents re-collecting dropped items)
   const pBox = playerAABB(state.player);
@@ -417,8 +480,24 @@ export function updateGameState(
       }
     }
 
-    // Fell out of bounds
-    if (item.y > activeBounds.height + 100) return false;
+    // Fell below death floor → respawn at original position
+    const itemDeathY = (level.deathFloorY ?? activeBounds.height) + 50;
+    if (item.y > itemDeathY) {
+      const originals = activeCollectiblesKey !== null
+        ? (level.segments?.find(s => s.id === activeCollectiblesKey)?.collectibles ?? [])
+        : level.collectibles;
+      const orig = originals.find(c => c.itemId === item.itemId);
+      if (orig) {
+        const info: CollectedInfo = { itemId: item.itemId, x: orig.x, y: orig.y };
+        if (activeCollectiblesKey !== null) {
+          const seg = state.segmentCollectibles[activeCollectiblesKey];
+          if (seg) seg.push(info);
+        } else {
+          state.remainingCollectibles.push(info);
+        }
+      }
+      return false;
+    }
 
     return true;
   });
@@ -554,6 +633,57 @@ export function updateGameState(
     state.shopBubble = null;
   }
 
+  // --- Street sign proximity and interaction ---
+  state.nearSign = null;
+  if (currentSegment?.streetSigns && currentSegment.type === "street" && !state.nearDoor) {
+    // Prefer interactive signs (with avenueName for directions) over passive ones
+    let fallbackId: string | null = null;
+    for (const sign of currentSegment.streetSigns) {
+      const dx = Math.abs(state.player.position.x - sign.x);
+      const dy = Math.abs(state.player.position.y - sign.y);
+      if (dx < SIGN_RANGE && dy < SIGN_VERT_RANGE) {
+        if (sign.avenueName) {
+          state.nearSign = sign.id;
+          break;
+        }
+        if (!fallbackId) fallbackId = sign.id;
+      }
+    }
+    if (!state.nearSign) state.nearSign = fallbackId;
+
+    if (state.nearSign) {
+      const sign = currentSegment.streetSigns.find((s: StreetSignDef) => s.id === state.nearSign)!;
+      // E key → speak all visible sign text (street + avenue + partner street if merged)
+      if (input.interact) {
+        // Build full text: this street, the avenue, and any partner street at the same intersection
+        const parts = [sign.label];
+        if (sign.avenueName) parts.push(sign.avenueName);
+        // Find partner sign at the same intersection (same y, close x)
+        for (const other of currentSegment.streetSigns) {
+          if (other.id === sign.id) continue;
+          if (Math.abs(other.y - sign.y) < 10 && Math.abs(other.x - sign.x) < 120) {
+            parts.push(other.label);
+          }
+        }
+        speakScold(parts.join(". "));
+        const pron = STREET_SIGN_PRONUNCIATION[sign.label];
+        state.signBubble = {
+          text: sign.label,
+          pronunciation: pron?.pronunciation,
+          ipa: pron?.ipa,
+          until: state.elapsed + SIGN_BUBBLE_MS,
+        };
+        input.interact = false;
+      }
+      // P key → open directions menu (only if sign has avenueName)
+      if (input.shout && sign.avenueName) {
+        speakAsChad(state.pointPhrase);
+        state.signMenuOpen = true;
+        input.shout = false;
+      }
+    }
+  }
+
   // Gate check (only in first segment or non-segment levels) — before landmarks so E isn't consumed
   if (!currentSegment || isFirstSegment) {
     const gateBox = {
@@ -594,9 +724,9 @@ export function updateGameState(
       if (item) pointLabel = item.script;
     }
 
-    state.nearLandmark = pointLabel;
+    state.nearLandmark = state.nearSign ? null : pointLabel;
 
-    if (input.shout && pointLabel) {
+    if (input.shout && pointLabel && !state.nearSign) {
       speakAsChad(state.pointPhrase);
       const label = pointLabel;
       setTimeout(() => speakScold(label), 1200);
@@ -614,6 +744,11 @@ export function updateGameState(
   // Shout response decay
   if (state.shoutResponse && state.shoutResponse.until < state.elapsed) {
     state.shoutResponse = null;
+  }
+
+  // Sign bubble decay
+  if (state.signBubble && state.elapsed > state.signBubble.until) {
+    state.signBubble = null;
   }
 
   // Camera — lerp for consistent feel in both street and interior

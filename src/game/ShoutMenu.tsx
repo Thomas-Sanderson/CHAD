@@ -346,6 +346,7 @@ const S: Record<string, React.CSSProperties> = {
     justifyContent: "center",
     alignItems: "center",
     zIndex: 100,
+    touchAction: "none",
   },
   panel: {
     background: "#1a1a2e",
@@ -355,6 +356,8 @@ const S: Record<string, React.CSSProperties> = {
     maxHeight: "90%",
     overflowY: "auto",
     border: "2px solid #FFD54F",
+    touchAction: "auto",
+    WebkitOverflowScrolling: "touch",
   },
   header: {
     display: "flex",
@@ -524,6 +527,8 @@ const S: Record<string, React.CSSProperties> = {
     gap: 6,
     maxHeight: 300,
     overflowY: "auto" as const,
+    touchAction: "pan-y",
+    WebkitOverflowScrolling: "touch",
   },
   flatWord: {
     display: "flex",

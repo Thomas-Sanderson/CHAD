@@ -101,6 +101,19 @@ function renderIcon(icon: string, s: number, color: string) {
         </g>
       );
 
+    case "cat":
+      // Tiny cat face — triangular ears, round head, dot eyes
+      return (
+        <g>
+          <polygon points={`${s*0.25},${s*0.45} ${s*0.35},${s*0.2} ${s*0.45},${s*0.45}`} fill={color} />
+          <polygon points={`${s*0.55},${s*0.45} ${s*0.65},${s*0.2} ${s*0.75},${s*0.45}`} fill={color} />
+          <ellipse cx={h} cy={s*0.55} rx={s*0.28} ry={s*0.22} fill={color} />
+          <circle cx={s*0.4} cy={s*0.52} r={s*0.05} fill="#1a1a2e" />
+          <circle cx={s*0.6} cy={s*0.52} r={s*0.05} fill="#1a1a2e" />
+          <ellipse cx={h} cy={s*0.62} rx={s*0.04} ry={s*0.025} fill="#ffaaaa" />
+        </g>
+      );
+
     default:
       return <circle cx={h} cy={h} r={s * 0.3} fill={color} />;
   }

@@ -136,6 +136,14 @@ export interface LandmarkDef {
   y?: number; // defaults to ground-level sign placement
 }
 
+export interface StreetSignDef {
+  id: string;
+  label: string;              // "УЛ. ПОБЕДЫ" — street name
+  avenueName?: string;        // "ПР. НЕЗАВИСИМОСТИ" — avenue this intersection is on
+  x: number;
+  y: number;
+}
+
 export interface LevelSegment {
   id: string;
   type: "street" | "interior";
@@ -148,7 +156,7 @@ export interface LevelSegment {
   shopkeeper?: ShopKeeperDef;
   shelfType?: "wood" | "metal";
   landmarks?: LandmarkDef[];
-  streetSigns?: { label: string; x: number; y: number }[];
+  streetSigns?: StreetSignDef[];
   streetCorridors?: StreetCorridor[];
 }
 
@@ -167,3 +175,21 @@ export interface LevelData {
   skylineY?: number; // world Y where sky ends and buildings begin (tall levels)
   deathFloorY?: number; // Y of lowest ground + margin; fall below = respawn
 }
+
+export const STREET_SIGN_PRONUNCIATION: Record<string, { pronunciation: string; ipa: string }> = {
+  // Street names
+  "УЛ. МИРА":       { pronunciation: "ool. MEE-rah",           ipa: "/ul. ˈmʲirə/" },
+  "УЛ. ЛЕНИНА":     { pronunciation: "ool. LYEH-nee-nah",      ipa: "/ul. ˈlʲenʲɪnə/" },
+  "УЛ. ПОБЕДЫ":     { pronunciation: "ool. pah-BYEH-dih",      ipa: "/ul. pɐˈbʲedɨ/" },
+  "УЛ. ПУШКИНА":    { pronunciation: "ool. POOSH-kee-nah",     ipa: "/ul. ˈpuʂkʲɪnə/" },
+  "УЛ. ГАГАРИНА":   { pronunciation: "ool. gah-GAH-ree-nah",   ipa: "/ul. ɡɐˈɡarʲɪnə/" },
+  "УЛ. ТОЛСТОГО":   { pronunciation: "ool. tahl-STOH-vah",     ipa: "/ul. tɐlˈstovə/" },
+  "УЛ. ЧЕХОВА":     { pronunciation: "ool. CHYEH-hah-vah",     ipa: "/ul. ˈtɕexəvə/" },
+  "УЛ. ЛЕРМОНТОВА": { pronunciation: "ool. LYER-mahn-tah-vah", ipa: "/ul. ˈlʲerməntəvə/" },
+  "УЛ. ГОРЬКОГО":   { pronunciation: "ool. GOR-kah-vah",       ipa: "/ul. ˈɡorʲkəvə/" },
+  // Avenue names
+  "ПР. НЕЗАВИСИМОСТИ": { pronunciation: "pr. nyeh-zah-VEE-see-mah-stee", ipa: "/pr. nʲɪzɐˈvʲisʲɪməsʲtʲɪ/" },
+  "ПР. ПОБЕДИТЕЛЕЙ":   { pronunciation: "pr. pah-byeh-DEE-tyeh-lyey",    ipa: "/pr. pəbʲɪˈdʲitʲɪlʲej/" },
+  "ПР. ПАРТИЗАНСКИЙ":  { pronunciation: "pr. par-tee-ZAHN-skee",         ipa: "/pr. pərtʲɪˈzanskʲɪj/" },
+  "ПР. МАШЕРОВА":      { pronunciation: "pr. mah-SHEH-rah-vah",          ipa: "/pr. mɐˈʂerəvə/" },
+};

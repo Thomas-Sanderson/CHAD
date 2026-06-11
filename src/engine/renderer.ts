@@ -4,7 +4,7 @@ import type {
   SkinEnvironment,
   CollectedInfo,
 } from "../types";
-import type { CollectibleItem, LevelSegment, DoorDef, PlatformDef, StreetCorridor } from "../types/content";
+import type { CollectibleItem, LevelSegment, DoorDef, PlatformDef, StreetCorridor, StreetSignDef } from "../types/content";
 import {
   drawSprite,
   getItemSprite,
@@ -25,6 +25,11 @@ import {
   heartFullSprite,
   heartEmptySprite,
   bagSprite,
+  noteSprite,
+  catSiamSprite,
+  catSiamNodSprite,
+  catTabbySprite,
+  catTabbyNodSprite,
 } from "./sprites";
 import type { TimeOfDay } from "./sky";
 import { getSkyPhase, renderSky, renderGroundTint, renderSceneBrightness, renderWarmthOverlay } from "./sky";
@@ -282,6 +287,58 @@ export function renderFrame(
     const groundPlatforms = activePlatforms.filter(p => p.isGround);
     const groundTargets = groundPlatforms.length > 0 ? groundPlatforms : (activePlatforms[0] ? [activePlatforms[0]] : []);
 
+    // Background scenery — small houses and trees set back along avenues
+    if (groundTargets.length > 0) {
+      const uniqueYs = [...new Set(groundTargets.map(gp => gp.y))];
+      ctx.globalAlpha = 0.4;
+      for (const aveY of uniqueYs) {
+        const baseY = aveY - camY;
+        // Seeded placement: deterministic per avenue Y so scenery doesn't shift
+        const seed = aveY * 137;
+        for (let i = 0; i < 12; i++) {
+          const hash = ((seed + i * 271) * 16807) % 2147483647;
+          const wx = (hash % 3000) - camX;
+          if (wx < -40 || wx > CANVAS_WIDTH + 40) continue;
+          const isTree = hash % 3 !== 0;
+          if (isTree) {
+            // Tree — small triangle crown + thin trunk, set back above avenue
+            const h = 10 + (hash % 8);
+            const ty = baseY - h - 6;
+            ctx.fillStyle = "#3a5a3a";
+            ctx.beginPath();
+            ctx.moveTo(wx, ty + h);
+            ctx.lineTo(wx + 5, ty);
+            ctx.lineTo(wx + 10, ty + h);
+            ctx.fill();
+            ctx.fillStyle = "#4a3a2a";
+            ctx.fillRect(wx + 4, ty + h, 3, 5);
+          } else {
+            // House — rectangle with pitched roof, bottom on ground
+            const hw = 20 + (hash % 8);
+            const hh = 14 + (hash % 6);
+            const hy = baseY - hh;
+            ctx.fillStyle = "#8a7a6a";
+            ctx.fillRect(wx, hy, hw, hh);
+            // Roof
+            ctx.fillStyle = "#6a5a4a";
+            ctx.beginPath();
+            ctx.moveTo(wx - 2, hy);
+            ctx.lineTo(wx + hw / 2, hy - 8);
+            ctx.lineTo(wx + hw + 2, hy);
+            ctx.fill();
+            // Windows
+            ctx.fillStyle = "#aaccdd";
+            ctx.fillRect(wx + 4, hy + 4, 5, 4);
+            if (hw > 22) ctx.fillRect(wx + hw - 9, hy + 4, 5, 4);
+            // Door
+            ctx.fillStyle = "#5a4a3a";
+            ctx.fillRect(wx + hw / 2 - 2, hy + hh - 6, 5, 6);
+          }
+        }
+      }
+      ctx.globalAlpha = 1;
+    }
+
     // Road surface — continuous asphalt strip at each avenue Y (bridges gaps)
     const avenueYs = new Set(groundTargets.map(gp => gp.y));
     for (const aveY of avenueYs) {
@@ -429,20 +486,181 @@ export function renderFrame(
     }
   }
 
-  // --- Street signs (passive Cyrillic labels at street entrances) ---
+  // --- Street signs (Soviet-style blue plates mounted on corridor walls) ---
   const streetSigns = currentSegment?.streetSigns;
-  if (streetSigns && !isInterior) {
+  if (streetSigns && !isInterior && corridors?.length) {
+    ctx.font = "bold 9px monospace";
+
+    // Pre-process: compute mount info for each sign
+    type SignMount = {
+      sign: StreetSignDef;
+      corridor: StreetCorridor;
+      atTop: boolean;
+      mountX: number;
+      mountY: number;
+      aveY: number;
+      onLeft: boolean;
+      streetArrow: string;
+      avenueArrow: string;
+    };
+    const mounts: SignMount[] = [];
     for (const sign of streetSigns) {
-      const sx = sign.x - camX;
-      const sy = sign.y - camY;
-      if (sx < -80 || sx > CANVAS_WIDTH + 80 || sy < -20 || sy > CANVAS_HEIGHT + 20) continue;
-      const tw = ctx.measureText(sign.label).width + 10;
-      ctx.fillStyle = "#2e7d32";
-      ctx.fillRect(sx - tw / 2, sy, tw, 16);
-      ctx.fillStyle = "#fff";
-      ctx.font = "bold 9px monospace";
-      ctx.textAlign = "center";
-      ctx.fillText(sign.label, sx, sy + 12);
+      let bestC = corridors[0]!;
+      let bestDist = Infinity;
+      for (const c of corridors) {
+        const cx = c.x + c.width / 2;
+        const dist = Math.abs(sign.x - cx);
+        if (dist < bestDist) { bestDist = dist; bestC = c; }
+      }
+      const atTop = Math.abs(sign.y - bestC.topY) <= Math.abs(sign.y - bestC.bottomY);
+      const aveY = atTop ? bestC.topY : bestC.bottomY;
+      const mountY = aveY - 70;
+
+      let onLeft = true;
+      if (atTop) {
+        let continuesUp = false;
+        for (const oc of corridors) {
+          if (oc === bestC) continue;
+          if (oc.bottomY === bestC.topY && Math.abs((oc.x + oc.width / 2) - (bestC.x + bestC.width / 2)) < 300) {
+            continuesUp = true;
+            break;
+          }
+        }
+        if (!continuesUp) onLeft = false;
+      }
+      const mountX = onLeft ? bestC.x - 2 : bestC.x + bestC.width + 2;
+
+      const streetArrow = atTop ? "↓" : "↑";
+
+      let avenueArrow = "";
+      if (sign.avenueName) {
+        const touchingCorridors: number[] = [];
+        for (const oc of corridors) {
+          if (oc.topY === aveY || oc.bottomY === aveY) {
+            touchingCorridors.push(oc.x + oc.width / 2);
+          }
+        }
+        touchingCorridors.sort((a, b) => a - b);
+        const myCx = bestC.x + bestC.width / 2;
+        const myIdx = touchingCorridors.indexOf(myCx);
+        if (touchingCorridors.length <= 1) {
+          avenueArrow = "↔";
+        } else if (myIdx === 0) {
+          avenueArrow = "→";
+        } else if (myIdx === touchingCorridors.length - 1) {
+          avenueArrow = "←";
+        } else {
+          avenueArrow = "↔";
+        }
+      }
+
+      mounts.push({ sign, corridor: bestC, atTop, mountX, mountY, aveY, onLeft, streetArrow, avenueArrow });
+    }
+
+    // Group signs at the same intersection (same aveY, mountX within 120px)
+    const used = new Set<number>();
+    const groups: SignMount[][] = [];
+    for (let i = 0; i < mounts.length; i++) {
+      if (used.has(i)) continue;
+      const group: SignMount[] = [mounts[i]!];
+      used.add(i);
+      for (let j = i + 1; j < mounts.length; j++) {
+        if (used.has(j)) continue;
+        if (mounts[i]!.aveY === mounts[j]!.aveY &&
+            Math.abs(mounts[i]!.mountX - mounts[j]!.mountX) < 120) {
+          group.push(mounts[j]!);
+          used.add(j);
+        }
+      }
+      groups.push(group);
+    }
+
+    const lineH = 14;
+
+    for (const group of groups) {
+      const primary = group[0]!;
+      const isMerged = group.length > 1;
+
+      // For merged signs, mount on a centered stub between the corridors
+      const avgMountX = isMerged
+        ? Math.round(group.reduce((s, m) => s + m.mountX, 0) / group.length)
+        : primary.mountX;
+      const { mountY, aveY, onLeft } = primary;
+
+      const sx = avgMountX - camX;
+      const sy = mountY - camY;
+      if (sx < -160 || sx > CANVAS_WIDTH + 160 || sy < -60 || sy > CANVAS_HEIGHT + 60) continue;
+
+      // Build plate lines
+      let plateLines: string[];
+      if (isMerged) {
+        // Three-line sign: ↑ street, avenue, ↓ street
+        // Sort so ↑ (going up) is first, ↓ (going down) is last
+        const upStreet = group.find(m => m.streetArrow === "↑");
+        const downStreet = group.find(m => m.streetArrow === "↓");
+        const aveLine = primary.sign.avenueName
+          ? `${primary.avenueArrow} ${primary.sign.avenueName}` : "";
+        plateLines = [
+          upStreet ? `↑ ${upStreet.sign.label}` : "",
+          aveLine,
+          downStreet ? `↓ ${downStreet.sign.label}` : "",
+        ].filter(l => l !== "");
+      } else {
+        const streetLine = `${primary.streetArrow} ${primary.sign.label}`;
+        const aveLine = primary.sign.avenueName
+          ? `${primary.avenueArrow} ${primary.sign.avenueName}` : "";
+        plateLines = aveLine ? [streetLine, aveLine] : [streetLine];
+      }
+
+      const plateH = plateLines.length * lineH + 6;
+      let plateW = 0;
+      for (const line of plateLines) {
+        plateW = Math.max(plateW, ctx.measureText(line).width + 12);
+      }
+
+      // Anchor plate position
+      const plateX = isMerged
+        ? sx - plateW / 2
+        : (onLeft ? sx - plateW : sx);
+
+      // Wall stub from avenue ground up to sign
+      const stubX = isMerged ? sx - WALL_THICKNESS / 2 : (onLeft ? sx - WALL_THICKNESS : sx);
+      const stubTop = mountY - camY;
+      const stubBottom = aveY - camY;
+      const stubH = stubBottom - stubTop;
+      if (stubH > 0) {
+        ctx.fillStyle = "#c8b89a";
+        ctx.fillRect(stubX, stubTop, WALL_THICKNESS, stubH);
+        ctx.strokeStyle = "#b8a888";
+        ctx.lineWidth = 1;
+        for (let row = 0; row < stubH; row += 16) {
+          ctx.beginPath();
+          ctx.moveTo(stubX, stubTop + row);
+          ctx.lineTo(stubX + WALL_THICKNESS, stubTop + row);
+          ctx.stroke();
+        }
+        for (let row = 0; row < stubH; row += 16) {
+          const offset = (Math.floor(row / 16) % 2) * 16;
+          for (let col = offset; col < WALL_THICKNESS; col += 32) {
+            ctx.beginPath();
+            ctx.moveTo(stubX + col, stubTop + row);
+            ctx.lineTo(stubX + col, stubTop + row + 16);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Soviet blue plate
+      ctx.fillStyle = "#1a3a6a";
+      ctx.fillRect(plateX, sy, plateW, plateH);
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(plateX + 1, sy + 1, plateW - 2, plateH - 2);
+      ctx.fillStyle = "#ffffff";
+      ctx.textAlign = "left";
+      for (let i = 0; i < plateLines.length; i++) {
+        ctx.fillText(plateLines[i]!, plateX + 6, sy + 12 + i * lineH);
+      }
     }
   }
 
@@ -683,6 +901,19 @@ export function renderFrame(
     }
   }
 
+  // --- КОШАЧЬЕ ВРЕМЯ cat ---
+  if (state.catTime.active && !isInterior) {
+    const catAge = state.elapsed - state.catTime.startedAt;
+    const isNod = state.catTime.jumpedDuring && catAge < 150;
+    const sprites = state.catTime.variant === 0
+      ? (isNod ? catSiamNodSprite : catSiamSprite)
+      : (isNod ? catTabbyNodSprite : catTabbySprite);
+    const cx = state.catTime.edgeX - camX;
+    const cy = state.catTime.edgeY - camY;
+    // Tail flick on fall (not jumped): shift last row pixel every 80ms
+    drawSprite(ctx, sprites, cx, cy, 2, state.catTime.facingLeft);
+  }
+
   // --- Player (Chad) ---
   const px = state.player.position.x - camX;
   const py = state.player.position.y - camY;
@@ -731,6 +962,10 @@ export function renderFrame(
     ctx.textAlign = "left";
     ctx.fillText(`${state.collectedItems.length}`, bagX + 20, 20);
 
+    // Briefing note icon (right of bag count)
+    const noteX = bagX + 44;
+    drawSprite(ctx, noteSprite, noteX, 4, 2);
+
     // Right: Timer
     const totalSec = Math.floor(state.elapsed / 1000);
     const mins = Math.floor(totalSec / 60);
@@ -775,6 +1010,20 @@ export function renderFrame(
     ctx.fillText("[P] Point", CANVAS_WIDTH / 2, CANVAS_HEIGHT - 36);
   }
 
+  // --- Street sign [E] Read / [P] Directions prompt ---
+  if (state.nearSign && !state.nearDoor) {
+    const activeSign = currentSegment?.streetSigns?.find((s: StreetSignDef) => s.id === state.nearSign);
+    const hasDirections = !!activeSign?.avenueName;
+    const promptText = hasDirections ? "[E] Read  [P] Directions" : "[E] Read";
+    ctx.font = "bold 13px monospace";
+    const promptW = ctx.measureText(promptText).width + 20;
+    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+    ctx.fillRect(CANVAS_WIDTH / 2 - promptW / 2, CANVAS_HEIGHT - 55, promptW, 28);
+    ctx.fillStyle = "#82b1ff";
+    ctx.textAlign = "center";
+    ctx.fillText(promptText, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 36);
+  }
+
   // --- Gate interact prompt ---
   if (state.nearGate && !state.reachedGate) {
     ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
@@ -796,6 +1045,77 @@ export function renderFrame(
     ctx.font = "bold 16px monospace";
     ctx.textAlign = "center";
     ctx.fillText(state.shoutResponse.text, CANVAS_WIDTH / 2, 76);
+  }
+
+  // --- Street sign triple-layer bubble (Soviet blue plate card) ---
+  if (state.signBubble) {
+    const cx = CANVAS_WIDTH / 2;
+    const sbY = 40;
+
+    if (state.signBubble.lines && state.signBubble.lines.length > 0) {
+      // Multi-line direction bubble
+      const lines = state.signBubble.lines;
+      ctx.font = "bold 13px monospace";
+      const lineHeight = 18;
+      // Measure widest line
+      let maxW = 0;
+      for (const line of lines) {
+        const w = ctx.measureText(line).width;
+        if (w > maxW) maxW = w;
+      }
+      const sbW = maxW + 40;
+      const sbH = lines.length * lineHeight + 16;
+      const sbX = cx - sbW / 2;
+      // Background — Soviet blue
+      ctx.fillStyle = "#1a3a6a";
+      ctx.fillRect(sbX, sbY, sbW, sbH);
+      // White border
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(sbX + 2, sbY + 2, sbW - 4, sbH - 4);
+      ctx.lineWidth = 1;
+      // Render each line
+      ctx.fillStyle = "#ffffff";
+      ctx.textAlign = "center";
+      let ty = sbY + 14 + lineHeight / 2;
+      for (const line of lines) {
+        ctx.fillText(line, cx, ty);
+        ty += lineHeight;
+      }
+    } else {
+      // Single-line pronunciation bubble ([E] Read)
+      const sbW = 260;
+      const sbH = state.signBubble.ipa ? 68 : (state.signBubble.pronunciation ? 52 : 34);
+      const sbX = cx - sbW / 2;
+      // Background — Soviet blue
+      ctx.fillStyle = "#1a3a6a";
+      ctx.fillRect(sbX, sbY, sbW, sbH);
+      // White border
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(sbX + 2, sbY + 2, sbW - 4, sbH - 4);
+      ctx.lineWidth = 1;
+      let ty = sbY + 18;
+      // Line 1: Cyrillic label (white, bold)
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 14px monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(state.signBubble.text, cx, ty);
+      // Line 2: Transliteration (yellow)
+      if (state.signBubble.pronunciation) {
+        ty += 18;
+        ctx.fillStyle = "#ffcc44";
+        ctx.font = "12px monospace";
+        ctx.fillText(state.signBubble.pronunciation, cx, ty);
+      }
+      // Line 3: IPA (gray italic)
+      if (state.signBubble.ipa) {
+        ty += 16;
+        ctx.fillStyle = "#aaaaaa";
+        ctx.font = "italic 11px monospace";
+        ctx.fillText(state.signBubble.ipa, cx, ty);
+      }
+    }
   }
 
   // --- Door transition overlay ---

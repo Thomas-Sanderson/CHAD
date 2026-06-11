@@ -117,40 +117,58 @@ export function GateScreen({
   }
 
   if (result.passed) {
+    const totalBonus = achievements.reduce((sum, a) => sum + a.def.points, 0);
+
     return (
-      <div className="gate-screen" style={styles.container}>
-        <div className="gate-success">
-          <div className="gate-left">
-            <Building skinId={skinId} />
-            <div style={styles.successText}>&#10003; Correct!</div>
-            <div style={styles.subtitle}>
-              Chad somehow got the right groceries.
+      <div className="gate-screen" style={{ ...styles.container, justifyContent: "flex-start" }}>
+        <div className="gate-success-scroll">
+          <div className="gate-success">
+            <div className="gate-left">
+              <Building skinId={skinId} />
+              <div style={styles.successText}>&#10003;&nbsp;Correct!</div>
+              <div style={styles.subtitle}>
+                Chad somehow got the right groceries.
+              </div>
+            </div>
+
+            <div className="gate-right">
+              {achievements.length > 0 && (
+                <div style={styles.achievementSection}>
+                  {achievements.map(({ def, isNew }) => (
+                    <div key={def.id} style={{
+                      ...styles.achievementCard,
+                      borderColor: isNew ? def.iconColor : "#333",
+                      opacity: isNew ? 1 : 0.7,
+                    }}>
+                      <div style={styles.achievementHeader}>
+                        <AchievementBadge icon={def.icon} color={def.iconColor} size={28} />
+                        <div style={styles.achievementTitleCol}>
+                          <span style={styles.achievementTitle}>{def.title}</span>
+                          {isNew && <span style={styles.achievementNew}>NEW</span>}
+                        </div>
+                        {def.points > 0 && (
+                          <span style={styles.achievementPts}>+{def.points}</span>
+                        )}
+                      </div>
+                      <div style={styles.achievementQuote}>
+                        {def.subtitles[skinId] ?? def.subtitles.belarus ?? ""}
+                      </div>
+                    </div>
+                  ))}
+                  {totalBonus > 0 && (
+                    <div style={styles.bonusTotal}>
+                      Bonus: +{totalBonus} pts
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
-
-          <div className="gate-right">
-            {achievements.length > 0 && (
-              <div style={styles.achievementList}>
-                {achievements.map(({ def, isNew }) => (
-                  <div key={def.id} style={{
-                    ...styles.achievementRow,
-                    opacity: isNew ? 1 : 0.6,
-                  }}>
-                    <AchievementBadge icon={def.icon} color={def.iconColor} size={22} />
-                    <span style={styles.achievementTitle}>{def.title}</span>
-                    {def.points > 0 && (
-                      <span style={styles.achievementPts}>+{def.points}</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <button style={styles.continueButton} onClick={onReveal}>
-              See what {mentorName} thinks &rarr;
-            </button>
-          </div>
         </div>
+
+        <button style={styles.continueButton} onClick={onReveal}>
+          See what {mentorName} thinks &rarr;
+        </button>
         <style>{gateCSS}</style>
       </div>
     );
@@ -192,8 +210,8 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    minHeight: "100dvh",
-    overflowY: "auto",
+    height: "100dvh",
+    overflow: "hidden",
     background: "#0a0a1a",
     color: "#fff",
     fontFamily: "'SF Pro', -apple-system, sans-serif",
@@ -211,39 +229,82 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: "monospace",
   },
   successText: {
-    fontSize: "var(--game-font-success)",
+    fontSize: "clamp(24px, 5vw, 48px)",
     fontWeight: "bold",
     color: "#4CAF50",
     marginTop: 12,
+    whiteSpace: "nowrap",
   },
   subtitle: {
     fontSize: "var(--game-font-body)",
     color: "#888",
   },
-  achievementList: {
+  achievementSection: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+    width: "100%",
+  },
+  achievementCard: {
     display: "flex",
     flexDirection: "column",
     gap: 6,
-    marginTop: 4,
+    background: "#111122",
+    border: "2px solid #333",
+    borderRadius: 10,
+    padding: "10px 14px",
   },
-  achievementRow: {
+  achievementHeader: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+  },
+  achievementTitleCol: {
     display: "flex",
     alignItems: "center",
     gap: 8,
+    flex: 1,
   },
   achievementTitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: "#FFD54F",
-    fontWeight: 600,
+    fontWeight: "bold",
+    fontFamily: "monospace",
+  },
+  achievementNew: {
+    fontSize: 9,
+    color: "#0a0a1a",
+    background: "#FFD54F",
+    borderRadius: 3,
+    padding: "1px 5px",
+    fontWeight: "bold",
+    fontFamily: "monospace",
+    letterSpacing: 1,
   },
   achievementPts: {
-    fontSize: 13,
+    fontSize: 15,
     color: "#4CAF50",
     fontWeight: "bold",
-    marginLeft: 4,
+    fontFamily: "monospace",
+  },
+  achievementQuote: {
+    fontSize: 12,
+    color: "#999",
+    fontStyle: "italic",
+    lineHeight: 1.4,
+    paddingLeft: 38,
+    borderLeft: "2px solid #6C3483",
+    marginLeft: 14,
+  },
+  bonusTotal: {
+    fontSize: 16,
+    color: "#4CAF50",
+    fontWeight: "bold",
+    fontFamily: "monospace",
+    textAlign: "right" as const,
+    padding: "4px 0",
   },
   continueButton: {
-    marginTop: 16,
     background: "#4CAF50",
     color: "#fff",
     border: "none",
@@ -253,6 +314,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: "bold",
     cursor: "pointer",
     minHeight: 44,
+    flexShrink: 0,
   },
   failText: {
     fontSize: "var(--game-font-fail)",
@@ -312,35 +374,50 @@ const styles: Record<string, React.CSSProperties> = {
 };
 
 const gateCSS = `
+  .gate-success-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    -webkit-overflow-scrolling: touch;
+  }
   .gate-success {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     gap: 32px;
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
+    padding: 8px 0;
   }
   .gate-left {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 12px;
+    flex-shrink: 0;
   }
   .gate-right {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
+    flex: 1;
+    min-width: 0;
   }
 
   @media (orientation: portrait), (max-width: 500px) {
     .gate-success {
       flex-direction: column;
+      align-items: center;
       gap: 16px;
     }
     .gate-right {
       align-items: center;
+      width: 100%;
     }
   }
 `;

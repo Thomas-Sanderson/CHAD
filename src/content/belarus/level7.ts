@@ -111,8 +111,6 @@ export const level7Data: LevelData = {
         { x: 900, y: 780, width: 80, height: 16 },    // decoy: pickle_jar
         { x: 2100, y: 340, width: 80, height: 16 },   // decoy: sunflower_seeds
 
-        // --- Sacred potato platform (high, near Street A) ---
-        { x: 280, y: 500, width: 60, height: 16, passThrough: true },
       ],
       collectibles: [
         // Avenue 1 items (outdoor, near bakery)
@@ -138,14 +136,14 @@ export const level7Data: LevelData = {
         { type: "babushka", x: 1000, y: AVENUE_1_Y - 44, patrolRange: 140 },
         // Avenue 2 babushka
         { type: "babushka", x: 1500, y: AVENUE_2_Y - 44, patrolRange: 120 },
-        // Sacred potato on high platform near Street A
-        { type: "potato", x: 290, y: 470 },
+        // Sacred potato above МОЛОЧНАЯ rooftop — must jump from facade roof (y=304)
+        { type: "potato", x: 915, y: 220 },
       ],
       doors: [
         // Bakery entrance on Avenue 1
         {
           id: "bakery-enter",
-          x: 550,
+          x: 630,
           y: AVENUE_1_Y - 60,
           width: 30,
           height: 60,
@@ -172,11 +170,25 @@ export const level7Data: LevelData = {
       bounds: { width: LEVEL_WIDTH, height: LEVEL_HEIGHT },
       landmarks: [
         { label: "АПТЕКА", x: 1500, y: AVENUE_1_Y - 88 },
-        { label: "КАФЕ", x: 1800, y: AVENUE_2_Y - 88 },
+        { label: "КАФЕ", x: 1700, y: AVENUE_2_Y - 88 },
       ],
       streetSigns: [
-        { label: "УЛ. МИРА", x: 400, y: AVENUE_2_Y + 5 },
-        { label: "УЛ. ЛЕНИНА", x: 1900, y: AVENUE_2_Y + 5 },
+        // === Street A × Avenue 2 (upper) ===
+        {
+          id: "sign-mira-ave2",
+          label: "УЛ. МИРА",
+          avenueName: "ПР. ПОБЕДИТЕЛЕЙ",
+          x: 530,
+          y: AVENUE_2_Y + 5,
+        },
+        // === Street A × Avenue 1 (lower) ===
+        {
+          id: "sign-mira-ave1",
+          label: "УЛ. МИРА",
+          avenueName: "ПР. НЕЗАВИСИМОСТИ",
+          x: 280,
+          y: AVENUE_1_Y + 5,
+        },
       ],
       streetCorridors: [
         { x: 300, width: 230, topY: AVENUE_2_Y, bottomY: AVENUE_1_Y },
@@ -207,7 +219,7 @@ export const level7Data: LevelData = {
           width: 30,
           height: 60,
           targetSegmentId: "city",
-          targetX: 550,
+          targetX: 630,
           targetY: AVENUE_1_Y - 48,
           locked: false,
           label: "ВЫХОД",

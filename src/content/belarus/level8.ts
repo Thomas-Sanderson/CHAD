@@ -188,15 +188,62 @@ export const level8Data: LevelData = {
         { label: "ПОЧТА", x: 1500, y: AVE3_Y - 88 },
       ],
       streetSigns: [
-        { label: "УЛ. ПОБЕДЫ", x: 420, y: AVE1_Y + 5 },
-        { label: "УЛ. ПУШКИНА", x: 1240, y: AVE1_Y + 5 },
-        { label: "УЛ. МИРА", x: 2030, y: AVE2_Y + 5 },
-        { label: "УЛ. ГАГАРИНА", x: 2610, y: AVE3_Y + 5 },
+        // === Street A × Avenue 1 ===
+        {
+          id: "sign-pobedy-ave1",
+          label: "УЛ. ПОБЕДЫ",
+          avenueName: "ПР. НЕЗАВИСИМОСТИ",
+          x: 330, y: AVE1_Y + 5,
+        },
+        // === Street A × Avenue 2 ===
+        {
+          id: "sign-pobedy-ave2",
+          label: "УЛ. ПОБЕДЫ",
+          avenueName: "ПР. ПОБЕДИТЕЛЕЙ",
+          x: 510, y: AVE2_Y + 5,
+        },
+        // === Street B × Avenue 1 ===
+        {
+          id: "sign-pushkina-ave1",
+          label: "УЛ. ПУШКИНА",
+          avenueName: "ПР. НЕЗАВИСИМОСТИ",
+          x: 1150, y: AVE1_Y + 5,
+        },
+        // === Street B × Avenue 2 ===
+        {
+          id: "sign-pushkina-ave2",
+          label: "УЛ. ПУШКИНА",
+          avenueName: "ПР. ПОБЕДИТЕЛЕЙ",
+          x: 1330, y: AVE2_Y + 5,
+        },
+        // === Street C × Avenue 2 ===
+        {
+          id: "sign-mira-ave2",
+          label: "УЛ. МИРА",
+          avenueName: "ПР. ПОБЕДИТЕЛЕЙ",
+          x: 1960, y: AVE2_Y + 5,
+        },
+        // === Street C × Avenue 3 ===
+        {
+          id: "sign-mira-ave3",
+          label: "УЛ. МИРА",
+          avenueName: "ПР. ПАРТИЗАНСКИЙ",
+          x: 2120, y: AVE3_Y + 5,
+        },
+        // === Street D × Avenue 3 (drop-only stub) ===
+        {
+          id: "sign-gagarina-ave3",
+          label: "УЛ. ГАГАРИНА",
+          avenueName: "ПР. ПАРТИЗАНСКИЙ",
+          x: 2680, y: AVE3_Y + 5,
+        },
       ],
       streetCorridors: [
         { x: 340, width: 210, topY: AVE2_Y, bottomY: AVE1_Y },
         { x: 1160, width: 210, topY: AVE2_Y, bottomY: AVE1_Y },
         { x: 1960, width: 210, topY: AVE3_Y, bottomY: AVE2_Y },
+        // Short corridor wall stub at Street D drop-only gap
+        { x: 2560, width: 120, topY: AVE3_Y, bottomY: AVE3_Y + 200 },
       ],
     },
 

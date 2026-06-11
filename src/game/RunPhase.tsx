@@ -1,7 +1,8 @@
 import { useEffect, useRef, useCallback, useState, useMemo } from "react";
 import type { LevelData, GameRunState, InputState, SkinEnvironment, VocabWord } from "../types";
 import type { TimeOfDay } from "../engine/sky";
-import type { CollectibleItem, ConvoPhrase } from "../types/content";
+import type { BriefingScript, CollectibleItem, ConvoPhrase, StreetSignDef, VocabPack } from "../types/content";
+import { computeDirection, findNearestCorridor, buildAvenueData } from "../engine/directions";
 import { isEmbedded } from "../engine/embed";
 import { isTouchDevice } from "../engine/touch";
 import {
@@ -15,10 +16,12 @@ import {
   CANVAS_HEIGHT,
 } from "../engine";
 import type { HudData } from "../engine";
-import { pronounceWord, speakText, speakQueued } from "../engine/audio";
+import { pronounceWord, speakText, speakQueued, speakScold } from "../engine/audio";
 import { sfxJump, sfxCollect, sfxHeartLost, sfxDoorEnter, sfxShout, sfxGateSuccess } from "../engine/sfx";
+import { updateBusAudio, stopAllBusAudio } from "../engine/sfxBus";
 import { ShoutMenu } from "./ShoutMenu";
 import { InventoryPanel } from "./InventoryPanel";
+import { BriefingPanel } from "./BriefingPanel";
 import { TouchControls } from "./TouchControls";
 
 interface Props {
@@ -33,12 +36,18 @@ interface Props {
   learnedWords?: VocabWord[];
   vocabWords?: VocabWord[];
   timeOfDay?: TimeOfDay;
+  briefing?: BriefingScript;
+  vocabPack?: VocabPack;
+  mentorName?: string;
+  mentorAvatar?: string;
+  mentorColor?: string;
 }
 
 export function RunPhase({
   level, itemDefs, environment, onGateReached,
   onHeartLost, hearts, maxHearts, checkGateResult,
   learnedWords = [], vocabWords = [], timeOfDay,
+  briefing, vocabPack, mentorName, mentorAvatar, mentorColor,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<GameRunState | null>(null);
@@ -59,7 +68,9 @@ export function RunPhase({
   maxHeartsRef.current = maxHearts;
   const [shoutMenuOpen, setShoutMenuOpen] = useState(false);
   const [shopConvoOpen, setShopConvoOpen] = useState(false);
+  const [signDirOpen, setSignDirOpen] = useState(false);
   const [inventoryOpen, setInventoryOpen] = useState(false);
+  const [briefingOpen, setBriefingOpen] = useState(false);
   const [currentSegmentId, setCurrentSegmentId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasScale, setCanvasScale] = useState(() => {
@@ -89,7 +100,7 @@ export function RunPhase({
     const input = createInputState();
     inputRef.current = input;
 
-    const cleanupKeyboard = setupKeyboardInput(input);
+    const cleanupKeyboard = setupKeyboardInput(input, pausedRef);
     const cleanupTouch = setupTouchInput(canvas, input);
 
     let lastTime = performance.now();
@@ -98,6 +109,14 @@ export function RunPhase({
     const loop = (now: number) => {
       // Pause when shout menu or inventory is open
       if (pausedRef.current) {
+        // Drain input so menu keypresses don't leak to gameplay on unpause
+        input.left = false;
+        input.right = false;
+        input.jump = false;
+        input.jumpHeld = false;
+        input.interact = false;
+        input.shout = false;
+        input.inventory = false;
         animFrameId = requestAnimationFrame(loop);
         return;
       }
@@ -137,6 +156,7 @@ export function RunPhase({
       }
 
       updateGameState(gameState, input, level, level.hazards, itemDefs, dt);
+      updateBusAudio(gameState.marshrutkas, gameState.player.position.x);
 
       // SFX: hit detection
       if (gameState.hitCount > prevHitCountRef.current) {
@@ -189,6 +209,13 @@ export function RunPhase({
         setShoutMenuOpen(true);
       }
 
+      // Check if game state wants to open sign directions menu
+      if (gameState.signMenuOpen && !pausedRef.current) {
+        gameState.signMenuOpen = false;
+        pausedRef.current = true;
+        setSignDirOpen(true);
+      }
+
       const hud: HudData = {
         hearts: heartsRef.current,
         maxHearts: maxHeartsRef.current,
@@ -219,6 +246,7 @@ export function RunPhase({
       cancelAnimationFrame(animFrameId);
       cleanupKeyboard();
       cleanupTouch();
+      stopAllBusAudio();
     };
   }, [level, itemDefs, environment, timeOfDay]);
 
@@ -259,8 +287,16 @@ export function RunPhase({
     if (x > bagX - 5 && x < bagX + 40 && y < 30) {
       pausedRef.current = true;
       setInventoryOpen(true);
+      return;
     }
-  }, []);
+
+    // Briefing note icon (right of bag)
+    const noteX = bagX + 44;
+    if (briefing && x > noteX - 3 && x < noteX + 20 && y < 30) {
+      pausedRef.current = true;
+      setBriefingOpen(true);
+    }
+  }, [briefing]);
 
   const handleShoutSelect = useCallback(
     (word: VocabWord) => {
@@ -412,6 +448,72 @@ export function RunPhase({
     pausedRef.current = false;
   }, []);
 
+  // --- Street sign directions via WASD trie picker ---
+  const directionDestinations: VocabWord[] = useMemo(() => {
+    const names = new Set<string>();
+    for (const seg of level.segments ?? []) {
+      for (const door of seg.doors) {
+        if (door.label && door.label !== "ВЫХОД") names.add(door.label);
+      }
+      for (const lm of seg.landmarks ?? []) names.add(lm.label);
+    }
+    return [...names].map(name => ({
+      id: `dest-${name}`, script: name, translation: "",
+      matchesItemId: null,
+    }));
+  }, [level.segments]);
+
+  const handleSignDirSelect = useCallback(
+    (word: VocabWord) => {
+      const state = stateRef.current;
+      if (!state || !level.segments) return;
+      const seg = level.segments.find(s => s.id === state.currentSegmentId);
+      if (!seg) return;
+      const sign = seg.streetSigns?.find((s: StreetSignDef) => s.id === state.nearSign);
+      if (!sign?.avenueName) return;
+
+      // Find target by name (door label or landmark label)
+      let targetX = 0, targetY = 0, found = false;
+      for (const door of seg.doors) {
+        if (door.label === word.script) {
+          targetX = door.x; targetY = door.y + door.height; found = true; break;
+        }
+      }
+      if (!found) {
+        const lm = (seg.landmarks ?? []).find(l => l.label === word.script);
+        if (lm) { targetX = lm.x; targetY = lm.y ?? 0; found = true; }
+      }
+      if (!found) {
+        state.signBubble = { text: "?", until: state.elapsed + 2000 };
+        setSignDirOpen(false);
+        pausedRef.current = false;
+        return;
+      }
+
+      // Build direction data from segment geometry
+      const corridors = seg.streetCorridors ?? [];
+      const signCorridor = findNearestCorridor(sign, corridors);
+      const { avenueYs, avenueNames } = buildAvenueData(
+        seg.platforms, seg.streetSigns ?? [],
+      );
+      const lines = computeDirection(
+        sign, signCorridor, { x: targetX, y: targetY },
+        corridors, avenueYs, avenueNames,
+      );
+
+      speakScold(lines.join(". "));
+      state.signBubble = { text: lines[0]!, lines, until: state.elapsed + 4000 };
+      setSignDirOpen(false);
+      pausedRef.current = false;
+    },
+    [level]
+  );
+
+  const handleSignDirCancel = useCallback(() => {
+    setSignDirOpen(false);
+    pausedRef.current = false;
+  }, []);
+
   const handleInventoryDrop = useCallback((itemId: string) => {
     const state = stateRef.current;
     if (!state) return;
@@ -424,6 +526,11 @@ export function RunPhase({
 
   const handleInventoryClose = useCallback(() => {
     setInventoryOpen(false);
+    pausedRef.current = false;
+  }, []);
+
+  const handleBriefingClose = useCallback(() => {
+    setBriefingOpen(false);
     pausedRef.current = false;
   }, []);
 
@@ -449,7 +556,7 @@ export function RunPhase({
           }}
           onClick={handleCanvasClick}
         />
-        {isTouchDevice && !shoutMenuOpen && !shopConvoOpen && !inventoryOpen && (
+        {isTouchDevice && !shoutMenuOpen && !shopConvoOpen && !signDirOpen && !inventoryOpen && !briefingOpen && (
           <TouchControls inputRef={inputRef} canvasScale={canvasScale} />
         )}
         {shoutMenuOpen && (
@@ -471,12 +578,33 @@ export function RunPhase({
             subtitle="Spell a phrase with W/A/D, cycle with S"
           />
         )}
+        {signDirOpen && (
+          <ShoutMenu
+            learnedWords={directionDestinations}
+            onSelect={handleSignDirSelect}
+            onCancel={handleSignDirCancel}
+            forceWASD
+            chadVoice
+            title="ASK FOR DIRECTIONS"
+            subtitle="Spell a destination with W/A/D, cycle with S"
+          />
+        )}
         {inventoryOpen && stateRef.current && (
           <InventoryPanel
             collectedItems={[...stateRef.current.collectedItems]}
             itemDefs={itemDefs}
             onDropItem={handleInventoryDrop}
             onClose={handleInventoryClose}
+          />
+        )}
+        {briefingOpen && briefing && vocabPack && (
+          <BriefingPanel
+            briefing={briefing}
+            vocabPack={vocabPack}
+            mentorName={mentorName}
+            mentorAvatar={mentorAvatar}
+            mentorColor={mentorColor}
+            onClose={handleBriefingClose}
           />
         )}
       </div>

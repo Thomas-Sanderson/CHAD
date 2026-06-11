@@ -8,8 +8,9 @@ export function createInputState(): InputState {
   };
 }
 
-export function setupKeyboardInput(state: InputState): () => void {
+export function setupKeyboardInput(state: InputState, pausedRef?: { current: boolean }): () => void {
   const onKeyDown = (e: KeyboardEvent) => {
+    if (pausedRef?.current) return;
     switch (e.code) {
       case "ArrowLeft":
       case "KeyA":
@@ -44,6 +45,7 @@ export function setupKeyboardInput(state: InputState): () => void {
   };
 
   const onKeyUp = (e: KeyboardEvent) => {
+    if (pausedRef?.current) return;
     switch (e.code) {
       case "ArrowLeft":
       case "KeyA":

@@ -199,7 +199,7 @@ export const level9Data: LevelData = {
         // Produce stall entrance — UNLOCKED (Ave1)
         {
           id: "produce-enter",
-          x: 500,
+          x: 580,
           y: AVE1_Y - 60,
           width: 30,
           height: 60,
@@ -225,7 +225,7 @@ export const level9Data: LevelData = {
         // Butcher shop entrance — LOCKED (Ave2, on ground stretch 1690-2040)
         {
           id: "butcher-enter",
-          x: 1750,
+          x: 1820,
           y: AVE2_Y - 60,
           width: 30,
           height: 60,
@@ -244,12 +244,78 @@ export const level9Data: LevelData = {
         { label: "БИБЛИОТЕКА", x: 1000, y: AVE4_Y - 88 },
       ],
       streetSigns: [
-        { label: "УЛ. ТОЛСТОГО", x: 320, y: AVE1_Y + 5 },
-        { label: "УЛ. ЧЕХОВА", x: 920, y: AVE1_Y + 5 },
-        { label: "УЛ. МИРА", x: 1520, y: AVE2_Y + 5 },
-        { label: "УЛ. ПОБЕДЫ", x: 2120, y: AVE2_Y + 5 },
-        { label: "УЛ. ЛЕРМОНТОВА", x: 2720, y: AVE3_Y + 5 },
-        { label: "УЛ. ГОРЬКОГО", x: 1820, y: AVE3_Y + 5 },
+        // === Street 1 (УЛ. ТОЛСТОГО) × Avenue 1 ===
+        {
+          id: "sign-tolstogo-ave1", label: "УЛ. ТОЛСТОГО",
+          avenueName: "ПР. НЕЗАВИСИМОСТИ",
+          x: 240, y: AVE1_Y + 5,
+        },
+        // === Street 1 (УЛ. ТОЛСТОГО) × Avenue 2 ===
+        {
+          id: "sign-tolstogo-ave2", label: "УЛ. ТОЛСТОГО",
+          avenueName: "ПР. ПОБЕДИТЕЛЕЙ",
+          x: 490, y: AVE2_Y + 5,
+        },
+        // === Street 2 (УЛ. ЧЕХОВА) × Avenue 1 ===
+        {
+          id: "sign-chehova-ave1", label: "УЛ. ЧЕХОВА",
+          avenueName: "ПР. НЕЗАВИСИМОСТИ",
+          x: 840, y: AVE1_Y + 5,
+        },
+        // === Street 2 (УЛ. ЧЕХОВА) × Avenue 2 ===
+        {
+          id: "sign-chehova-ave2", label: "УЛ. ЧЕХОВА",
+          avenueName: "ПР. ПОБЕДИТЕЛЕЙ",
+          x: 1090, y: AVE2_Y + 5,
+        },
+        // === Street 3 (УЛ. МИРА) × Avenue 2 ===
+        {
+          id: "sign-mira-ave2", label: "УЛ. МИРА",
+          avenueName: "ПР. ПОБЕДИТЕЛЕЙ",
+          x: 1440, y: AVE2_Y + 5,
+        },
+        // === Street 3 (УЛ. МИРА) × Avenue 3 ===
+        {
+          id: "sign-mira-ave3", label: "УЛ. МИРА",
+          avenueName: "ПР. ПАРТИЗАНСКИЙ",
+          x: 1690, y: AVE3_Y + 5,
+        },
+        // === Street 4 (УЛ. ПОБЕДЫ) × Avenue 2 ===
+        {
+          id: "sign-pobedy-ave2", label: "УЛ. ПОБЕДЫ",
+          avenueName: "ПР. ПОБЕДИТЕЛЕЙ",
+          x: 2040, y: AVE2_Y + 5,
+        },
+        // === Street 4 (УЛ. ПОБЕДЫ) × Avenue 3 ===
+        {
+          id: "sign-pobedy-ave3", label: "УЛ. ПОБЕДЫ",
+          avenueName: "ПР. ПАРТИЗАНСКИЙ",
+          x: 2290, y: AVE3_Y + 5,
+        },
+        // === Street 5 (УЛ. ЛЕРМОНТОВА) × Avenue 3 ===
+        {
+          id: "sign-lermontova-ave3", label: "УЛ. ЛЕРМОНТОВА",
+          avenueName: "ПР. ПАРТИЗАНСКИЙ",
+          x: 2640, y: AVE3_Y + 5,
+        },
+        // === Street 5 (УЛ. ЛЕРМОНТОВА) × Avenue 4 ===
+        {
+          id: "sign-lermontova-ave4", label: "УЛ. ЛЕРМОНТОВА",
+          avenueName: "ПР. МАШЕРОВА",
+          x: 2890, y: AVE4_Y + 5,
+        },
+        // === Street 6 (УЛ. ГОРЬКОГО) × Avenue 3 ===
+        {
+          id: "sign-gorkogo-ave3", label: "УЛ. ГОРЬКОГО",
+          avenueName: "ПР. ПАРТИЗАНСКИЙ",
+          x: 1740, y: AVE3_Y + 5,
+        },
+        // === Street 6 (УЛ. ГОРЬКОГО) × Avenue 4 ===
+        {
+          id: "sign-gorkogo-ave4", label: "УЛ. ГОРЬКОГО",
+          avenueName: "ПР. МАШЕРОВА",
+          x: 1990, y: AVE4_Y + 5,
+        },
       ],
       streetCorridors: [
         { x: 250, width: 230, topY: AVE2_Y, bottomY: AVE1_Y },
@@ -285,7 +351,7 @@ export const level9Data: LevelData = {
           width: 30,
           height: 60,
           targetSegmentId: "city",
-          targetX: 500,
+          targetX: 580,
           targetY: AVE1_Y - 48,
           locked: false,
           label: "ВЫХОД",
@@ -367,7 +433,7 @@ export const level9Data: LevelData = {
           width: 30,
           height: 60,
           targetSegmentId: "city",
-          targetX: 1750,
+          targetX: 1820,
           targetY: AVE2_Y - 48,
           locked: false,
           label: "ВЫХОД",

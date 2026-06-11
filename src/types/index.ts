@@ -18,6 +18,7 @@ export type {
   ConvoPhrase,
   LevelSegment,
   LandmarkDef,
+  StreetSignDef,
 } from "./content";
 
 export type {
