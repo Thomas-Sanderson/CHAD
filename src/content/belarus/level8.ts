@@ -124,6 +124,9 @@ export const level8Data: LevelData = {
         // Elevated platform for ukrop on Street A
         { x: 400, y: 950, width: 70, height: 16, passThrough: true },
 
+        // Mystery can platform (between Ave2 and Ave3, near hidden drop)
+        { x: 1500, y: 600, width: 70, height: 16, passThrough: true },
+
         // Hard-to-reach platform for sacred potato (above Street C)
         { x: 2030, y: 340, width: 60, height: 16, passThrough: true },
       ],
@@ -135,6 +138,7 @@ export const level8Data: LevelData = {
         { itemId: "kvass_bottle", x: 1200, y: 1050 },
         { itemId: "kolbasa_ring", x: 2000, y: 630 },
         { itemId: "pickle_jar", x: 2030, y: 400 },
+        { itemId: "mystery_can", x: 1525, y: 570 },
       ],
       hazards: [
         // One marshrutka per avenue

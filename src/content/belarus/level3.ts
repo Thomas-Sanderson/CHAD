@@ -39,6 +39,7 @@ export const level3Data: LevelData = {
     { itemId: "smetana_tub", x: 920, y: 230 },
     { itemId: "ogurtsy_cuke", x: 1580, y: 220 },
     { itemId: "bread_loaf", x: 2290, y: 280 }, // close to hleb_rye to make the choice hard
+    { itemId: "mystery_can", x: 2060, y: 240 },
   ],
   hazards: [
     { type: "marshrutka", y: GROUND_Y - 40, speed: 440, interval: 5000 },

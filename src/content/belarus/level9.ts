@@ -162,6 +162,9 @@ export const level9Data: LevelData = {
         { x: 1760, y: 290, width: 80, height: 16, passThrough: true },           // gap: 75
         { x: 1810, y: AVE4_Y + 16, width: 90, height: 16 },  // landing (y=216, gap: 74)
 
+        // Mystery can platform (elevated between Ave3 and Ave4)
+        { x: 1350, y: 570, width: 70, height: 16 },
+
         // Scattered platforms for decoys and kefir
         { x: 600, y: 1300, width: 70, height: 16 },   // kefir between Ave1-Ave2
         { x: 1800, y: 1020, width: 80, height: 16 },  // Ave2 decoy
@@ -178,6 +181,7 @@ export const level9Data: LevelData = {
         { itemId: "bread_loaf", x: 2530, y: 1004 },
         { itemId: "sunflower_seeds", x: 530, y: 544 },
         { itemId: "pickle_jar", x: 1130, y: 534 },
+        { itemId: "mystery_can", x: 1375, y: 540 },
       ],
       hazards: [
         // Marshrutka on Ave1

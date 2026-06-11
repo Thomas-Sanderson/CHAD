@@ -109,7 +109,7 @@ export const level2Items: CollectibleItem[] = [
   {
     id: "mystery_can",
     name: "Mystery Can",
-    revealName: "Green Peas",
+    revealName: "Beans",
     script: "ГОРОШЕК",
     description: "A dented grey tin. The label fell off. It's written in marker...",
     isDecoy: true,
@@ -207,6 +207,22 @@ export const level3Items: CollectibleItem[] = [
     description: "A round loaf of golden bread.",
     isDecoy: true,
     color: "#c4a882",
+  },
+  {
+    id: "mystery_can",
+    name: "Mystery Can",
+    script: "ТУШЁНКА",
+    description: "A dented grey tin. The label fell off. It's written in marker...",
+    isDecoy: true,
+    color: "#9E9E9E",
+    revealName: "Canned Stew",
+    revealSpriteId: "tushyonka_reveal",
+    pronunciation: "too-SHON-kah",
+    hints: [
+      "It's not a vegetable. It's not a fruit. It mooed once.",
+      "Soldiers eat this. Campers eat this. You, apparently, cannot read this.",
+      "I labeled it myself. With a marker. You're welcome.",
+    ],
   },
 ];
 
@@ -348,6 +364,22 @@ export const level5Items: CollectibleItem[] = [
     isDecoy: true,
     color: "#555555",
   },
+  {
+    id: "mystery_can",
+    name: "Mystery Can",
+    script: "СГУЩЁНКА",
+    description: "A dented grey tin. The label fell off. It's written in marker...",
+    isDecoy: true,
+    color: "#9E9E9E",
+    revealName: "Condensed Milk",
+    revealSpriteId: "sgushchyonka_reveal",
+    pronunciation: "sgoo-SHCHON-kah",
+    hints: [
+      "Sweet. Sticky. Every Soviet child's weakness.",
+      "You boil it in the can and it turns into caramel. Focus.",
+      "The suffix is the same as the last can. Pattern recognition, Chad.",
+    ],
+  },
 ];
 
 // === Level 6 items ===
@@ -418,6 +450,22 @@ export const level6Items: CollectibleItem[] = [
     isDecoy: true,
     color: "#FFC107",
   },
+  {
+    id: "mystery_can",
+    name: "Mystery Can",
+    script: "ШПРОТЫ",
+    description: "A dented grey tin. The label fell off. It's written in marker...",
+    isDecoy: true,
+    color: "#9E9E9E",
+    revealName: "Sprats",
+    revealSpriteId: "shproty_reveal",
+    pronunciation: "SHPROH-tih",
+    hints: [
+      "Small. Oily. Comes in a flat tin. Think seafood.",
+      "It's the fancy appetizer at every Soviet New Year's table.",
+      "Tiny fish. In oil. I literally cannot be more clear.",
+    ],
+  },
 ];
 
 // === Level 7 items ===
@@ -481,6 +529,22 @@ export const level7Items: CollectibleItem[] = [
     isDecoy: true,
     color: "#8B5E3C",
   },
+  {
+    id: "mystery_can",
+    name: "Mystery Can",
+    script: "АНАНАС",
+    description: "A dented grey tin. The label fell off. It's written in marker...",
+    isDecoy: true,
+    color: "#9E9E9E",
+    revealName: "Pineapple",
+    revealSpriteId: "ananas_reveal",
+    pronunciation: "ah-nah-NAHS",
+    hints: [
+      "This one doesn't grow in Belarus. Think tropical.",
+      "It's yellow. It's spiky on the outside. It's sweet.",
+      "The word is almost the same in every language. Come on.",
+    ],
+  },
 ];
 
 // === Level 8 items ===
@@ -535,6 +599,22 @@ export const level8Items: CollectibleItem[] = [
     description: "A jar of pickled cucumbers.",
     isDecoy: true,
     color: "#4CAF50",
+  },
+  {
+    id: "mystery_can",
+    name: "Mystery Can",
+    script: "ЧЕЧЕВИЦА",
+    description: "A dented grey tin. The label fell off. It's written in marker...",
+    isDecoy: true,
+    color: "#9E9E9E",
+    revealName: "Lentils",
+    revealSpriteId: "lentil_reveal",
+    pronunciation: "cheh-cheh-VEE-tsah",
+    hints: [
+      "Small. Round. Comes in brown, green, or red.",
+      "It's a legume. Not beans, not peas. The other one.",
+      "Soup. You make soup with it. I give up.",
+    ],
   },
 ];
 
@@ -607,5 +687,21 @@ export const level9Items: CollectibleItem[] = [
     description: "A jar of pickled cucumbers.",
     isDecoy: true,
     color: "#4CAF50",
+  },
+  {
+    id: "mystery_can",
+    name: "Mystery Can",
+    script: "НУТ",
+    description: "A dented grey tin. The label fell off. It's written in marker...",
+    isDecoy: true,
+    color: "#9E9E9E",
+    revealName: "Chickpeas",
+    revealSpriteId: "chickpea_reveal",
+    pronunciation: "NOOT",
+    hints: [
+      "Three letters. You can do three letters.",
+      "Hummus. It's what hummus is made of.",
+      "I hid this can behind a building for THREE LETTERS, Chad.",
+    ],
   },
 ];

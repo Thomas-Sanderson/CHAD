@@ -110,6 +110,7 @@ export const level7Data: LevelData = {
         // --- Elevated decoy platforms ---
         { x: 900, y: 780, width: 80, height: 16 },    // decoy: pickle_jar
         { x: 2100, y: 340, width: 80, height: 16 },   // decoy: sunflower_seeds
+        { x: 1650, y: 300, width: 80, height: 16 },   // mystery can platform
 
       ],
       collectibles: [
@@ -124,6 +125,7 @@ export const level7Data: LevelData = {
         // Decoys on elevated platforms
         { itemId: "pickle_jar", x: 920, y: 750 },
         { itemId: "sunflower_seeds", x: 2120, y: 310 },
+        { itemId: "mystery_can", x: 1680, y: 270 },
       ],
       hazards: [
         // Marshrutka on Avenue 1

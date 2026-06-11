@@ -1,10 +1,16 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import type { VocabPack, InferenceResult, RevealLine } from "../types";
 import type { CollectibleItem } from "../types/content";
 import type { LevelScore } from "./scoring";
 import { getItemSprite, drawSprite, heartFullSprite, heartEmptySprite } from "../engine/sprites";
-import { pronounceWord } from "../engine/audio";
+import { pronounceWord, stopAll } from "../engine/audio";
 import { sfxHeartRefill } from "../engine/sfx";
+import {
+  isSpeechAvailable,
+  getSpeechConsent,
+  setSpeechConsent,
+  listenForWord,
+} from "../engine/speechRecognition";
 
 function ItemSpriteThumb({ itemId }: { itemId: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -102,7 +108,133 @@ export function RevealScreen({
   const listRef = useRef<HTMLDivElement>(null);
 
   const targetWords = vocabPack.words.filter((w) => w.matchesItemId !== null);
-  const allRevealed = revealedCount >= targetWords.length;
+
+  // --- Speech gate state ---
+  const speechSupported = isSpeechAvailable();
+  const [speechConsent, setSpeechConsentState] = useState<boolean | null>(
+    () => getSpeechConsent(),
+  );
+  const [showConsentPrompt, setShowConsentPrompt] = useState(false);
+  const [speechState, setSpeechState] = useState<
+    "idle" | "listening" | "success" | "fail" | "almost"
+  >("idle");
+  const [, setSpeechAttempts] = useState(0);
+  const [speechFeedback, setSpeechFeedback] = useState("");
+  const activeSpeechWord = useRef(-1);
+
+  const canUseSpeech = speechSupported && speechConsent === true;
+
+  // When speech is active, the last word needs one extra increment
+  // (speech gate completion) before we consider everything revealed.
+  const allRevealed = canUseSpeech
+    ? revealedCount > targetWords.length
+    : revealedCount >= targetWords.length;
+
+  // Reset speech state when advancing to next word
+  useEffect(() => {
+    setSpeechState("idle");
+    setSpeechAttempts(0);
+    setSpeechFeedback("");
+    activeSpeechWord.current = -1;
+  }, [revealedCount]);
+
+  const handleConsentYes = useCallback(() => {
+    setSpeechConsent(true);
+    setSpeechConsentState(true);
+    setShowConsentPrompt(false);
+  }, []);
+
+  const handleConsentNo = useCallback(() => {
+    setSpeechConsent(false);
+    setSpeechConsentState(false);
+    setShowConsentPrompt(false);
+  }, []);
+
+  const handleMicClick = useCallback(async () => {
+    if (speechConsent === null) {
+      setShowConsentPrompt(true);
+      return;
+    }
+    if (revealedCount === 0 || revealedCount > targetWords.length) return;
+    const word = targetWords[revealedCount - 1];
+    if (!word) return;
+
+    const wordIdx = revealedCount - 1;
+    activeSpeechWord.current = wordIdx;
+    setSpeechState("listening");
+    setSpeechFeedback("");
+
+    stopAll();
+    const result = await listenForWord(word.script, word.pronunciation);
+
+    // Stale result — user already advanced past this word
+    if (activeSpeechWord.current !== wordIdx) return;
+
+    switch (result.type) {
+      case "match": {
+        setSpeechState("success");
+        setSpeechFeedback(
+          result.distance === 0
+            ? `Your accent is... I won't comment. But yes. ${word.script}.`
+            : `Close enough. ${word.script}. Moving on.`,
+        );
+        pronounceWord(word);
+        setTimeout(() => {
+          if (activeSpeechWord.current === wordIdx) {
+            setRevealedCount((c) => c + 1);
+          }
+        }, 1500);
+        break;
+      }
+      case "no_match": {
+        setSpeechAttempts((prev) => {
+          const newAttempts = prev + 1;
+          if (newAttempts >= 3) {
+            setSpeechState("fail");
+            setSpeechFeedback("...close enough. We'll work on it.");
+            pronounceWord(word);
+            setTimeout(() => {
+              if (activeSpeechWord.current === wordIdx) {
+                setRevealedCount((c) => c + 1);
+              }
+            }, 1500);
+          } else if (result.distance <= 5) {
+            setSpeechState("almost");
+            setSpeechFeedback(
+              `Almost. It's ${word.pronunciation ?? word.script}, not... whatever that was.`,
+            );
+            pronounceWord(word);
+          } else {
+            setSpeechState("fail");
+            setSpeechFeedback("Нет. Listen...");
+            pronounceWord(word);
+          }
+          return newAttempts;
+        });
+        break;
+      }
+      case "no_speech":
+        setSpeechState("idle");
+        setSpeechFeedback("I didn't hear anything. Try again.");
+        break;
+      case "error":
+        if (result.error === "not-allowed") {
+          setSpeechConsentState(false);
+          setSpeechFeedback("Microphone access denied.");
+        } else if (result.error === "network" || result.error === "service-not-allowed") {
+          setSpeechFeedback("Speech recognition blocked by browser. Try Chrome.");
+        } else {
+          setSpeechFeedback("Could not start microphone. Try again.");
+        }
+        setSpeechState("idle");
+        break;
+    }
+  }, [speechConsent, revealedCount, targetWords]);
+
+  const handleNextWord = useCallback(() => {
+    activeSpeechWord.current = -1;
+    setRevealedCount((c) => c + 1);
+  }, []);
 
   // Prevent accidental tap-through from "Next word" to "Next Level"
   const [navReady, setNavReady] = useState(false);
@@ -164,7 +296,7 @@ export function RevealScreen({
 
       <div className="reveal-body">
         <div className="reveal-left" ref={listRef}>
-          {targetWords.slice(0, revealedCount).map((word) => {
+          {targetWords.slice(0, revealedCount).map((word, idx) => {
             const result = inferenceResult.matches.find(
               (m) => m.vocabWordId === word.id
             );
@@ -173,8 +305,19 @@ export function RevealScreen({
               ? itemDefs.get(word.matchesItemId)
               : null;
 
+            const isFlashing =
+              speechState === "success" &&
+              idx === revealedCount - 1;
+
             return (
-              <div key={word.id} style={styles.revealCard}>
+              <div
+                key={word.id}
+                className={isFlashing ? "speech-flash" : ""}
+                style={{
+                  ...styles.revealCard,
+                  ...(isFlashing ? styles.greenFlash : {}),
+                }}
+              >
                 <div style={styles.wordRow}>
                   <div style={styles.wordStack}>
                     <span style={styles.scriptWord}>{word.script}</span>
@@ -210,7 +353,7 @@ export function RevealScreen({
             <div style={styles.progressText}>
               {allRevealed
                 ? `${targetWords.filter((w) => (sortingAttempts?.get(w.id) ?? 1) === 1).length} of ${targetWords.length} first try`
-                : `Word ${revealedCount + 1} of ${targetWords.length}`}
+                : `Word ${Math.min(revealedCount + 1, targetWords.length)} of ${targetWords.length}`}
             </div>
             <div style={styles.progressRow}>
               {targetWords.map((word, i) => {
@@ -273,13 +416,87 @@ export function RevealScreen({
 
           <div className="reveal-right-actions">
             {!allRevealed ? (
-              <button
-                className="reveal-action-btn"
-                style={styles.nextButton}
-                onClick={() => setRevealedCount((c) => c + 1)}
-              >
-                Next word &rarr;
-              </button>
+              showConsentPrompt ? (
+                <div style={styles.consentCard}>
+                  <div style={styles.consentText}>
+                    Speech recognition sends audio to your browser&apos;s
+                    speech service. No audio is stored by this game.
+                  </div>
+                  <div style={styles.consentButtons}>
+                    <button
+                      className="reveal-action-btn"
+                      style={styles.consentYes}
+                      onClick={handleConsentYes}
+                    >
+                      Enable speech
+                    </button>
+                    <button
+                      className="reveal-action-btn"
+                      style={styles.consentNo}
+                      onClick={handleConsentNo}
+                    >
+                      No thanks
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div style={styles.speechArea}>
+                  {speechFeedback && (
+                    <div
+                      style={{
+                        ...styles.speechFeedback,
+                        color:
+                          speechState === "success"
+                            ? "#4CAF50"
+                            : speechState === "almost"
+                              ? "#FF9800"
+                              : "#ce93d8",
+                      }}
+                    >
+                      {speechFeedback}
+                    </div>
+                  )}
+                  <div style={styles.buttonPair}>
+                    {(canUseSpeech ||
+                      (speechSupported && speechConsent === null)) &&
+                      revealedCount > 0 && (
+                        <button
+                          className={`speech-mic-btn${speechState === "listening" ? " listening" : ""}${speechState === "success" ? " success" : ""}`}
+                          style={styles.micButton}
+                          onClick={
+                            canUseSpeech
+                              ? handleMicClick
+                              : () => setShowConsentPrompt(true)
+                          }
+                          disabled={
+                            speechState === "listening" ||
+                            speechState === "success"
+                          }
+                        >
+                          {speechState === "listening"
+                            ? "..."
+                            : speechState === "success"
+                              ? "\u2713"
+                              : "\uD83C\uDFA4"}
+                        </button>
+                      )}
+                    <button
+                      className="reveal-action-btn"
+                      style={styles.nextButton}
+                      onClick={handleNextWord}
+                      disabled={
+                        speechState === "listening" ||
+                        speechState === "success"
+                      }
+                    >
+                      {revealedCount === 0 || !canUseSpeech
+                        ? "Next word"
+                        : "Skip"}{" "}
+                      &rarr;
+                    </button>
+                  </div>
+                </div>
+              )
             ) : (
               <div style={{ ...styles.buttonRow, opacity: navReady ? 1 : 0.4, pointerEvents: navReady ? "auto" : "none", transition: "opacity 0.3s" }}>
                 {hasNextLevel ? (
@@ -349,6 +566,32 @@ const revealCSS = `
     display: flex;
     justify-content: center;
     padding-top: 8px;
+  }
+
+  .speech-mic-btn {
+    transition: all 0.2s;
+  }
+  .speech-mic-btn.listening {
+    animation: pulse-mic 1s infinite;
+  }
+  .speech-mic-btn.success {
+    background: #4CAF50 !important;
+    color: #fff !important;
+  }
+  .speech-mic-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .speech-flash {
+    animation: flash-green 0.4s ease-out;
+  }
+  @keyframes pulse-mic {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 213, 79, 0.6); }
+    50% { box-shadow: 0 0 0 8px rgba(255, 213, 79, 0); }
+  }
+  @keyframes flash-green {
+    0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.8); }
+    100% { box-shadow: 0 0 20px rgba(76, 175, 80, 0.3); }
   }
 
   @media (orientation: landscape) and (max-height: 500px) {
@@ -548,5 +791,83 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 14,
     fontWeight: "bold",
     marginLeft: 8,
+  },
+  greenFlash: {
+    boxShadow: "0 0 20px rgba(76, 175, 80, 0.4)",
+    border: "1px solid #4CAF50",
+    transition: "box-shadow 0.3s, border 0.3s",
+  },
+  speechArea: {
+    display: "flex",
+    flexDirection: "column" as const,
+    alignItems: "center",
+    gap: 6,
+    width: "100%",
+  },
+  speechFeedback: {
+    fontSize: 13,
+    fontStyle: "italic",
+    textAlign: "center" as const,
+    lineHeight: 1.4,
+    maxWidth: 280,
+  },
+  buttonPair: {
+    display: "flex",
+    gap: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  micButton: {
+    width: 44,
+    height: 44,
+    borderRadius: "50%",
+    border: "2px solid #FFD54F",
+    background: "transparent",
+    fontSize: 20,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#FFD54F",
+    flexShrink: 0,
+  },
+  consentCard: {
+    display: "flex",
+    flexDirection: "column" as const,
+    alignItems: "center",
+    gap: 10,
+    padding: 12,
+    background: "#1a1a2e",
+    borderRadius: 12,
+    maxWidth: 300,
+  },
+  consentText: {
+    fontSize: 12,
+    color: "#888",
+    textAlign: "center" as const,
+    lineHeight: 1.5,
+  },
+  consentButtons: {
+    display: "flex",
+    gap: 10,
+  },
+  consentYes: {
+    background: "#4CAF50",
+    color: "#fff",
+    border: "none",
+    borderRadius: 16,
+    padding: "8px 16px",
+    fontSize: 13,
+    fontWeight: "bold",
+    cursor: "pointer",
+  },
+  consentNo: {
+    background: "transparent",
+    color: "#888",
+    border: "1px solid #555",
+    borderRadius: 16,
+    padding: "8px 16px",
+    fontSize: 13,
+    cursor: "pointer",
   },
 };

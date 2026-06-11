@@ -36,6 +36,7 @@ export const level5Data: LevelData = {
     { itemId: "chasy_clock", x: 830, y: 300 },
     { itemId: "mylo_soap", x: 1500, y: 260 },
     { itemId: "pult_remote", x: 2100, y: 240 },
+    { itemId: "mystery_can", x: 2640, y: 280 },
   ],
   hazards: [
     // Marshrutka (even on Saturday morning, they're out there)

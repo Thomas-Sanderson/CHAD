@@ -696,6 +696,26 @@ const CHP = "#ddbb88"; // Chickpea beige
 const DHP = "#bb9966"; // Dark chickpea
 const LHP = "#eedd99"; // Light chickpea
 
+// --- Tushyonka (canned stew) palette ---
+const STW = "#8B4513"; // Stew brown
+const STD = "#6B3410"; // Stew dark
+const STL = "#aa6633"; // Stew light
+
+// --- Sgushchyonka (condensed milk) palette ---
+const CMK = "#f5deb3"; // Condensed milk cream
+const CMD = "#dabb8a"; // Condensed milk dark
+const CML = "#fff3cd"; // Condensed milk light
+
+// --- Shproty (sprats) palette ---
+const SPF = "#c8a040"; // Sprat fish gold
+const SPD2 = "#a07820"; // Sprat dark
+const SPL = "#e0c060"; // Sprat light
+
+// --- Ananas (pineapple) palette ---
+const ANP = "#f0c040"; // Pineapple yellow
+const APD = "#d0a020"; // Pineapple dark
+const APL = "#ffe070"; // Pineapple light
+
 export const beetRevealSprite: SpriteData = [
   [_, _, _, _, _, _, GN, _, GN, _, _, _, _, _, _, _],
   [_, _, _, _, _, _, GN, GN, GN, _, _, _, _, _, _, _],
@@ -773,6 +793,70 @@ export const chickpeaRevealSprite: SpriteData = [
   [_, _, _, _, _, DHP, CHP, LHP, CHP, DHP, _, _, _, _, _, _],
   [_, _, _, _, _, DHP, CHP, CHP, CHP, DHP, _, _, _, _, _, _],
   [_, _, _, _, _, _, DHP, DHP, DHP, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+];
+
+export const tushyonkaRevealSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, STD, STD, STD, _, _, _, _, _, _, _],
+  [_, _, _, _, _, STD, STW, STW, STW, STD, _, _, _, _, _, _],
+  [_, _, _, _, STD, STW, STL, STW, STL, STW, STD, _, _, _, _, _],
+  [_, _, _, STD, STW, STW, STW, STL, STW, STW, STW, STD, _, _, _, _],
+  [_, _, _, STD, STL, STW, STD, STW, STD, STW, STL, STD, _, _, _, _],
+  [_, _, _, STD, STW, STD, STL, STD, STL, STD, STW, STD, _, _, _, _],
+  [_, _, _, STD, STW, STW, STW, STL, STW, STW, STW, STD, _, _, _, _],
+  [_, _, _, _, STD, STL, STW, STW, STW, STL, STD, _, _, _, _, _],
+  [_, _, _, _, _, STD, STW, STL, STW, STD, _, _, _, _, _, _],
+  [_, _, _, _, _, _, STD, STD, STD, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+];
+
+export const sgushchyonkaRevealSprite: SpriteData = [
+  [_, _, _, _, _, _, _, CMD, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, CMD, CMK, CMD, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, CMD, CMK, CMD, _, _, _, _, _, _, _],
+  [_, _, _, _, _, CMD, CMK, CML, CMK, CMD, _, _, _, _, _, _],
+  [_, _, _, _, _, CMD, CMK, CMK, CMK, CMD, _, _, _, _, _, _],
+  [_, _, _, _, CMD, CMK, CML, CMK, CML, CMK, CMD, _, _, _, _, _],
+  [_, _, _, CMD, CMK, CMK, CMK, CML, CMK, CMK, CMK, CMD, _, _, _, _],
+  [_, _, CMD, CMK, CML, CMK, CMK, CMK, CMK, CML, CMK, CMD, _, _, _, _],
+  [_, _, CMD, CMK, CMK, CML, CMK, CML, CMK, CMK, CMK, CMD, _, _, _, _],
+  [_, _, _, CMD, CMK, CMK, CMK, CMK, CMK, CMK, CMD, _, _, _, _, _],
+  [_, _, _, _, CMD, CMD, CMK, CMK, CMD, CMD, _, _, _, _, _, _],
+  [_, _, _, _, _, _, CMD, CMD, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+];
+
+export const shprotyRevealSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, SPD2, SPF, SPF, SPF, SPD2, _, _, _, _, _, _],
+  [_, _, _, _, SPD2, SPF, SPL, SPF, SPF, SPF, SPD2, _, _, _, _, _],
+  [_, _, _, _, _, SPD2, SPF, SPF, SPF, SPD2, SPD2, _, _, _, _, _],
+  [_, _, _, _, _, _, SPD2, SPD2, SPD2, _, _, _, _, _, _, _],
+  [_, _, SPD2, SPF, SPF, SPF, SPD2, _, _, _, _, _, _, _, _, _],
+  [_, SPD2, SPF, SPL, SPF, SPF, SPF, SPD2, _, _, _, _, _, _, _, _],
+  [_, _, SPD2, SPF, SPF, SPF, SPD2, SPD2, _, _, _, _, _, _, _, _],
+  [_, _, _, SPD2, SPD2, SPD2, _, _, SPD2, SPF, SPF, SPD2, _, _, _, _],
+  [_, _, _, _, _, _, _, SPD2, SPF, SPL, SPF, SPF, SPD2, _, _, _],
+  [_, _, _, _, _, _, _, _, SPD2, SPF, SPF, SPD2, SPD2, _, _, _],
+  [_, _, _, _, _, _, _, _, _, SPD2, SPD2, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+];
+
+export const ananasRevealSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, APD, ANP, ANP, ANP, APD, _, _, _, _, _, _],
+  [_, _, _, _, APD, ANP, APL, ANP, APL, ANP, APD, _, _, _, _, _],
+  [_, _, _, APD, ANP, APL, ANP, ANP, ANP, APL, ANP, APD, _, _, _, _],
+  [_, _, _, APD, ANP, ANP, APD, APD, APD, ANP, ANP, APD, _, _, _, _],
+  [_, _, _, APD, ANP, APD, _, _, _, APD, ANP, APD, _, _, _, _],
+  [_, _, _, APD, ANP, APD, _, _, _, APD, ANP, APD, _, _, _, _],
+  [_, _, _, APD, ANP, ANP, APD, APD, APD, ANP, ANP, APD, _, _, _, _],
+  [_, _, _, APD, ANP, APL, ANP, ANP, ANP, APL, ANP, APD, _, _, _, _],
+  [_, _, _, _, APD, ANP, APL, ANP, APL, ANP, APD, _, _, _, _, _],
+  [_, _, _, _, _, APD, ANP, ANP, ANP, APD, _, _, _, _, _, _],
+  [_, _, _, _, _, _, APD, APD, APD, _, _, _, _, _, _, _],
   [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
 ];
 
@@ -1912,6 +1996,10 @@ const itemSpriteMap: Record<string, SpriteData> = {
   corn_reveal: cornRevealSprite,
   lentil_reveal: lentilRevealSprite,
   chickpea_reveal: chickpeaRevealSprite,
+  tushyonka_reveal: tushyonkaRevealSprite,
+  sgushchyonka_reveal: sgushchyonkaRevealSprite,
+  shproty_reveal: shprotyRevealSprite,
+  ananas_reveal: ananasRevealSprite,
   sunflower_seeds: sunflowerSeedsSprite,
   moloko_carton: molokoCartonSprite,
   chai_box: chaiBoxSprite,

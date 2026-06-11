@@ -100,6 +100,7 @@ export const level6Data: LevelData = {
         { x: 1300, y: 280, width: 100, height: 16 },
         { x: 2200, y: 290, width: 80, height: 16 },
         { x: 2700, y: 200, width: 80, height: 16 }, // high platform for potato
+        { x: 2850, y: 250, width: 80, height: 16 }, // mystery can platform
         { x: 2900, y: 330, width: 120, height: 16 },
       ],
       collectibles: [
@@ -108,6 +109,7 @@ export const level6Data: LevelData = {
         { itemId: "kvass_bottle", x: 1340, y: 250 },
         { itemId: "pickle_jar", x: 2240, y: 260 },
         { itemId: "sunflower_seeds", x: 2950, y: 300 },
+        { itemId: "mystery_can", x: 2880, y: 220 },
       ],
       hazards: [
         { type: "marshrutka", y: GROUND_Y - 40, speed: 380, interval: 5500 },
