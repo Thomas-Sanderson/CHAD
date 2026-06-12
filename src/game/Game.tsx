@@ -29,6 +29,7 @@ import { DeathScreen } from "./DeathScreen";
 import { sfxDeath } from "../engine/sfx";
 import { startMusic, stopMusic } from "../engine/music";
 import { isTouchDevice } from "../engine/touch";
+import { safeGetItem, safeSetItem } from "../engine/storage";
 
 const ALL_SKINS: SkinConfig[] = [belarusSkin, ethiopiaSkin, italySkin];
 
@@ -44,7 +45,7 @@ const VOCAB_STORAGE_KEY = "chad-rescues-nobody-vocab";
 
 function loadProgress(): Map<string, LevelProgress> {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = safeGetItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as Record<string, LevelProgress>;
       return new Map(Object.entries(parsed));
@@ -60,7 +61,7 @@ function saveProgress(progress: Map<string, LevelProgress>): void {
   for (const [key, val] of progress) {
     obj[key] = val;
   }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+  safeSetItem(STORAGE_KEY, JSON.stringify(obj));
 }
 
 // Progress keys are scoped per-skin: "skinId:levelId"
@@ -100,7 +101,7 @@ export function Game() {
   // Learned vocabulary tracking (persisted per skin)
   const [learnedVocab, setLearnedVocab] = useState<Record<string, string[]>>(() => {
     try {
-      const raw = localStorage.getItem(VOCAB_STORAGE_KEY);
+      const raw = safeGetItem(VOCAB_STORAGE_KEY);
       return raw ? JSON.parse(raw) : {};
     } catch {
       return {};
@@ -108,7 +109,7 @@ export function Game() {
   });
 
   useEffect(() => {
-    localStorage.setItem(VOCAB_STORAGE_KEY, JSON.stringify(learnedVocab));
+    safeSetItem(VOCAB_STORAGE_KEY, JSON.stringify(learnedVocab));
   }, [learnedVocab]);
 
   const learnedWordsForSkin: VocabWord[] = useMemo(() => {

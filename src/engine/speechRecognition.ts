@@ -1,3 +1,4 @@
+import { safeGetItem, safeSetItem } from "./storage";
 // Speech recognition engine for the reveal screen speech gate.
 // Uses the Web Speech API (SpeechRecognition) with generous fuzzy
 // matching — the player is learning, not being tested.
@@ -53,14 +54,14 @@ export function isSpeechAvailable(): boolean {
 // --- Privacy consent (one-time, localStorage) ---
 
 export function getSpeechConsent(): boolean | null {
-  const v = localStorage.getItem(CONSENT_KEY);
+  const v = safeGetItem(CONSENT_KEY);
   if (v === "yes") return true;
   if (v === "no") return false;
   return null;
 }
 
 export function setSpeechConsent(consent: boolean): void {
-  localStorage.setItem(CONSENT_KEY, consent ? "yes" : "no");
+  safeSetItem(CONSENT_KEY, consent ? "yes" : "no");
 }
 
 // --- Levenshtein distance ---

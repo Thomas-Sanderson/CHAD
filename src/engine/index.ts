@@ -2,7 +2,7 @@ export { applyGravity, applyMovement, tryJump, aabbOverlap, playerAABB, resolveP
 export { createInputState, setupKeyboardInput, setupTouchInput } from "./input";
 export { renderFrame, CANVAS_WIDTH, CANVAS_HEIGHT } from "./renderer";
 export type { HudData } from "./renderer";
-export { createGameRunState, updateGameState } from "./gameLoop";
+export { createGameRunState, updateGameState, cancelPendingLandmarkSpeech } from "./gameLoop";
 export { drawSprite, getItemSprite } from "./sprites";
 export type { SpriteData } from "./sprites";
 export type { TimeOfDay } from "./sky";

@@ -80,7 +80,7 @@ Decoy items that look like grey cans in-game. Player decodes the Cyrillic word l
 **Rule:** Mystery can words must be standalone grocery items buyable at a store. No "canned-only" words (тушёнка, сгущёнка) — these teach the can word, not the ingredient.
 
 ## Content structure
-Three skins: Belarus (Russian, 12 levels), Ethiopia (Amharic, 4 levels), Italy (Italian, 6 levels).
+Three skins: Belarus (Russian, 13 levels), Ethiopia (Amharic, 4 levels), Italy (Italian, 6 levels).
 
 Levels, vocab packs, messages, items, and reveal lines are data files in `src/content/{skin}/`.
 The engine consumes content through typed interfaces. Content never contains logic.
@@ -97,6 +97,7 @@ Adding a new level means adding new data files, not changing engine code.
 | L10 | 4 avenues | Shop name vocab (item + location pairs) |
 | L11 | 5 avenues | New neighborhood, pharmacy |
 | L12 | 5 avenues, 7 streets | Full city map, all shops |
+| L13 | 5 avenues, 7 streets | Spring City — same geometry as L12, spring season |
 
 ## Segment system (L6+)
 Multi-avenue levels use segments: typed sections of the world with their own platforms, items, doors, and NPCs.

@@ -2382,13 +2382,26 @@ export const rediskaRevealSprite: SpriteData = [
 
 // --- Sprite drawing utility ---
 
-export function drawSprite(
+/**
+ * Pre-rendered sprite cache.
+ *
+ * Sprites are module-level constant arrays (stable identity), so each
+ * (sprite, scale, flipH) combination is rasterized once into an offscreen
+ * canvas and blitted with a single drawImage thereafter. This replaces
+ * hundreds of per-pixel fillRect calls per sprite per frame.
+ *
+ * If canvas creation fails (non-browser env), we fall back to the
+ * original per-pixel path.
+ */
+const spriteCache = new WeakMap<SpriteData, Map<string, HTMLCanvasElement>>();
+
+function rasterizeSprite(
   ctx: CanvasRenderingContext2D,
   sprite: SpriteData,
   x: number,
   y: number,
-  scale: number = 2,
-  flipH: boolean = false
+  scale: number,
+  flipH: boolean
 ): void {
   const w = sprite[0]?.length ?? 0;
   for (let row = 0; row < sprite.length; row++) {
@@ -2402,6 +2415,55 @@ export function drawSprite(
       ctx.fillRect(x + drawCol * scale, y + row * scale, scale, scale);
     }
   }
+}
+
+function getCachedSprite(
+  sprite: SpriteData,
+  scale: number,
+  flipH: boolean
+): HTMLCanvasElement | null {
+  let variants = spriteCache.get(sprite);
+  if (!variants) {
+    variants = new Map();
+    spriteCache.set(sprite, variants);
+  }
+  const key = `${scale}|${flipH ? 1 : 0}`;
+  const hit = variants.get(key);
+  if (hit) return hit;
+
+  const w = sprite[0]?.length ?? 0;
+  const h = sprite.length;
+  if (w === 0 || h === 0) return null;
+
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = w * scale;
+    canvas.height = h * scale;
+    const cctx = canvas.getContext("2d");
+    if (!cctx) return null;
+    rasterizeSprite(cctx, sprite, 0, 0, scale, flipH);
+    variants.set(key, canvas);
+    return canvas;
+  } catch {
+    return null;
+  }
+}
+
+export function drawSprite(
+  ctx: CanvasRenderingContext2D,
+  sprite: SpriteData,
+  x: number,
+  y: number,
+  scale: number = 2,
+  flipH: boolean = false
+): void {
+  const cached = getCachedSprite(sprite, scale, flipH);
+  if (cached) {
+    ctx.drawImage(cached, x, y);
+    return;
+  }
+  // Fallback: per-pixel path (test environments, canvas unavailable)
+  rasterizeSprite(ctx, sprite, x, y, scale, flipH);
 }
 
 // --- Sprite lookup for items ---

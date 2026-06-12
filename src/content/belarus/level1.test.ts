@@ -323,6 +323,71 @@ for (const skin of allSkins) {
         it("has a gate fail text", () => {
           expect(level.gateFailText.length).toBeGreaterThan(0);
         });
+
+        it("reveal lines reference valid vocab words", () => {
+          const wordIds = new Set(level.vocabPack.words.map((w) => w.id));
+          for (const line of level.revealLines) {
+            expect(
+              wordIds.has(line.vocabWordId),
+              `Reveal line references vocab word "${line.vocabWordId}" which doesn't exist`
+            ).toBe(true);
+          }
+        });
+
+        it("location words are not tied to items", () => {
+          for (const word of level.vocabPack.words) {
+            if (word.category === "location") {
+              expect(
+                word.matchesItemId,
+                `Location word "${word.id}" must have matchesItemId null (tested via navigation, not sorting)`
+              ).toBeNull();
+            }
+          }
+        });
+
+        it("vocab word ids are unique", () => {
+          const seen = new Set<string>();
+          for (const word of level.vocabPack.words) {
+            expect(seen.has(word.id), `Duplicate vocab word id "${word.id}"`).toBe(false);
+            seen.add(word.id);
+          }
+        });
+
+        it("item ids are unique", () => {
+          const seen = new Set<string>();
+          for (const item of level.items) {
+            expect(seen.has(item.id), `Duplicate item id "${item.id}"`).toBe(false);
+            seen.add(item.id);
+          }
+        });
+
+        it("doors reference valid target segments", () => {
+          const segments = level.levelData.segments;
+          if (!segments) return;
+          const segIds = new Set(segments.map((s) => s.id));
+          for (const seg of segments) {
+            for (const door of seg.doors) {
+              expect(
+                segIds.has(door.targetSegmentId),
+                `Door "${door.id}" in segment "${seg.id}" targets nonexistent segment "${door.targetSegmentId}"`
+              ).toBe(true);
+              const target = segments.find((s) => s.id === door.targetSegmentId)!;
+              expect(door.targetX, `Door "${door.id}" targetX out of bounds`).toBeGreaterThanOrEqual(0);
+              expect(door.targetX, `Door "${door.id}" targetX out of bounds`).toBeLessThan(target.bounds.width);
+              expect(door.targetY, `Door "${door.id}" targetY out of bounds`).toBeGreaterThanOrEqual(0);
+              expect(door.targetY, `Door "${door.id}" targetY out of bounds`).toBeLessThan(target.bounds.height);
+            }
+          }
+        });
+
+        it("mystery can (if present) is fully defined", () => {
+          const can = level.items.find((i) => i.id === "mystery_can");
+          if (!can) return;
+          expect(can.script.length, "mystery can needs a script word to decode").toBeGreaterThan(0);
+          expect(can.revealName, "mystery can needs a revealName").toBeTruthy();
+          expect(can.revealSpriteId, "mystery can needs a revealSpriteId").toBeTruthy();
+          expect(can.isDecoy, "mystery can must be a decoy").toBe(true);
+        });
       }
     );
   });

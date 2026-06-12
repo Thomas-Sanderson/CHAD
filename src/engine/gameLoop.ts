@@ -23,6 +23,7 @@ import {
 } from "./physics";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./renderer";
 import { generateRooftopPlatforms } from "./rooftops";
+import { getSegmentById } from "./segmentIndex";
 import { shopFacadeSprites, landmarkSprites } from "./sprites";
 import type { Season } from "../types/skin";
 import { updateParticles, updateFootprints } from "./seasonal";
@@ -44,6 +45,17 @@ const NEAR_ITEM_RANGE = 60;   // px — "standing near" an item
 const SIGN_RANGE = 80;
 const SIGN_VERT_RANGE = 120;
 const SIGN_BUBBLE_MS = 4000;
+
+// Pending landmark-pronunciation timer — cancelled when the run phase unmounts
+// so speech doesn't fire on the gate/reveal screens.
+let pendingLandmarkSpeech: ReturnType<typeof setTimeout> | null = null;
+
+export function cancelPendingLandmarkSpeech(): void {
+  if (pendingLandmarkSpeech !== null) {
+    clearTimeout(pendingLandmarkSpeech);
+    pendingLandmarkSpeech = null;
+  }
+}
 
 const DEFAULT_SCOLDINGS = [
   "КУДА?!",
@@ -223,7 +235,7 @@ export function updateGameState(
         state.transition.phase = "fadeIn";
         state.transition.timer = TRANSITION_MS;
         // Snap camera to new segment
-        const seg = level.segments?.find(s => s.id === state.currentSegmentId);
+        const seg = getSegmentById(level, state.currentSegmentId);
         if (seg) {
           const targetCamX = state.player.position.x - CANVAS_WIDTH / 3;
           state.camera.x = Math.max(0, Math.min(targetCamX, seg.bounds.width - CANVAS_WIDTH));
@@ -249,7 +261,7 @@ export function updateGameState(
     level.segments[0]!.id === state.currentSegmentId;
 
   if (level.segments?.length && state.currentSegmentId) {
-    currentSegment = level.segments.find(s => s.id === state.currentSegmentId) ?? null;
+    currentSegment = getSegmentById(level, state.currentSegmentId);
     if (currentSegment) {
       const rooftops = state.rooftopPlatforms[currentSegment.id] ?? [];
       activePlatforms = rooftops.length > 0
@@ -320,9 +332,7 @@ export function updateGameState(
       edgeX: facingRight
         ? state.player.position.x - 12  // cat sits behind Chad on the edge he left
         : state.player.position.x + state.player.width + 4,
-      edgeY: state.player.lastGroundedTime === state.elapsed
-        ? state.player.position.y + state.player.height - 16
-        : state.player.position.y + state.player.height - 16,
+      edgeY: state.player.position.y + state.player.height - 16,
       variant: Math.random() < 0.5 ? 0 : 1,
       facingLeft: facingRight, // cat faces direction Chad went (watches him)
       jumpedDuring: false,
@@ -491,7 +501,7 @@ export function updateGameState(
     const itemDeathY = (level.deathFloorY ?? activeBounds.height) + 50;
     if (item.y > itemDeathY) {
       const originals = activeCollectiblesKey !== null
-        ? (level.segments?.find(s => s.id === activeCollectiblesKey)?.collectibles ?? [])
+        ? (getSegmentById(level, activeCollectiblesKey)?.collectibles ?? [])
         : level.collectibles;
       const orig = originals.find(c => c.itemId === item.itemId);
       if (orig) {
@@ -737,7 +747,10 @@ export function updateGameState(
     if (input.shout && pointLabel && !state.nearSign) {
       speakAsChad(state.pointPhrase);
       const label = pointLabel;
-      setTimeout(() => speakScold(label), 1200);
+      pendingLandmarkSpeech = setTimeout(() => {
+        pendingLandmarkSpeech = null;
+        speakScold(label);
+      }, 1200);
       state.visitedLandmarks.add(label);
       input.shout = false;
     }

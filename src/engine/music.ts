@@ -3,6 +3,7 @@
 // Supports dual-instance phase offset for harmonic interference.
 
 import { getAudioContext, isMuted, onAudioUnlocked } from "./sfx";
+import { safeGetItem, safeSetItem } from "./storage";
 
 export type MusicMode = "title" | "level";
 
@@ -29,10 +30,8 @@ const SCHEDULE_INTERVAL = 50; // check every 50ms
 const PHASE_KEY = "chad-music-phase";
 
 let phaseOffset: number = (() => {
-  try {
-    const val = parseFloat(localStorage.getItem(PHASE_KEY) ?? "0");
-    return isNaN(val) ? 0 : Math.max(0, Math.min(1, val));
-  } catch { return 0; }
+  const val = parseFloat(safeGetItem(PHASE_KEY) ?? "0");
+  return isNaN(val) ? 0 : Math.max(0, Math.min(1, val));
 })();
 
 export function getPhaseOffset(): number {
@@ -41,7 +40,7 @@ export function getPhaseOffset(): number {
 
 export function setPhaseOffset(val: number): void {
   phaseOffset = Math.max(0, Math.min(1, val));
-  try { localStorage.setItem(PHASE_KEY, phaseOffset.toFixed(3)); } catch { /* */ }
+  safeSetItem(PHASE_KEY, phaseOffset.toFixed(3));
 }
 
 // Deterministic melody pattern (16-beat loop) — different per mode

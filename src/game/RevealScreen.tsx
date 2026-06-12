@@ -121,6 +121,12 @@ export function RevealScreen({
   const [, setSpeechAttempts] = useState(0);
   const [speechFeedback, setSpeechFeedback] = useState("");
   const activeSpeechWord = useRef(-1);
+  // Advance timers tracked so they can't fire after unmount
+  const advanceTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  useEffect(() => {
+    const timers = advanceTimers.current;
+    return () => { timers.forEach(clearTimeout); };
+  }, []);
 
   const canUseSpeech = speechSupported && speechConsent === true;
 
@@ -179,11 +185,11 @@ export function RevealScreen({
             : `Close enough. ${word.script}. Moving on.`,
         );
         pronounceWord(word);
-        setTimeout(() => {
+        advanceTimers.current.push(setTimeout(() => {
           if (activeSpeechWord.current === wordIdx) {
             setRevealedCount((c) => c + 1);
           }
-        }, 1500);
+        }, 1500));
         break;
       }
       case "no_match": {
@@ -193,11 +199,11 @@ export function RevealScreen({
             setSpeechState("fail");
             setSpeechFeedback("...close enough. We'll work on it.");
             pronounceWord(word);
-            setTimeout(() => {
+            advanceTimers.current.push(setTimeout(() => {
               if (activeSpeechWord.current === wordIdx) {
                 setRevealedCount((c) => c + 1);
               }
-            }, 1500);
+            }, 1500));
           } else if (result.distance <= 5) {
             setSpeechState("almost");
             setSpeechFeedback(

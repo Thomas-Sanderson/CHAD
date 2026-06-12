@@ -171,7 +171,7 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
       );
       pos = m.end;
     }
-    if (pos < text.length) result.push(<span key={`t-${key++}`}>{text.slice(pos)}</span>);
+    if (pos < text.length) result.push(<span key={`t-${key}`}>{text.slice(pos)}</span>);
     return result;
   }
 
