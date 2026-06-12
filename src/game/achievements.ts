@@ -1,4 +1,5 @@
 import type { LevelData } from "../types/content";
+import { safeGetItem, safeSetItem } from "../engine/storage";
 
 export interface AchievementDef {
   id: string;
@@ -172,7 +173,7 @@ const STORAGE_PREFIX = "chad-achievements-";
 
 export function loadEarnedAchievements(skinId: string, levelId: string): string[] {
   try {
-    const raw = localStorage.getItem(`${STORAGE_PREFIX}${skinId}-${levelId}`);
+    const raw = safeGetItem(`${STORAGE_PREFIX}${skinId}-${levelId}`);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -180,7 +181,7 @@ export function loadEarnedAchievements(skinId: string, levelId: string): string[
 }
 
 export function saveEarnedAchievements(skinId: string, levelId: string, ids: string[]): void {
-  localStorage.setItem(`${STORAGE_PREFIX}${skinId}-${levelId}`, JSON.stringify(ids));
+  safeSetItem(`${STORAGE_PREFIX}${skinId}-${levelId}`, JSON.stringify(ids));
 }
 
 export function loadAllAchievements(skinId: string, levelIds: string[]): Map<string, string[]> {

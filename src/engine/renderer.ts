@@ -37,6 +37,7 @@ import type { TimeOfDay } from "./sky";
 import { getSkyPhase, renderSky, renderGroundTint, renderSceneBrightness, renderWarmthOverlay } from "./sky";
 import type { Season } from "../types/skin";
 import { getApartmentSprite, APARTMENT_SCALE, getTreeSprite } from "./seasonalSprites";
+import { getSegmentById } from "./segmentIndex";
 import {
   renderSeasonalSky,
   renderSeasonalTrees,
@@ -218,6 +219,185 @@ function drawPlatformBrackets(
   }
 }
 
+// --- Static geometry caches ---
+// Platform arrays and segments are immutable content data, so derived
+// geometry (ground rows, sign layouts) is computed once and reused per frame.
+
+interface GroundGeometry {
+  /** isGround platforms, falling back to platform[0] (matches prior inline logic) */
+  groundTargets: PlatformDef[];
+  /** unique avenue Ys of groundTargets */
+  uniqueYs: number[];
+  /** unique Ys of strictly-isGround platforms (no fallback) — used by seasonal overlays */
+  groundOnlyYs: number[];
+}
+
+const groundGeometryCache = new WeakMap<PlatformDef[], GroundGeometry>();
+
+function getGroundGeometry(activePlatforms: PlatformDef[]): GroundGeometry {
+  let cached = groundGeometryCache.get(activePlatforms);
+  if (cached) return cached;
+  const ground = activePlatforms.filter(p => p.isGround);
+  const fallback = activePlatforms[0];
+  const groundTargets = ground.length > 0 ? ground : (fallback ? [fallback] : []);
+  cached = {
+    groundTargets,
+    uniqueYs: [...new Set(groundTargets.map(gp => gp.y))],
+    groundOnlyYs: [...new Set(ground.map(gp => gp.y))],
+  };
+  groundGeometryCache.set(activePlatforms, cached);
+  return cached;
+}
+
+interface SignGroupLayout {
+  isMerged: boolean;
+  avgMountX: number;
+  mountY: number;
+  aveY: number;
+  onLeft: boolean;
+  plateLines: string[];
+  plateW: number;
+  plateH: number;
+}
+
+const SIGN_LINE_H = 14;
+const signLayoutCache = new WeakMap<LevelSegment, SignGroupLayout[]>();
+
+/**
+ * Compute static street-sign plate layouts for a segment: corridor binding,
+ * intersection grouping, plate text, and measured plate widths.
+ * Caller must set ctx.font before calling (plate widths depend on it).
+ */
+function computeSignLayouts(
+  streetSigns: StreetSignDef[],
+  corridors: StreetCorridor[],
+  ctx: CanvasRenderingContext2D
+): SignGroupLayout[] {
+  type SignMount = {
+    sign: StreetSignDef;
+    corridor: StreetCorridor;
+    atTop: boolean;
+    mountX: number;
+    mountY: number;
+    aveY: number;
+    onLeft: boolean;
+    streetArrow: string;
+    avenueArrow: string;
+  };
+  const mounts: SignMount[] = [];
+  for (const sign of streetSigns) {
+    let bestC = corridors[0]!;
+    let bestDist = Infinity;
+    for (const c of corridors) {
+      const cx = c.x + c.width / 2;
+      const dist = Math.abs(sign.x - cx);
+      if (dist < bestDist) { bestDist = dist; bestC = c; }
+    }
+    const atTop = Math.abs(sign.y - bestC.topY) <= Math.abs(sign.y - bestC.bottomY);
+    const aveY = atTop ? bestC.topY : bestC.bottomY;
+    const mountY = aveY - 70;
+
+    let onLeft = true;
+    if (atTop) {
+      let continuesUp = false;
+      for (const oc of corridors) {
+        if (oc === bestC) continue;
+        if (oc.bottomY === bestC.topY && Math.abs((oc.x + oc.width / 2) - (bestC.x + bestC.width / 2)) < 300) {
+          continuesUp = true;
+          break;
+        }
+      }
+      if (!continuesUp) onLeft = false;
+    }
+    const mountX = onLeft ? bestC.x - 2 : bestC.x + bestC.width + 2;
+
+    const streetArrow = atTop ? "\u2193" : "\u2191";
+
+    let avenueArrow = "";
+    if (sign.avenueName) {
+      const touchingCorridors: number[] = [];
+      for (const oc of corridors) {
+        if (oc.topY === aveY || oc.bottomY === aveY) {
+          touchingCorridors.push(oc.x + oc.width / 2);
+        }
+      }
+      touchingCorridors.sort((a, b) => a - b);
+      const myCx = bestC.x + bestC.width / 2;
+      const myIdx = touchingCorridors.indexOf(myCx);
+      if (touchingCorridors.length <= 1) {
+        avenueArrow = "\u2194";
+      } else if (myIdx === 0) {
+        avenueArrow = "\u2192";
+      } else if (myIdx === touchingCorridors.length - 1) {
+        avenueArrow = "\u2190";
+      } else {
+        avenueArrow = "\u2194";
+      }
+    }
+
+    mounts.push({ sign, corridor: bestC, atTop, mountX, mountY, aveY, onLeft, streetArrow, avenueArrow });
+  }
+
+  // Group signs at the same intersection (same aveY, mountX within 120px)
+  const used = new Set<number>();
+  const groups: SignMount[][] = [];
+  for (let i = 0; i < mounts.length; i++) {
+    if (used.has(i)) continue;
+    const group: SignMount[] = [mounts[i]!];
+    used.add(i);
+    for (let j = i + 1; j < mounts.length; j++) {
+      if (used.has(j)) continue;
+      if (mounts[i]!.aveY === mounts[j]!.aveY &&
+          Math.abs(mounts[i]!.mountX - mounts[j]!.mountX) < 120) {
+        group.push(mounts[j]!);
+        used.add(j);
+      }
+    }
+    groups.push(group);
+  }
+
+  const layouts: SignGroupLayout[] = [];
+  for (const group of groups) {
+    const primary = group[0]!;
+    const isMerged = group.length > 1;
+
+    // For merged signs, mount on a centered stub between the corridors
+    const avgMountX = isMerged
+      ? Math.round(group.reduce((s, m) => s + m.mountX, 0) / group.length)
+      : primary.mountX;
+    const { mountY, aveY, onLeft } = primary;
+
+    // Build plate lines
+    let plateLines: string[];
+    if (isMerged) {
+      // Three-line sign: up street, avenue, down street
+      const upStreet = group.find(m => m.streetArrow === "\u2191");
+      const downStreet = group.find(m => m.streetArrow === "\u2193");
+      const aveLine = primary.sign.avenueName
+        ? `${primary.avenueArrow} ${primary.sign.avenueName}` : "";
+      plateLines = [
+        upStreet ? `\u2191 ${upStreet.sign.label}` : "",
+        aveLine,
+        downStreet ? `\u2193 ${downStreet.sign.label}` : "",
+      ].filter(l => l !== "");
+    } else {
+      const streetLine = `${primary.streetArrow} ${primary.sign.label}`;
+      const aveLine = primary.sign.avenueName
+        ? `${primary.avenueArrow} ${primary.sign.avenueName}` : "";
+      plateLines = aveLine ? [streetLine, aveLine] : [streetLine];
+    }
+
+    const plateH = plateLines.length * SIGN_LINE_H + 6;
+    let plateW = 0;
+    for (const line of plateLines) {
+      plateW = Math.max(plateW, ctx.measureText(line).width + 12);
+    }
+
+    layouts.push({ isMerged, avgMountX, mountY, aveY, onLeft, plateLines, plateW, plateH });
+  }
+  return layouts;
+}
+
 export function renderFrame(
   ctx: CanvasRenderingContext2D,
   state: GameRunState,
@@ -231,7 +411,7 @@ export function renderFrame(
   // Resolve current segment
   let currentSegment: LevelSegment | null = null;
   if (level.segments?.length && state.currentSegmentId) {
-    currentSegment = level.segments.find(s => s.id === state.currentSegmentId) ?? null;
+    currentSegment = getSegmentById(level, state.currentSegmentId);
   }
 
   const isInterior = currentSegment?.type === "interior";
@@ -302,12 +482,10 @@ export function renderFrame(
     }
 
     // Ground tiles — render all isGround platforms, or platform[0] as fallback
-    const groundPlatforms = activePlatforms.filter(p => p.isGround);
-    const groundTargets = groundPlatforms.length > 0 ? groundPlatforms : (activePlatforms[0] ? [activePlatforms[0]] : []);
+    const { groundTargets, uniqueYs } = getGroundGeometry(activePlatforms);
 
     // Background scenery — seasonal trees or procedural houses/trees
     if (groundTargets.length > 0) {
-      const uniqueYs = [...new Set(groundTargets.map(gp => gp.y))];
       if (season) {
         renderSeasonalTrees(ctx, season, uniqueYs, camX, camY, CANVAS_WIDTH);
       } else {
@@ -362,7 +540,7 @@ export function renderFrame(
     }
 
     // Road surface — continuous asphalt strip at each avenue Y (bridges gaps)
-    const avenueYs = new Set(groundTargets.map(gp => gp.y));
+    const avenueYs = uniqueYs;
     for (const aveY of avenueYs) {
       const roadScreenY = aveY - camY;
       if (roadScreenY > CANVAS_HEIGHT + 16 || roadScreenY + 40 < -16) continue;
@@ -509,8 +687,7 @@ export function renderFrame(
 
   // --- Seasonal ground overlay (puddles/leaves/snow on road surface) ---
   if (season && !isInterior) {
-    const groundPlatformsForSeason = activePlatforms.filter(p => p.isGround);
-    const seasonAveYs = [...new Set(groundPlatformsForSeason.map(gp => gp.y))];
+    const seasonAveYs = getGroundGeometry(activePlatforms).groundOnlyYs;
     renderGroundOverlay(ctx, season, seasonAveYs, camX, camY, CANVAS_WIDTH);
     renderSeasonalFlowers(ctx, season, seasonAveYs, camX, camY, CANVAS_WIDTH);
   }
@@ -555,135 +732,21 @@ export function renderFrame(
 
   // --- Street signs (Soviet-style blue plates mounted on corridor walls) ---
   const streetSigns = currentSegment?.streetSigns;
-  if (streetSigns && !isInterior && corridors?.length) {
+  if (streetSigns && !isInterior && corridors?.length && currentSegment) {
     ctx.font = "bold 9px monospace";
 
-    // Pre-process: compute mount info for each sign
-    type SignMount = {
-      sign: StreetSignDef;
-      corridor: StreetCorridor;
-      atTop: boolean;
-      mountX: number;
-      mountY: number;
-      aveY: number;
-      onLeft: boolean;
-      streetArrow: string;
-      avenueArrow: string;
-    };
-    const mounts: SignMount[] = [];
-    for (const sign of streetSigns) {
-      let bestC = corridors[0]!;
-      let bestDist = Infinity;
-      for (const c of corridors) {
-        const cx = c.x + c.width / 2;
-        const dist = Math.abs(sign.x - cx);
-        if (dist < bestDist) { bestDist = dist; bestC = c; }
-      }
-      const atTop = Math.abs(sign.y - bestC.topY) <= Math.abs(sign.y - bestC.bottomY);
-      const aveY = atTop ? bestC.topY : bestC.bottomY;
-      const mountY = aveY - 70;
-
-      let onLeft = true;
-      if (atTop) {
-        let continuesUp = false;
-        for (const oc of corridors) {
-          if (oc === bestC) continue;
-          if (oc.bottomY === bestC.topY && Math.abs((oc.x + oc.width / 2) - (bestC.x + bestC.width / 2)) < 300) {
-            continuesUp = true;
-            break;
-          }
-        }
-        if (!continuesUp) onLeft = false;
-      }
-      const mountX = onLeft ? bestC.x - 2 : bestC.x + bestC.width + 2;
-
-      const streetArrow = atTop ? "↓" : "↑";
-
-      let avenueArrow = "";
-      if (sign.avenueName) {
-        const touchingCorridors: number[] = [];
-        for (const oc of corridors) {
-          if (oc.topY === aveY || oc.bottomY === aveY) {
-            touchingCorridors.push(oc.x + oc.width / 2);
-          }
-        }
-        touchingCorridors.sort((a, b) => a - b);
-        const myCx = bestC.x + bestC.width / 2;
-        const myIdx = touchingCorridors.indexOf(myCx);
-        if (touchingCorridors.length <= 1) {
-          avenueArrow = "↔";
-        } else if (myIdx === 0) {
-          avenueArrow = "→";
-        } else if (myIdx === touchingCorridors.length - 1) {
-          avenueArrow = "←";
-        } else {
-          avenueArrow = "↔";
-        }
-      }
-
-      mounts.push({ sign, corridor: bestC, atTop, mountX, mountY, aveY, onLeft, streetArrow, avenueArrow });
+    let layouts = signLayoutCache.get(currentSegment);
+    if (!layouts) {
+      layouts = computeSignLayouts(streetSigns, corridors, ctx);
+      signLayoutCache.set(currentSegment, layouts);
     }
 
-    // Group signs at the same intersection (same aveY, mountX within 120px)
-    const used = new Set<number>();
-    const groups: SignMount[][] = [];
-    for (let i = 0; i < mounts.length; i++) {
-      if (used.has(i)) continue;
-      const group: SignMount[] = [mounts[i]!];
-      used.add(i);
-      for (let j = i + 1; j < mounts.length; j++) {
-        if (used.has(j)) continue;
-        if (mounts[i]!.aveY === mounts[j]!.aveY &&
-            Math.abs(mounts[i]!.mountX - mounts[j]!.mountX) < 120) {
-          group.push(mounts[j]!);
-          used.add(j);
-        }
-      }
-      groups.push(group);
-    }
-
-    const lineH = 14;
-
-    for (const group of groups) {
-      const primary = group[0]!;
-      const isMerged = group.length > 1;
-
-      // For merged signs, mount on a centered stub between the corridors
-      const avgMountX = isMerged
-        ? Math.round(group.reduce((s, m) => s + m.mountX, 0) / group.length)
-        : primary.mountX;
-      const { mountY, aveY, onLeft } = primary;
+    for (const layout of layouts) {
+      const { isMerged, avgMountX, mountY, aveY, onLeft, plateLines, plateW, plateH } = layout;
 
       const sx = avgMountX - camX;
       const sy = mountY - camY;
       if (sx < -160 || sx > CANVAS_WIDTH + 160 || sy < -60 || sy > CANVAS_HEIGHT + 60) continue;
-
-      // Build plate lines
-      let plateLines: string[];
-      if (isMerged) {
-        // Three-line sign: ↑ street, avenue, ↓ street
-        // Sort so ↑ (going up) is first, ↓ (going down) is last
-        const upStreet = group.find(m => m.streetArrow === "↑");
-        const downStreet = group.find(m => m.streetArrow === "↓");
-        const aveLine = primary.sign.avenueName
-          ? `${primary.avenueArrow} ${primary.sign.avenueName}` : "";
-        plateLines = [
-          upStreet ? `↑ ${upStreet.sign.label}` : "",
-          aveLine,
-          downStreet ? `↓ ${downStreet.sign.label}` : "",
-        ].filter(l => l !== "");
-      } else {
-        const streetLine = `${primary.streetArrow} ${primary.sign.label}`;
-        const aveLine = primary.sign.avenueName
-          ? `${primary.avenueArrow} ${primary.sign.avenueName}` : "";
-        plateLines = aveLine ? [streetLine, aveLine] : [streetLine];
-      }
-
-      const plateH = plateLines.length * lineH + 6;
-      let plateW = 0;
-      for (const line of plateLines) {
-        plateW = Math.max(plateW, ctx.measureText(line).width + 12);
-      }
 
       // Anchor plate position
       const plateX = isMerged
@@ -726,7 +789,7 @@ export function renderFrame(
       ctx.fillStyle = "#ffffff";
       ctx.textAlign = "left";
       for (let i = 0; i < plateLines.length; i++) {
-        ctx.fillText(plateLines[i]!, plateX + 6, sy + 12 + i * lineH);
+        ctx.fillText(plateLines[i]!, plateX + 6, sy + 12 + i * SIGN_LINE_H);
       }
 
       // Snow on sign top (winter only)

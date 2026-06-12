@@ -8,6 +8,7 @@ import { isTouchDevice } from "../engine/touch";
 import {
   createGameRunState,
   updateGameState,
+  cancelPendingLandmarkSpeech,
   renderFrame,
   createInputState,
   setupKeyboardInput,
@@ -246,6 +247,7 @@ export function RunPhase({
       cleanupKeyboard();
       cleanupTouch();
       stopAllBusAudio();
+      cancelPendingLandmarkSpeech();
     };
   }, [level, itemDefs, environment, timeOfDay, season]);
 
