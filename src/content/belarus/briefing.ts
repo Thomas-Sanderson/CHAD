@@ -300,6 +300,189 @@ export const level9Briefing: BriefingScript = {
   ],
 };
 
+// === Level 10 briefing — The Shop Names ===
+export const level10Briefing: BriefingScript = {
+  levelId: "the-shop-names",
+  messages: [
+    {
+      id: "l10-msg-1",
+      sender: "mentor",
+      text: "You know the items. Now learn where they come from. First: РЫБА.",
+      vocabWordIds: ["ryba_shops"],
+    },
+    {
+      id: "l10-msg-1b",
+      sender: "mentor",
+      text: "РЫБНАЯ. The fish shop. Read the sign above the door.",
+      vocabWordIds: ["rybnaya"],
+    },
+    {
+      id: "l10-msg-2",
+      sender: "mentor",
+      text: "Next: ХЛЕБ. You know this word by now.",
+      vocabWordIds: ["hleb_shops"],
+    },
+    {
+      id: "l10-msg-2b",
+      sender: "mentor",
+      text: "ПЕКАРНЯ. The bakery. The shops have names for a reason.",
+      vocabWordIds: ["pekarnya"],
+    },
+    {
+      id: "l10-msg-3",
+      sender: "mentor",
+      text: "And МАСЛО. Yellow slab. You've bought it before.",
+      vocabWordIds: ["maslo_shops"],
+    },
+    {
+      id: "l10-msg-3b",
+      sender: "mentor",
+      text: "МОЛОЧНАЯ. The dairy. You've been in there. You just didn't read the sign.",
+      vocabWordIds: ["molochnaya"],
+    },
+    {
+      id: "l10-msg-4",
+      sender: "mentor",
+      text: "Every МАГАЗИН in this city has a name. Learn them or wander forever.",
+      vocabWordIds: ["magazin"],
+    },
+    {
+      id: "l10-msg-5",
+      sender: "chad",
+      text: "I can figure out store names",
+      vocabWordIds: [],
+    },
+    {
+      id: "l10-msg-6",
+      sender: "mentor",
+      text: "You couldn't figure out a door lock two levels ago.",
+      vocabWordIds: [],
+    },
+  ],
+};
+
+// === Level 11 briefing — The Far Side ===
+export const level11Briefing: BriefingScript = {
+  levelId: "the-far-side",
+  messages: [
+    {
+      id: "l11-msg-1",
+      sender: "mentor",
+      text: "New neighborhood. I need СОСИСКИ. You remember — thin sausages.",
+      vocabWordIds: ["sosiski_farside"],
+    },
+    {
+      id: "l11-msg-1b",
+      sender: "mentor",
+      text: "МЯСНАЯ. The butcher. Red sign. You can't miss it.",
+      vocabWordIds: ["myasnaya"],
+    },
+    {
+      id: "l11-msg-2",
+      sender: "mentor",
+      text: "And СВЁКЛА. Purple root. You know this one.",
+      vocabWordIds: ["sveokla_farside"],
+    },
+    {
+      id: "l11-msg-2b",
+      sender: "mentor",
+      text: "ОВОЩНАЯ. The produce shop. She locked the door. Obviously.",
+      vocabWordIds: ["ovoshchnaya"],
+    },
+    {
+      id: "l11-msg-3",
+      sender: "mentor",
+      text: "I also need АСПИРИН. The white box with the green cross.",
+      vocabWordIds: ["aspirin_farside"],
+    },
+    {
+      id: "l11-msg-3b",
+      sender: "mentor",
+      text: "АПТЕКА sells it. You've walked past that green cross for nine levels.",
+      vocabWordIds: ["apteka"],
+    },
+    {
+      id: "l11-msg-4",
+      sender: "mentor",
+      text: "This whole РЫНОК is starting to feel like home. Whether you like it or not.",
+      vocabWordIds: ["rynok"],
+    },
+    {
+      id: "l11-msg-5",
+      sender: "chad",
+      text: "I know this city",
+      vocabWordIds: [],
+    },
+    {
+      id: "l11-msg-6",
+      sender: "mentor",
+      text: "You know three streets. Don't get ahead of yourself.",
+      vocabWordIds: [],
+    },
+  ],
+};
+
+// === Level 12 briefing — The Full Map ===
+export const level12Briefing: BriefingScript = {
+  levelId: "the-full-map",
+  messages: [
+    {
+      id: "l12-msg-1",
+      sender: "mentor",
+      text: "You know this city now. I want a ПИРОЖОК. The golden baked one.",
+      vocabWordIds: ["pirozhok"],
+    },
+    {
+      id: "l12-msg-1b",
+      sender: "mentor",
+      text: "КАФЕ on the corner. Go inside. Order it like a real person.",
+      vocabWordIds: ["kafe"],
+    },
+    {
+      id: "l12-msg-2",
+      sender: "mentor",
+      text: "I also need a КОНВЕРТ. White. Sealed. Don't ask what's in it.",
+      vocabWordIds: ["konvert"],
+    },
+    {
+      id: "l12-msg-2b",
+      sender: "mentor",
+      text: "ПОЧТА. Blue sign. You've walked past it since level six.",
+      vocabWordIds: ["pochta"],
+    },
+    {
+      id: "l12-msg-3",
+      sender: "mentor",
+      text: "And a МОНЕТА from the jar on the counter. Don't make it weird.",
+      vocabWordIds: ["moneta"],
+    },
+    {
+      id: "l12-msg-3b",
+      sender: "mentor",
+      text: "БАНК. It sounds the same in English. You'll figure it out.",
+      vocabWordIds: ["bank"],
+    },
+    {
+      id: "l12-msg-4",
+      sender: "mentor",
+      text: "You've learned this whole ГОРОД. Every corner. Every sign. Maybe you're not hopeless after all.",
+      vocabWordIds: ["gorod"],
+    },
+    {
+      id: "l12-msg-5",
+      sender: "chad",
+      text: "I know every street",
+      vocabWordIds: [],
+    },
+    {
+      id: "l12-msg-6",
+      sender: "mentor",
+      text: "...I know you do. That's the terrifying part.",
+      vocabWordIds: [],
+    },
+  ],
+};
+
 export const level4Briefing: BriefingScript = {
   levelId: "the-apology",
   messages: [

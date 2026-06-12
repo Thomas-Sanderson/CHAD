@@ -710,11 +710,12 @@ export function updateGameState(
     if (currentSegment?.type !== "interior") {
       const landmarks: LandmarkDef[] = currentSegment?.landmarks ?? level.landmarks ?? [];
       for (const lm of landmarks) {
-        const dist = Math.abs(state.player.position.x - lm.x);
-        if (dist < 60) {
-          pointLabel = lm.label;
-          break;
-        }
+        const dx = Math.abs(state.player.position.x - lm.x);
+        if (dx >= 60) continue;
+        // Multi-avenue levels set lm.y — reject landmarks on distant avenues
+        if (lm.y != null && Math.abs(state.player.position.y - lm.y) > 120) continue;
+        pointLabel = lm.label;
+        break;
       }
     }
 

@@ -2,6 +2,12 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import type { BriefingScript, VocabPack, VocabWord } from "../types";
 import { pronounceWord } from "../engine/audio";
 
+const ITEM_COLOR = "#FFD54F";
+const LOCATION_COLOR = "#64B5F6";
+function wordColor(w: VocabWord): string {
+  return w.category === "location" ? LOCATION_COLOR : ITEM_COLOR;
+}
+
 interface Props {
   briefing: BriefingScript;
   vocabPack: VocabPack;
@@ -54,20 +60,57 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
   // Build a map of script words for highlighting
   const cyrillicWordMap = new Map(vocabPack.words.map((w) => [w.script, w]));
 
-  // Auto-force the word from the most recent visible message
+  // Track whether the user manually clicked a word (cancels auto-sequence)
+  const userPinnedRef = useRef(false);
+  const sequenceTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  // Auto-force words from the most recent visible message, in text order with a delay between each.
+  // Clicking any word pins it until the next message advances.
   useEffect(() => {
     if (visibleCount === 0 || typing) return;
-    // Walk backwards through visible messages to find the latest one with a vocab word
+    userPinnedRef.current = false;
+    clearTimeout(sequenceTimerRef.current);
+
+    // Find latest message with vocab words, extract in text order (longest match first to avoid substrings)
     for (let i = visibleCount - 1; i >= 0; i--) {
       const msg = briefing.messages[i]!;
-      for (const [, word] of cyrillicWordMap) {
-        if (msg.text.includes(word.script)) {
-          setActiveWord(word);
-          setShowHint(false); // forced word shows pronunciation/IPA but not hint
-          return;
+      const sorted = [...cyrillicWordMap.entries()].sort((a, b) => b[0].length - a[0].length);
+      const found: { pos: number; word: VocabWord }[] = [];
+      const covered = new Set<number>();
+      for (const [cyr, word] of sorted) {
+        let from = 0;
+        for (;;) {
+          const idx = msg.text.indexOf(cyr, from);
+          if (idx === -1) break;
+          let overlap = false;
+          for (let p = idx; p < idx + cyr.length; p++) {
+            if (covered.has(p)) { overlap = true; break; }
+          }
+          if (!overlap) {
+            found.push({ pos: idx, word });
+            for (let p = idx; p < idx + cyr.length; p++) covered.add(p);
+          }
+          from = idx + 1;
         }
       }
+      if (found.length === 0) continue;
+      found.sort((a, b) => a.pos - b.pos);
+
+      // Show first word immediately, chain the rest with delays
+      const showWord = (index: number) => {
+        if (index >= found.length || userPinnedRef.current) return;
+        setActiveWord(found[index]!.word);
+        setShowHint(false);
+        if (index > 0) setFlashKey((k) => k + 1);
+        if (index + 1 < found.length) {
+          sequenceTimerRef.current = setTimeout(() => showWord(index + 1), 2000);
+        }
+      };
+      showWord(0);
+      break;
     }
+
+    return () => clearTimeout(sequenceTimerRef.current);
   }, [visibleCount, typing]);
 
   // Auto-scroll messages to bottom
@@ -80,6 +123,8 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
   }, [visibleCount, typing]);
 
   function handleInlineClick(word: VocabWord) {
+    userPinnedRef.current = true;
+    clearTimeout(sequenceTimerRef.current);
     setActiveWord(word);
     setShowHint(true);
     setFlashKey((k) => k + 1);
@@ -87,34 +132,47 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
   }
 
   function highlightCyrillic(text: string): React.ReactNode[] {
-    const parts: React.ReactNode[] = [];
-    let remaining = text;
-    let key = 0;
+    // Find all vocab word matches, longest first to avoid substring collisions (РЫБА inside РЫБНАЯ)
+    const sorted = [...cyrillicWordMap.entries()].sort((a, b) => b[0].length - a[0].length);
+    const matches: { start: number; end: number; word: VocabWord; cyr: string }[] = [];
+    const covered = new Set<number>();
 
-    for (const [cyr, word] of cyrillicWordMap) {
-      const segments = remaining.split(cyr);
-      if (segments.length > 1) {
-        const result: React.ReactNode[] = [];
-        segments.forEach((seg, i) => {
-          if (i > 0) {
-            result.push(
-              <span
-                key={`cyr-${key++}`}
-                style={styles.script}
-                onClick={(e) => { e.stopPropagation(); handleInlineClick(word); }}
-              >
-                {cyr}
-              </span>
-            );
-          }
-          result.push(<span key={`txt-${key++}`}>{seg}</span>);
-        });
-        return result;
+    for (const [cyr, word] of sorted) {
+      let from = 0;
+      for (;;) {
+        const idx = text.indexOf(cyr, from);
+        if (idx === -1) break;
+        let overlap = false;
+        for (let p = idx; p < idx + cyr.length; p++) {
+          if (covered.has(p)) { overlap = true; break; }
+        }
+        if (!overlap) {
+          matches.push({ start: idx, end: idx + cyr.length, word, cyr });
+          for (let p = idx; p < idx + cyr.length; p++) covered.add(p);
+        }
+        from = idx + 1;
       }
     }
 
-    parts.push(<span key="full">{remaining}</span>);
-    return parts;
+    if (matches.length === 0) return [<span key="full">{text}</span>];
+    matches.sort((a, b) => a.start - b.start);
+
+    const result: React.ReactNode[] = [];
+    let pos = 0;
+    let key = 0;
+    for (const m of matches) {
+      if (pos < m.start) result.push(<span key={`t-${key++}`}>{text.slice(pos, m.start)}</span>);
+      result.push(
+        <span
+          key={`c-${key++}`}
+          style={{ ...styles.script, color: wordColor(m.word) }}
+          onClick={(e) => { e.stopPropagation(); handleInlineClick(m.word); }}
+        >{m.cyr}</span>
+      );
+      pos = m.end;
+    }
+    if (pos < text.length) result.push(<span key={`t-${key++}`}>{text.slice(pos)}</span>);
+    return result;
   }
 
   return (
@@ -122,10 +180,10 @@ export function BriefingScreen({ briefing, vocabPack, onComplete, mentorName = "
       <div className="briefing-body">
         <div className="briefing-left">
           {activeWord ? (
-            <div key={flashKey} className="briefing-word-panel" style={styles.wordPanel}>
-              <div style={styles.wordScript}>{activeWord.script}</div>
+            <div key={flashKey} className="briefing-word-panel" style={{ ...styles.wordPanel, "--flash-color": wordColor(activeWord) } as React.CSSProperties}>
+              <div style={{ ...styles.wordScript, color: wordColor(activeWord) }}>{activeWord.script}</div>
               {activeWord.pronunciation && (
-                <div style={styles.wordPronunciation}>{activeWord.pronunciation}</div>
+                <div style={{ ...styles.wordPronunciation, color: wordColor(activeWord) }}>{activeWord.pronunciation}</div>
               )}
               {activeWord.ipa && (
                 <div style={styles.wordIpa}>{activeWord.ipa}</div>
@@ -228,7 +286,7 @@ const briefingCSS = `
   }
 
   @keyframes briefing-flash {
-    0% { background: rgba(255, 213, 79, 0.25); }
+    0% { background: color-mix(in srgb, var(--flash-color, #FFD54F) 25%, transparent); }
     100% { background: transparent; }
   }
   @keyframes briefing-hint-in {

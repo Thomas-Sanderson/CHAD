@@ -172,7 +172,9 @@ export const level7Data: LevelData = {
       bounds: { width: LEVEL_WIDTH, height: LEVEL_HEIGHT },
       landmarks: [
         { label: "АПТЕКА", x: 1500, y: AVENUE_1_Y - 88 },
+        { label: "БАНК", x: 1900, y: AVENUE_1_Y - 88 },
         { label: "КАФЕ", x: 1700, y: AVENUE_2_Y - 88 },
+        { label: "МАГАЗИН", x: 2100, y: AVENUE_2_Y - 88 },
       ],
       streetSigns: [
         // === Street A × Avenue 2 (upper) ===

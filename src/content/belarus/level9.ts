@@ -242,10 +242,13 @@ export const level9Data: LevelData = {
       ],
       bounds: { width: LEVEL_WIDTH, height: LEVEL_HEIGHT },
       landmarks: [
-        { label: "АПТЕКА", x: 1800, y: AVE1_Y - 88 },
-        { label: "ШКОЛА", x: 2800, y: AVE2_Y - 88 },
-        { label: "КАФЕ", x: 1200, y: AVE3_Y - 88 },
-        { label: "БИБЛИОТЕКА", x: 1000, y: AVE4_Y - 88 },
+        { label: "АПТЕКА", x: 54, y: AVE1_Y - 88 },
+        { label: "ШКОЛА", x: 2800, y: AVE1_Y - 88 },
+        { label: "МАГАЗИН", x: 1500, y: AVE1_Y - 88 },
+        { label: "БАНК", x: 1266, y: AVE2_Y - 88 },
+        { label: "КАФЕ", x: 2500, y: AVE2_Y - 88 },
+        { label: "БИБЛИОТЕКА", x: 1200, y: AVE3_Y - 88 },
+        { label: "ПОЧТА", x: 2400, y: AVE4_Y - 88 },
       ],
       streetSigns: [
         // === Street 1 (УЛ. ТОЛСТОГО) × Avenue 1 ===
@@ -281,7 +284,7 @@ export const level9Data: LevelData = {
         // === Street 3 (УЛ. МИРА) × Avenue 3 ===
         {
           id: "sign-mira-ave3", label: "УЛ. МИРА",
-          avenueName: "ПР. ПАРТИЗАНСКИЙ",
+          avenueName: "ПР. ОКТЯБРЬСКИЙ",
           x: 1690, y: AVE3_Y + 5,
         },
         // === Street 4 (УЛ. ПОБЕДЫ) × Avenue 2 ===
@@ -293,31 +296,31 @@ export const level9Data: LevelData = {
         // === Street 4 (УЛ. ПОБЕДЫ) × Avenue 3 ===
         {
           id: "sign-pobedy-ave3", label: "УЛ. ПОБЕДЫ",
-          avenueName: "ПР. ПАРТИЗАНСКИЙ",
+          avenueName: "ПР. ОКТЯБРЬСКИЙ",
           x: 2290, y: AVE3_Y + 5,
         },
         // === Street 5 (УЛ. ЛЕРМОНТОВА) × Avenue 3 ===
         {
           id: "sign-lermontova-ave3", label: "УЛ. ЛЕРМОНТОВА",
-          avenueName: "ПР. ПАРТИЗАНСКИЙ",
+          avenueName: "ПР. ОКТЯБРЬСКИЙ",
           x: 2640, y: AVE3_Y + 5,
         },
         // === Street 5 (УЛ. ЛЕРМОНТОВА) × Avenue 4 ===
         {
           id: "sign-lermontova-ave4", label: "УЛ. ЛЕРМОНТОВА",
-          avenueName: "ПР. МАШЕРОВА",
+          avenueName: "ПР. ПАРТИЗАНСКИЙ",
           x: 2890, y: AVE4_Y + 5,
         },
         // === Street 6 (УЛ. ГОРЬКОГО) × Avenue 3 ===
         {
           id: "sign-gorkogo-ave3", label: "УЛ. ГОРЬКОГО",
-          avenueName: "ПР. ПАРТИЗАНСКИЙ",
+          avenueName: "ПР. ОКТЯБРЬСКИЙ",
           x: 1740, y: AVE3_Y + 5,
         },
         // === Street 6 (УЛ. ГОРЬКОГО) × Avenue 4 ===
         {
           id: "sign-gorkogo-ave4", label: "УЛ. ГОРЬКОГО",
-          avenueName: "ПР. МАШЕРОВА",
+          avenueName: "ПР. ПАРТИЗАНСКИЙ",
           x: 1990, y: AVE4_Y + 5,
         },
       ],

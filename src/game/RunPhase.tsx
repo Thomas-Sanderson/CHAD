@@ -16,7 +16,7 @@ import {
   CANVAS_HEIGHT,
 } from "../engine";
 import type { HudData } from "../engine";
-import { pronounceWord, speakText, speakQueued, speakScold } from "../engine/audio";
+import { speakText, speakQueued, speakScold } from "../engine/audio";
 import { sfxJump, sfxCollect, sfxHeartLost, sfxDoorEnter, sfxShout, sfxGateSuccess } from "../engine/sfx";
 import { updateBusAudio, stopAllBusAudio } from "../engine/sfxBus";
 import { ShoutMenu } from "./ShoutMenu";
@@ -171,17 +171,14 @@ export function RunPhase({
       }
       prevOnGroundRef.current = gameState.player.onGround;
 
-      // SFX: item collected
+      // SFX: item collected — speak the item's own name, not the matching vocab word
+      // (In L10-12 the vocab word is the shop name, not the item name)
       if (gameState.collectedItems.length > prevCollectedCount) {
         sfxCollect();
         const newItemId = gameState.collectedItems[gameState.collectedItems.length - 1];
-        const allWords = [...vocabWordsRef.current, ...learnedWordsRef.current];
-        const matchingWord = allWords.find(w => w.matchesItemId === newItemId);
-        if (matchingWord) {
-          setTimeout(() => pronounceWord(matchingWord), 100);
-        } else {
-          const itemDef = itemDefs.get(newItemId!);
-          if (itemDef?.script?.trim()) setTimeout(() => speakText(itemDef.script), 100);
+        const itemDef = itemDefs.get(newItemId!);
+        if (itemDef?.script?.trim()) {
+          setTimeout(() => speakText(itemDef.script), 100);
         }
       }
 

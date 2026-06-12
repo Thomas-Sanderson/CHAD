@@ -3,6 +3,172 @@ import { belarusSkin } from "./skin";
 import { ethiopiaSkin } from "../ethiopia/skin";
 import { italySkin } from "../italy/skin";
 import type { SkinConfig } from "../../types/skin";
+import type { LevelSegment, StreetSignDef, StreetCorridor } from "../../types/content";
+
+// --- Overlap detection helpers ---
+// Replicates the renderer's sign mounting logic to compute actual visual bounds.
+// Approximate monospace char width at "bold 9px monospace" — ~6px per char (generous).
+const CHAR_W = 6;
+const PLATE_PAD = 12; // ctx.measureText(line).width + 12 in renderer
+const DOOR_FACADE_HALF_W = 48; // 24px sprite × scale 4 = 96px, half = 48
+const LANDMARK_HALF_W = 48;    // 20-24px sprite × scale 4 = 80-96px, half ≤ 48
+
+interface Span { label: string; left: number; right: number; aveY: number }
+
+/** Mirrors the renderer's corridor-binding for a sign. */
+function signMount(sign: StreetSignDef, corridors: StreetCorridor[]) {
+  let bestC = corridors[0]!;
+  let bestDist = Infinity;
+  for (const c of corridors) {
+    const cx = c.x + c.width / 2;
+    const dist = Math.abs(sign.x - cx);
+    if (dist < bestDist) { bestDist = dist; bestC = c; }
+  }
+  const atTop = Math.abs(sign.y - bestC.topY) <= Math.abs(sign.y - bestC.bottomY);
+  const aveY = atTop ? bestC.topY : bestC.bottomY;
+  let onLeft = true;
+  if (atTop) {
+    let continuesUp = false;
+    for (const oc of corridors) {
+      if (oc === bestC) continue;
+      if (oc.bottomY === bestC.topY && Math.abs((oc.x + oc.width / 2) - (bestC.x + bestC.width / 2)) < 300) {
+        continuesUp = true; break;
+      }
+    }
+    if (!continuesUp) onLeft = false;
+  }
+  const mountX = onLeft ? bestC.x - 2 : bestC.x + bestC.width + 2;
+  return { mountX, aveY, onLeft };
+}
+
+/** Build the sign plate text lines (same logic as renderer) to measure width. */
+function signPlateLines(sign: StreetSignDef, streetArrow: string, avenueArrow: string): string[] {
+  const streetLine = `${streetArrow} ${sign.label}`;
+  const aveLine = sign.avenueName ? `${avenueArrow} ${sign.avenueName}` : "";
+  return aveLine ? [streetLine, aveLine] : [streetLine];
+}
+
+function mergedPlateLines(group: { sign: StreetSignDef; streetArrow: string; avenueArrow: string }[]): string[] {
+  if (group.length === 1) return signPlateLines(group[0]!.sign, group[0]!.streetArrow, group[0]!.avenueArrow);
+  const up = group.find(m => m.streetArrow === "↑");
+  const down = group.find(m => m.streetArrow === "↓");
+  const primary = group[0]!;
+  const aveLine = primary.sign.avenueName ? `${primary.avenueArrow} ${primary.sign.avenueName}` : "";
+  return [
+    up ? `↑ ${up.sign.label}` : "",
+    aveLine,
+    down ? `↓ ${down.sign.label}` : "",
+  ].filter(l => l !== "");
+}
+
+function plateWidth(lines: string[]): number {
+  let w = 0;
+  for (const l of lines) w = Math.max(w, l.length * CHAR_W + PLATE_PAD);
+  return w;
+}
+
+function collectStreetSpans(seg: LevelSegment): Span[] {
+  const spans: Span[] = [];
+  const corridors = seg.streetCorridors ?? [];
+
+  // Street signs — group merged signs (same aveY, mountX within 120px),
+  // then compute actual plate bounds (extends left or right, or centered for merged)
+  if (seg.streetSigns && corridors.length) {
+    const mounts = seg.streetSigns.map(sign => {
+      const m = signMount(sign, corridors);
+      const streetArrow = (Math.abs(sign.y - corridors.reduce((best, c) => {
+        const d = Math.abs(sign.x - (c.x + c.width / 2));
+        return d < Math.abs(sign.x - (best.x + best.width / 2)) ? c : best;
+      }, corridors[0]!).topY) <= Math.abs(sign.y - corridors.reduce((best, c) => {
+        const d = Math.abs(sign.x - (c.x + c.width / 2));
+        return d < Math.abs(sign.x - (best.x + best.width / 2)) ? c : best;
+      }, corridors[0]!).bottomY)) ? "↓" : "↑";
+      return { sign, ...m, streetArrow, avenueArrow: sign.avenueName ? "→" : "" };
+    });
+
+    const used = new Set<number>();
+    for (let i = 0; i < mounts.length; i++) {
+      if (used.has(i)) continue;
+      const group = [mounts[i]!];
+      used.add(i);
+      for (let j = i + 1; j < mounts.length; j++) {
+        if (used.has(j)) continue;
+        if (mounts[i]!.aveY === mounts[j]!.aveY &&
+            Math.abs(mounts[i]!.mountX - mounts[j]!.mountX) < 120) {
+          group.push(mounts[j]!);
+          used.add(j);
+        }
+      }
+      const isMerged = group.length > 1;
+      const lines = mergedPlateLines(group);
+      const pw = plateWidth(lines);
+      const avgMountX = Math.round(group.reduce((s, m) => s + m.mountX, 0) / group.length);
+      const labels = group.map(m => m.sign.label).join(" + ");
+
+      let left: number, right: number;
+      if (isMerged) {
+        // Centered on avgMountX
+        left = avgMountX - pw / 2;
+        right = avgMountX + pw / 2;
+      } else {
+        // Extends entirely to one side
+        if (group[0]!.onLeft) {
+          right = group[0]!.mountX;
+          left = right - pw;
+        } else {
+          left = group[0]!.mountX;
+          right = left + pw;
+        }
+      }
+      spans.push({ label: `sign "${labels}"`, left, right, aveY: group[0]!.aveY });
+    }
+  }
+
+  // Doors with labels (shop facades)
+  if (seg.type === "street") {
+    for (const door of seg.doors) {
+      if (!door.label) continue;
+      const cx = door.x + door.width / 2;
+      spans.push({
+        label: `door "${door.label}" (${door.id})`,
+        left: cx - DOOR_FACADE_HALF_W,
+        right: cx + DOOR_FACADE_HALF_W,
+        aveY: door.y + door.height,
+      });
+    }
+  }
+
+  // Landmarks
+  if (seg.landmarks) {
+    for (const lm of seg.landmarks) {
+      const groundY = lm.y ? lm.y + 88 : 0;
+      spans.push({
+        label: `landmark "${lm.label}"`,
+        left: lm.x - LANDMARK_HALF_W,
+        right: lm.x + LANDMARK_HALF_W,
+        aveY: groundY,
+      });
+    }
+  }
+
+  return spans;
+}
+
+/** Check if two spans on the same avenue overlap horizontally. */
+function findOverlaps(spans: Span[], aveTolerance = 200): string[] {
+  const errors: string[] = [];
+  for (let i = 0; i < spans.length; i++) {
+    for (let j = i + 1; j < spans.length; j++) {
+      const a = spans[i]!, b = spans[j]!;
+      if (Math.abs(a.aveY - b.aveY) > aveTolerance) continue;
+      const overlap = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+      if (overlap > 0) {
+        errors.push(`${a.label} overlaps ${b.label} by ${overlap.toFixed(0)}px (${a.left.toFixed(0)}-${a.right.toFixed(0)} vs ${b.left.toFixed(0)}-${b.right.toFixed(0)})`);
+      }
+    }
+  }
+  return errors;
+}
 
 const allSkins: SkinConfig[] = [belarusSkin, ethiopiaSkin, italySkin];
 
@@ -117,6 +283,17 @@ for (const skin of allSkins) {
         it("has decoy items", () => {
           const decoys = level.items.filter((i) => i.isDecoy);
           expect(decoys.length).toBeGreaterThanOrEqual(3);
+        });
+
+        it("signs, doors, and landmarks do not overlap in street segments", () => {
+          const segments = level.levelData.segments;
+          if (!segments) return; // flat levels don't have segments
+          for (const seg of segments) {
+            if (seg.type !== "street") continue;
+            const spans = collectStreetSpans(seg);
+            const overlaps = findOverlaps(spans);
+            expect(overlaps, `Overlaps in segment "${seg.id}":\n${overlaps.join("\n")}`).toHaveLength(0);
+          }
         });
 
         it("has a gate fail text", () => {

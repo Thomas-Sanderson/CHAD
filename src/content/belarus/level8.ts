@@ -187,8 +187,11 @@ export const level8Data: LevelData = {
       ],
       bounds: { width: LEVEL_WIDTH, height: LEVEL_HEIGHT },
       landmarks: [
-        { label: "ШКОЛА", x: 800, y: AVE1_Y - 88 },
-        { label: "БАНК", x: 1400, y: AVE2_Y - 88 },
+        { label: "ШКОЛА", x: 144, y: AVE1_Y - 88 },
+        { label: "МАГАЗИН", x: 1700, y: AVE1_Y - 88 },
+        { label: "АПТЕКА", x: 900, y: AVE2_Y - 88 },
+        { label: "БАНК", x: 1554, y: AVE2_Y - 88 },
+        { label: "КАФЕ", x: 2300, y: AVE2_Y - 88 },
         { label: "ПОЧТА", x: 1500, y: AVE3_Y - 88 },
       ],
       streetSigns: [
@@ -231,14 +234,14 @@ export const level8Data: LevelData = {
         {
           id: "sign-mira-ave3",
           label: "УЛ. МИРА",
-          avenueName: "ПР. ПАРТИЗАНСКИЙ",
+          avenueName: "ПР. ОКТЯБРЬСКИЙ",
           x: 2120, y: AVE3_Y + 5,
         },
         // === Street D × Avenue 3 (drop-only stub) ===
         {
           id: "sign-gagarina-ave3",
           label: "УЛ. ГАГАРИНА",
-          avenueName: "ПР. ПАРТИЗАНСКИЙ",
+          avenueName: "ПР. ОКТЯБРЬСКИЙ",
           x: 2680, y: AVE3_Y + 5,
         },
       ],

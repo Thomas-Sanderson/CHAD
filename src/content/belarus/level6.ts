@@ -1,8 +1,11 @@
 import type { LevelData } from "../../types";
 import type { ShopKeeperConversation, ConvoPhrase } from "../../types/content";
 
-const GROUND_Y = 410;
-const LEVEL_WIDTH = 3400;
+// Two avenues — gentle introduction to vertical city
+const AVE1_Y = 600; // lower avenue (start)
+const AVE2_Y = 250; // upper avenue (gate)
+const LEVEL_WIDTH = 2600;
+const LEVEL_HEIGHT = 900;
 
 // Shared greetings / farewells — all Belarus shopkeepers use these
 const GREETINGS = [
@@ -70,63 +73,75 @@ const veggiesConversation: ShopKeeperConversation = {
 export const level6Data: LevelData = {
   id: "the-market",
   name: "The Market",
-  // These fields are used as fallback; segments override them
+  // Fallback fields — segments override these
   platforms: [],
   collectibles: [],
   hazards: [],
   npcs: [],
-  startPosition: { x: 120, y: GROUND_Y - 48 },
-  gatePosition: { x: 3200, y: GROUND_Y - 80 },
-  bounds: { width: LEVEL_WIDTH, height: 450 },
+  startPosition: { x: 120, y: AVE1_Y - 48 },
+  gatePosition: { x: 2400, y: AVE2_Y - 80 },
+  bounds: { width: LEVEL_WIDTH, height: LEVEL_HEIGHT },
+  skylineY: 50,
+  deathFloorY: 800,
   segments: [
-    // === STREET SEGMENT ===
+    // === CITY STREET SEGMENT (both avenues + connecting street) ===
     {
       id: "street",
       type: "street",
       platforms: [
-        // Ground — full width
-        { x: 0, y: GROUND_Y, width: LEVEL_WIDTH, height: 40 },
+        // --- Avenue 1 (lower) — gap at Street A (x: 780-1010) ---
+        { x: 0, y: AVE1_Y, width: 780, height: 40, isGround: true },
+        { x: 1010, y: AVE1_Y, width: LEVEL_WIDTH - 1010, height: 40, isGround: true },
 
-        // Light platforming between shops (puddle jumps, low obstacles)
-        { x: 350, y: 370, width: 60, height: 16 },
-        { x: 700, y: 380, width: 80, height: 16 },
-        { x: 1150, y: 370, width: 60, height: 16 },
-        { x: 1600, y: 380, width: 80, height: 16 },
-        { x: 2050, y: 370, width: 60, height: 16 },
-        { x: 2500, y: 380, width: 80, height: 16 },
+        // --- Avenue 2 (upper) — gap at Street A (x: 780-1010) ---
+        { x: 0, y: AVE2_Y, width: 780, height: 40, isGround: true },
+        { x: 1010, y: AVE2_Y, width: LEVEL_WIDTH - 1010, height: 40, isGround: true },
 
-        // Elevated platforms for decoy items
-        { x: 500, y: 300, width: 100, height: 16 },
-        { x: 1300, y: 280, width: 100, height: 16 },
-        { x: 2200, y: 290, width: 80, height: 16 },
-        { x: 2700, y: 200, width: 80, height: 16 }, // high platform for potato
-        { x: 2850, y: 250, width: 80, height: 16 }, // mystery can platform
-        { x: 2900, y: 330, width: 120, height: 16 },
+        // --- Street A (x≈800-1000): gentle ascending platforms ---
+        { x: 800, y: AVE1_Y - 60, width: 90, height: 16 },                  // entry (y=540)
+        { x: 920, y: 470, width: 80, height: 16, passThrough: true },        // step 2 (gap: 70)
+        { x: 800, y: 400, width: 80, height: 16, passThrough: true },        // step 3 (gap: 70)
+        { x: 920, y: 330, width: 80, height: 16, passThrough: true },        // step 4 (gap: 70)
+        { x: 850, y: AVE2_Y + 16, width: 90, height: 16 },                  // landing (y=266, gap: 64)
+
+        // --- Avenue 1 platforming ---
+        { x: 350, y: 560, width: 60, height: 16 },       // puddle jump
+        { x: 600, y: 550, width: 80, height: 16 },        // decoy platform
+        { x: 1400, y: 560, width: 60, height: 16 },       // puddle jump
+        { x: 1800, y: 550, width: 80, height: 16 },       // decoy platform
+
+        // --- Avenue 2 platforming ---
+        { x: 1200, y: 210, width: 80, height: 16 },       // decoy platform
+        { x: 1700, y: 200, width: 80, height: 16 },       // high platform for potato
+        { x: 2000, y: 210, width: 80, height: 16 },       // mystery can platform
       ],
       collectibles: [
         // Outdoor decoys only — target items are inside shops
-        { itemId: "kolbasa_ring", x: 540, y: 270 },
-        { itemId: "kvass_bottle", x: 1340, y: 250 },
-        { itemId: "pickle_jar", x: 2240, y: 260 },
-        { itemId: "sunflower_seeds", x: 2950, y: 300 },
-        { itemId: "mystery_can", x: 2880, y: 220 },
+        { itemId: "kolbasa_ring", x: 620, y: 520 },
+        { itemId: "kvass_bottle", x: 1820, y: 520 },
+        { itemId: "pickle_jar", x: 1220, y: 180 },
+        { itemId: "sunflower_seeds", x: 1420, y: 530 },
+        { itemId: "mystery_can", x: 2020, y: 180 },
       ],
       hazards: [
-        { type: "marshrutka", y: GROUND_Y - 40, speed: 380, interval: 5500 },
+        // Marshrutka on Avenue 1
+        { type: "marshrutka", y: AVE1_Y - 40, speed: 350, interval: 6000 },
       ],
       npcs: [
-        { type: "babushka", x: 400, y: GROUND_Y - 44, patrolRange: 140 },
-        { type: "babushka", x: 1200, y: GROUND_Y - 44, patrolRange: 120 },
-        { type: "babushka", x: 1900, y: GROUND_Y - 44, patrolRange: 130 },
-        { type: "babushka", x: 2600, y: GROUND_Y - 44, patrolRange: 100 },
-        { type: "potato", x: 2710, y: 170 },
+        // Avenue 1 babushkas
+        { type: "babushka", x: 400, y: AVE1_Y - 44, patrolRange: 140 },
+        { type: "babushka", x: 1500, y: AVE1_Y - 44, patrolRange: 120 },
+        // Avenue 2 babushka
+        { type: "babushka", x: 1600, y: AVE2_Y - 44, patrolRange: 100 },
+        // Sacred potato on high platform
+        { type: "potato", x: 1710, y: 170 },
       ],
       doors: [
-        // Dairy shop entrance
+        // Dairy shop entrance (Avenue 1, left)
         {
           id: "dairy-enter",
           x: 165,
-          y: GROUND_Y - 60,
+          y: AVE1_Y - 60,
           width: 30,
           height: 60,
           targetSegmentId: "dairy",
@@ -135,24 +150,11 @@ export const level6Data: LevelData = {
           locked: false,
           label: "МОЛОЧНАЯ",
         },
-        // Fish shop entrance
-        {
-          id: "fish-enter",
-          x: 815,
-          y: GROUND_Y - 60,
-          width: 30,
-          height: 60,
-          targetSegmentId: "fish",
-          targetX: 140,
-          targetY: 206,
-          locked: false,
-          label: "РЫБНАЯ",
-        },
-        // Veggies shop entrance — LOCKED, requires shout
+        // Veggies shop entrance (Avenue 1, right of corridor) — LOCKED
         {
           id: "veggies-enter",
-          x: 1715,
-          y: GROUND_Y - 60,
+          x: 1200,
+          y: AVE1_Y - 60,
           width: 30,
           height: 60,
           targetSegmentId: "veggies",
@@ -161,14 +163,48 @@ export const level6Data: LevelData = {
           locked: true,
           label: "ОВОЩИ-ФРУКТЫ",
         },
+        // Fish shop entrance (Avenue 2, right of corridor)
+        {
+          id: "fish-enter",
+          x: 1500,
+          y: AVE2_Y - 60,
+          width: 30,
+          height: 60,
+          targetSegmentId: "fish",
+          targetX: 140,
+          targetY: 206,
+          locked: false,
+          label: "РЫБНАЯ",
+        },
       ],
-      bounds: { width: LEVEL_WIDTH, height: 450 },
+      bounds: { width: LEVEL_WIDTH, height: LEVEL_HEIGHT },
       landmarks: [
-        { label: "КАФЕ", x: 450 },
-        { label: "МАГАЗИН", x: 1050 },
-        { label: "БИБЛИОТЕКА", x: 1900 },
-        { label: "БАНК", x: 2400 },
-        { label: "ПАРК", x: 3000 },
+        { label: "МАГАЗИН", x: 450, y: AVE1_Y - 88 },
+        { label: "БАНК", x: 1700, y: AVE1_Y - 88 },
+        { label: "КАФЕ", x: 300, y: AVE2_Y - 88 },
+        { label: "АПТЕКА", x: 2000, y: AVE2_Y - 88 },
+        { label: "ПАРК", x: 2300, y: AVE2_Y - 88 },
+      ],
+      streetSigns: [
+        // === Street A × Avenue 1 (lower) ===
+        {
+          id: "sign-mira-ave1",
+          label: "УЛ. МИРА",
+          avenueName: "ПР. НЕЗАВИСИМОСТИ",
+          x: 780,
+          y: AVE1_Y + 5,
+        },
+        // === Street A × Avenue 2 (upper) ===
+        {
+          id: "sign-mira-ave2",
+          label: "УЛ. МИРА",
+          avenueName: "ПР. ПОБЕДИТЕЛЕЙ",
+          x: 1010,
+          y: AVE2_Y + 5,
+        },
+      ],
+      streetCorridors: [
+        { x: 790, width: 220, topY: AVE2_Y, bottomY: AVE1_Y },
       ],
     },
 
@@ -200,7 +236,7 @@ export const level6Data: LevelData = {
           height: 60,
           targetSegmentId: "street",
           targetX: 165,
-          targetY: GROUND_Y - 48,
+          targetY: AVE1_Y - 48,
           locked: false,
           label: "ВЫХОД",
         },
@@ -240,8 +276,8 @@ export const level6Data: LevelData = {
           width: 30,
           height: 60,
           targetSegmentId: "street",
-          targetX: 815,
-          targetY: GROUND_Y - 48,
+          targetX: 1500,
+          targetY: AVE2_Y - 48,
           locked: false,
           label: "ВЫХОД",
         },
@@ -281,8 +317,8 @@ export const level6Data: LevelData = {
           width: 30,
           height: 60,
           targetSegmentId: "street",
-          targetX: 1715,
-          targetY: GROUND_Y - 48,
+          targetX: 1200,
+          targetY: AVE1_Y - 48,
           locked: false,
           label: "ВЫХОД",
         },

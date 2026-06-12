@@ -68,7 +68,7 @@ export function SortingScreen({
   const [shaking, setShaking] = useState(false);
 
   const targetWords = useMemo(
-    () => vocabPack.words.filter((w) => w.matchesItemId !== null),
+    () => vocabPack.words.filter((w) => w.matchesItemId !== null && w.category !== "location"),
     [vocabPack]
   );
 

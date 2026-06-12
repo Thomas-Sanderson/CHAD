@@ -64,6 +64,8 @@ const SL = "#aa7744"; // Shelf Light (bracket)
 const KT = "#bbaa88"; // Counter Top
 const MS = "#8899aa"; // Metal Shelf
 const ML = "#99aabb"; // Metal Shelf Light
+const GF = "#55aa66"; // Glass Frame (pharmacy green)
+const GP = "#c8e8d0"; // Glass Panel (frosted)
 const EG = "#2d8c3c"; // Exit Green (ГОСТ standard)
 const ED = "#1f6b2e"; // Exit Green Dark (ГОСТ border)
 const LR = "#cc4444"; // Lock Red
@@ -567,14 +569,116 @@ export const shopButcherSprite: SpriteData = buildLandmark(24, 24, [
   [19, 16, 1, 1, "#ccaa88"],  // handle
 ]);
 
+// АПТЕКА — Pharmacy (green cross, white/green, clinical)
+export const shopPharmacySprite: SpriteData = buildLandmark(24, 24, [
+  [0, 2, 24, 2, "#33aa55"],   // pharmacy green sign plate
+  [1, 2, 22, 1, "#2a9948"],   // sign inner
+  [10, 0, 4, 2, "#33aa55"],   // green cross top
+  [11, 0, 1, 2, "#2a9948"],   // cross shadow
+  [9, 0, 1, 1, "#33aa55"],    // cross arm left
+  [14, 0, 1, 1, "#33aa55"],   // cross arm right
+  [0, 4, 24, 20, "#e8f0e8"],  // pale green body
+  [0, 4, 24, 1, "#dde8dd"],   // cornice
+  [0, 5, 24, 3, "#33aa55"],   // green awning
+  [0, 5, 4, 3, "#2a9948"],    // awning dark
+  [8, 5, 4, 3, "#2a9948"],
+  [16, 5, 4, 3, "#2a9948"],
+  [2, 10, 10, 7, "#d4e8d8"],  // display window
+  [3, 11, 8, 5, "#e0f0e4"],   // glass
+  [6, 10, 1, 7, "#bbddcc"],   // window divider
+  [4, 13, 2, 2, WH],          // medicine box
+  [7, 12, 2, 3, "#cc4444"],   // red cross bottle
+  [4, 11, 1, 1, "#33aa55"],   // green bottle
+  [15, 10, 6, 14, "#2a9948"], // door
+  [16, 11, 4, 12, "#228844"], // door inner
+  [19, 16, 1, 1, WH],         // handle
+  [16, 12, 3, 3, "#d4e8d8"],  // door window
+]);
+
+// КАФЕ — Cafe (warm brown, red-white awning, front window)
+export const shopCafeSprite: SpriteData = buildLandmark(24, 24, [
+  [0, 2, 24, 2, "#884422"],   // brown sign plate
+  [1, 2, 22, 1, "#773311"],   // sign inner
+  [0, 4, 24, 20, "#e8dcc8"],  // warm plaster body
+  [0, 4, 24, 1, "#ddccaa"],   // cornice
+  [0, 5, 24, 3, "#cc3333"],   // red awning
+  [0, 5, 3, 3, WH],           // white stripe
+  [6, 5, 3, 3, WH],
+  [12, 5, 3, 3, WH],
+  [18, 5, 3, 3, WH],
+  [2, 10, 10, 7, "#c8b8a0"],  // big front window
+  [3, 11, 8, 5, "#e0d8cc"],   // glass
+  [3, 11, 1, 5, "#bb9966"],   // curtain left
+  [10, 11, 1, 5, "#bb9966"],  // curtain right
+  [5, 13, 3, 2, "#996633"],   // table in window
+  [6, 12, 1, 1, "#cc4444"],   // cup
+  [0, 20, 5, 2, "#886644"],   // outdoor table leg
+  [0, 18, 6, 2, "#996633"],   // outdoor table top
+  [1, 17, 1, 1, "#cc4444"],   // outdoor cup
+  [15, 10, 6, 14, "#773311"], // door
+  [16, 11, 4, 12, "#662200"], // door inner
+  [19, 16, 1, 1, "#ccaa55"],  // handle
+  [16, 12, 3, 3, "#c8b8a0"],  // door window
+]);
+
+// ПОЧТА — Post office (blue-gray, envelope icon, mail slot)
+export const shopPostSprite: SpriteData = buildLandmark(24, 24, [
+  [0, 2, 24, 2, "#3355aa"],   // blue sign plate
+  [1, 2, 22, 1, "#2244aa"],   // sign inner
+  [10, 0, 4, 2, WH],          // envelope icon
+  [11, 0, 2, 1, "#3355aa"],   // envelope flap
+  [0, 4, 24, 20, "#c0c8d4"],  // blue-gray body
+  [0, 4, 24, 1, "#b0b8c4"],   // cornice
+  [0, 5, 24, 3, "#3355aa"],   // blue awning
+  [0, 5, 4, 3, "#2244aa"],    // awning dark
+  [8, 5, 4, 3, "#2244aa"],
+  [16, 5, 4, 3, "#2244aa"],
+  [2, 10, 10, 7, "#b0bcc8"],  // window
+  [3, 11, 8, 5, "#c8d4e0"],   // glass
+  [6, 10, 1, 7, "#99aacc"],   // window divider
+  [4, 13, 3, 2, "#eeddcc"],   // letter stack
+  [8, 12, 2, 2, "#eeddcc"],   // parcel
+  [2, 19, 6, 2, "#2244aa"],   // mail slot
+  [3, 19, 4, 1, "#111133"],   // slot opening
+  [15, 10, 6, 14, "#2244aa"], // door
+  [16, 11, 4, 12, "#1a3388"], // door inner
+  [19, 16, 1, 1, "#ccccdd"],  // handle
+]);
+
+// БАНК — Bank (stone/navy, columns, formal)
+export const shopBankSprite: SpriteData = buildLandmark(24, 24, [
+  [0, 0, 24, 4, "#2a4a6a"],   // heavy stone lintel
+  [1, 1, 22, 2, "#1a3a5a"],   // lintel inner
+  [8, 1, 8, 2, "#ccbb88"],    // brass sign plate
+  [0, 4, 24, 20, "#c8c4b8"],  // stone body
+  [0, 4, 24, 1, "#b8b4a8"],   // cornice
+  [2, 5, 2, 19, "#a8a498"],   // column left
+  [2, 5, 2, 1, "#b8b4a8"],    // column cap left
+  [20, 5, 2, 19, "#a8a498"],  // column right
+  [20, 5, 2, 1, "#b8b4a8"],   // column cap right
+  [5, 10, 5, 6, "#b0bcc8"],   // window left
+  [6, 11, 3, 4, "#c8d4e0"],   // glass left
+  [14, 10, 5, 6, "#b0bcc8"],  // window right
+  [15, 11, 3, 4, "#c8d4e0"],  // glass right
+  [9, 8, 6, 16, "#1a3a5a"],   // heavy door
+  [10, 9, 4, 14, "#2a4a6a"],  // door inner
+  [11, 8, 2, 1, "#ccbb88"],   // door brass plate
+  [13, 14, 1, 1, "#ccbb88"],  // handle
+]);
+
 // Shop facade lookup by door label
 export const shopFacadeSprites: Record<string, SpriteData> = {
   "МОЛОЧНАЯ": shopDairySprite,
   "РЫБНАЯ": shopFishSprite,
   "ОВОЩИ-ФРУКТЫ": shopProduceSprite,
   "ОВОЩИ": shopProduceSprite,
+  "ОВОЩНАЯ": shopProduceSprite,
   "ПЕКАРНЯ": shopBakerySprite,
   "МЯСНАЯ": shopButcherSprite,
+  "АПТЕКА": shopPharmacySprite,
+  "КАФЕ": shopCafeSprite,
+  "ПОЧТА": shopPostSprite,
+  "БАНК": shopBankSprite,
   // Italy shops
   "SALUMERIA": macelleriaSpriteIT,
   "PANETTERIA": panetteriaSpriteIT,
@@ -696,20 +800,6 @@ const CHP = "#ddbb88"; // Chickpea beige
 const DHP = "#bb9966"; // Dark chickpea
 const LHP = "#eedd99"; // Light chickpea
 
-// --- Tushyonka (canned stew) palette ---
-const STW = "#8B4513"; // Stew brown
-const STD = "#6B3410"; // Stew dark
-const STL = "#aa6633"; // Stew light
-
-// --- Sgushchyonka (condensed milk) palette ---
-const CMK = "#f5deb3"; // Condensed milk cream
-const CMD = "#dabb8a"; // Condensed milk dark
-const CML = "#fff3cd"; // Condensed milk light
-
-// --- Shproty (sprats) palette ---
-const SPF = "#c8a040"; // Sprat fish gold
-const SPD2 = "#a07820"; // Sprat dark
-const SPL = "#e0c060"; // Sprat light
 
 // --- Ananas (pineapple) palette ---
 const ANP = "#f0c040"; // Pineapple yellow
@@ -796,51 +886,125 @@ export const chickpeaRevealSprite: SpriteData = [
   [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
 ];
 
-export const tushyonkaRevealSprite: SpriteData = [
+// Гречка — pile of brown triangular buckwheat kernels
+const GK = "#8B6B3C"; // grechka kernel
+const GKL = "#a07844"; // grechka light
+const GKD = "#6B4E2C"; // grechka dark
+export const grechkaRevealSprite: SpriteData = [
   [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
-  [_, _, _, _, _, _, STD, STD, STD, _, _, _, _, _, _, _],
-  [_, _, _, _, _, STD, STW, STW, STW, STD, _, _, _, _, _, _],
-  [_, _, _, _, STD, STW, STL, STW, STL, STW, STD, _, _, _, _, _],
-  [_, _, _, STD, STW, STW, STW, STL, STW, STW, STW, STD, _, _, _, _],
-  [_, _, _, STD, STL, STW, STD, STW, STD, STW, STL, STD, _, _, _, _],
-  [_, _, _, STD, STW, STD, STL, STD, STL, STD, STW, STD, _, _, _, _],
-  [_, _, _, STD, STW, STW, STW, STL, STW, STW, STW, STD, _, _, _, _],
-  [_, _, _, _, STD, STL, STW, STW, STW, STL, STD, _, _, _, _, _],
-  [_, _, _, _, _, STD, STW, STL, STW, STD, _, _, _, _, _, _],
-  [_, _, _, _, _, _, STD, STD, STD, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, GK, GKL, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, GK, GKL, GK, GK, _, _, _, _, _, _],
+  [_, _, _, _, _, GKD, GK, GK, GKL, GK, GKD, _, _, _, _, _],
+  [_, _, _, _, GKD, GK, GKL, GK, GK, GKL, GK, GKD, _, _, _, _],
+  [_, _, _, GKD, GK, GK, GK, GKL, GK, GK, GK, GK, GKD, _, _, _],
+  [_, _, GKD, GK, GKL, GK, GKD, GK, GKD, GK, GKL, GK, GKD, _, _, _],
+  [_, _, GKD, GKD, GK, GKD, GK, GKL, GK, GKD, GK, GKD, GKD, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+];
+
+// Мёд — golden honey jar with drip
+const HY = "#ddaa22"; // honey gold
+const HYL = "#eebb44"; // honey light
+const HYD = "#bb8811"; // honey dark
+const HJR = "#c8b8a0"; // jar glass
+export const myodRevealSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, BN, BN, BN, BN, _, _, _, _, _, _],
+  [_, _, _, _, _, BN, BN, LN, BN, BN, BN, _, _, _, _, _],
+  [_, _, _, _, _, HJR, HJR, HJR, HJR, HJR, _, _, _, _, _, _],
+  [_, _, _, _, HJR, HY, HY, HYL, HY, HY, HJR, _, _, _, _, _],
+  [_, _, _, _, HJR, HY, HYL, HY, HY, HY, HJR, _, _, _, _, _],
+  [_, _, _, _, HJR, HY, HY, HY, HYL, HY, HJR, _, _, _, _, _],
+  [_, _, _, _, HJR, HYD, HY, HY, HY, HYD, HJR, _, _, _, _, _],
+  [_, _, _, _, HJR, HYD, HYD, HY, HYD, HYD, HJR, _, _, _, _, _],
+  [_, _, _, _, _, HJR, HJR, HJR, HJR, HJR, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
   [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
   [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
 ];
 
-export const sgushchyonkaRevealSprite: SpriteData = [
-  [_, _, _, _, _, _, _, CMD, _, _, _, _, _, _, _, _],
-  [_, _, _, _, _, _, CMD, CMK, CMD, _, _, _, _, _, _, _],
-  [_, _, _, _, _, _, CMD, CMK, CMD, _, _, _, _, _, _, _],
-  [_, _, _, _, _, CMD, CMK, CML, CMK, CMD, _, _, _, _, _, _],
-  [_, _, _, _, _, CMD, CMK, CMK, CMK, CMD, _, _, _, _, _, _],
-  [_, _, _, _, CMD, CMK, CML, CMK, CML, CMK, CMD, _, _, _, _, _],
-  [_, _, _, CMD, CMK, CMK, CMK, CML, CMK, CMK, CMK, CMD, _, _, _, _],
-  [_, _, CMD, CMK, CML, CMK, CMK, CMK, CMK, CML, CMK, CMD, _, _, _, _],
-  [_, _, CMD, CMK, CMK, CML, CMK, CML, CMK, CMK, CMK, CMD, _, _, _, _],
-  [_, _, _, CMD, CMK, CMK, CMK, CMK, CMK, CMK, CMD, _, _, _, _, _],
-  [_, _, _, _, CMD, CMD, CMK, CMK, CMD, CMD, _, _, _, _, _, _],
-  [_, _, _, _, _, _, CMD, CMD, _, _, _, _, _, _, _, _],
+// Лимон — bright yellow lemon with stem nub
+const LY = "#eecc33"; // lemon yellow
+const LYL = "#ffdd55"; // lemon highlight
+const LYD = "#ccaa22"; // lemon shadow
+export const limonRevealSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, DK, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, LYD, LY, LYD, _, _, _, _, _, _, _],
+  [_, _, _, _, _, LYD, LY, LYL, LY, LYD, _, _, _, _, _, _],
+  [_, _, _, _, LYD, LY, LYL, LY, LY, LY, LYD, _, _, _, _, _],
+  [_, _, _, _, LYD, LY, LY, LY, LY, LY, LYD, _, _, _, _, _],
+  [_, _, _, _, LYD, LY, LY, LY, LY, LY, LYD, _, _, _, _, _],
+  [_, _, _, _, _, LYD, LY, LY, LY, LYD, _, _, _, _, _, _],
+  [_, _, _, _, _, _, LYD, LYD, LYD, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
   [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
 ];
 
-export const shprotyRevealSprite: SpriteData = [
+// Морковь — orange carrot with green top
+const CO = "#dd6622"; // carrot orange
+const COL = "#ee7733"; // carrot light
+const COD = "#cc5511"; // carrot dark
+export const morkovRevealSprite: SpriteData = [
   [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
-  [_, _, _, _, _, SPD2, SPF, SPF, SPF, SPD2, _, _, _, _, _, _],
-  [_, _, _, _, SPD2, SPF, SPL, SPF, SPF, SPF, SPD2, _, _, _, _, _],
-  [_, _, _, _, _, SPD2, SPF, SPF, SPF, SPD2, SPD2, _, _, _, _, _],
-  [_, _, _, _, _, _, SPD2, SPD2, SPD2, _, _, _, _, _, _, _],
-  [_, _, SPD2, SPF, SPF, SPF, SPD2, _, _, _, _, _, _, _, _, _],
-  [_, SPD2, SPF, SPL, SPF, SPF, SPF, SPD2, _, _, _, _, _, _, _, _],
-  [_, _, SPD2, SPF, SPF, SPF, SPD2, SPD2, _, _, _, _, _, _, _, _],
-  [_, _, _, SPD2, SPD2, SPD2, _, _, SPD2, SPF, SPF, SPD2, _, _, _, _],
-  [_, _, _, _, _, _, _, SPD2, SPF, SPL, SPF, SPF, SPD2, _, _, _],
-  [_, _, _, _, _, _, _, _, SPD2, SPF, SPF, SPD2, SPD2, _, _, _],
-  [_, _, _, _, _, _, _, _, _, SPD2, SPD2, _, _, _, _, _],
+  [_, _, _, _, _, _, GN, _, GN, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, GN, GN, GN, _, _, _, _, _, _, _],
+  [_, _, _, _, _, GN, DK, GN, DK, GN, _, _, _, _, _, _],
+  [_, _, _, _, _, _, CO, COL, CO, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, CO, CO, CO, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, COD, CO, COD, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, CO, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, COD, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, COD, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, YL, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+];
+
+// Фасоль — scattered kidney beans
+const FB2 = "#882233"; // kidney bean red
+const FBL = "#aa3344"; // kidney bean light
+const FBD = "#661122"; // kidney bean dark
+export const fasolRevealSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, FBD, FB2, FBL, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, FBD, FB2, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, FBD, FB2, FBL, _, _, _, _],
+  [_, _, _, FBD, FB2, FBL, _, _, _, _, FBD, FB2, _, _, _, _],
+  [_, _, _, _, FBD, FB2, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, FBD, FB2, FBL, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, FBD, FB2, _, _, _, _, _, _],
+  [_, _, FBD, FB2, FBL, _, _, _, _, _, _, FBD, FB2, FBL, _, _],
+  [_, _, _, FBD, FB2, _, _, _, _, _, _, _, FBD, FB2, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+];
+
+// Варенье — jar of dark red jam with cloth lid
+const JR = "#aa2244"; // jam red
+const JRL = "#cc3355"; // jam light
+const JRD = "#881133"; // jam dark
+const JG = "#c8b8a0"; // jar glass
+export const varenyeRevealSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, WH, WH, WH, WH, _, _, _, _, _, _],
+  [_, _, _, _, _, WH, WE, WH, WE, WH, WH, _, _, _, _, _],
+  [_, _, _, _, _, BN, BN, BN, BN, BN, _, _, _, _, _, _],
+  [_, _, _, _, JG, JR, JR, JRL, JR, JR, JG, _, _, _, _, _],
+  [_, _, _, _, JG, JR, JRL, JR, JR, JR, JG, _, _, _, _, _],
+  [_, _, _, _, JG, JRD, JR, JR, JRL, JR, JG, _, _, _, _, _],
+  [_, _, _, _, JG, JR, JR, JRL, JR, JRD, JG, _, _, _, _, _],
+  [_, _, _, _, JG, JRD, JR, JR, JR, JRD, JG, _, _, _, _, _],
+  [_, _, _, _, _, JG, JG, JG, JG, JG, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
   [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
 ];
 
@@ -1560,6 +1724,19 @@ export const shelfMetalSprite: SpriteData = [
   [MS,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,MS],
 ];
 
+// Glass shelf (32×8 logical, drawn at 2x = 64×16)
+// Glass-front medicine cabinet. Pharmacy green frame with frosted panels.
+export const shelfGlassSprite: SpriteData = [
+  [GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF],
+  [GF,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GF,GF,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GF],
+  [GF,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GF,GF,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GF],
+  [GF,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GF,GF,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GF],
+  [GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF],
+  [GF,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GF,GF,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GF],
+  [GF,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GF,GF,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GP,GF],
+  [GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF,GF],
+];
+
 // Interior wall tile (32×32 logical, drawn at 2x = 64×64)
 // Cream plaster with wear marks and baseboard at bottom
 export const interiorWallTile: SpriteData = (() => {
@@ -1934,6 +2111,88 @@ export const sosiskiPackSprite: SpriteData = [
   [_, _, s3, s3, s3, s3, s3, s3, s3, s3, _, _],
 ];
 
+// --- Belarus items (L11+) ---
+
+// Soviet aspirin box — white cardboard, green cross, red text band
+export const aspirinBoxSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, WE, WE, WE, WE, WE, WE, WE, WE, _, _, _, _],
+  [_, _, _, _, WE, WE, WE, GN, WE, WE, WE, WE, _, _, _, _],
+  [_, _, _, _, WE, WE, GN, GN, GN, WE, WE, WE, _, _, _, _],
+  [_, _, _, _, WE, WE, WE, GN, WE, WE, WE, WE, _, _, _, _],
+  [_, _, _, _, WE, WE, WE, WE, WE, WE, WE, WE, _, _, _, _],
+  [_, _, _, _, RD, RD, RD, RD, RD, RD, RD, RD, _, _, _, _],
+  [_, _, _, _, RD, WH, RD, WH, RD, WH, RD, RD, _, _, _, _],
+  [_, _, _, _, RD, RD, RD, RD, RD, RD, RD, RD, _, _, _, _],
+  [_, _, _, _, WE, WE, WE, WE, WE, WE, WE, WE, _, _, _, _],
+  [_, _, _, _, WE, WE, WE, WE, WE, WE, WE, WE, _, _, _, _],
+  [_, _, _, _, LG, LG, LG, LG, LG, LG, LG, LG, _, _, _, _],
+  [_, _, _, _, _, LG, LG, LG, LG, LG, LG, _, _, _, _, _],
+];
+
+// --- Belarus items (L12) ---
+
+// Пирожок — golden baked pastry with crimped edge and filling peek
+const PY = "#dda833"; // pastry gold
+const PC = "#bb8822"; // pastry dark crust
+const PF2 = "#cc5533"; // pastry filling (meat/cabbage peek)
+export const pirogSliceSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, PC, PC, PC, _, _, _, _, _, _, _],
+  [_, _, _, _, _, PC, PY, PY, PY, PC, _, _, _, _, _, _],
+  [_, _, _, _, PC, PY, PY, PY, PY, PY, PC, _, _, _, _, _],
+  [_, _, _, PC, PY, PY, PF2, PF2, PY, PY, PY, PC, _, _, _, _],
+  [_, _, PC, PY, PY, PY, PY, PY, PY, PY, PY, PY, PC, _, _, _],
+  [_, _, PC, PY, PY, PY, PY, PY, PY, PY, PY, PY, PC, _, _, _],
+  [_, _, _, PC, PC, PY, PY, PY, PY, PY, PY, PC, _, _, _, _],
+  [_, _, _, _, PC, PC, PC, PC, PC, PC, PC, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+];
+
+// Конверт — white envelope with blue stamp and sealed flap
+const EW = "#f0eff0"; // envelope white
+const EF = "#dddcdd"; // envelope flap shadow
+const ES = "#3366aa"; // envelope stamp blue
+const ER = "#cc3333"; // stamp detail red
+export const konvertEnvelopeSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, EF, EF, EF, EF, EF, EF, EF, EF, EF, EF, _, _, _],
+  [_, _, _, EW, EF, EF, EF, EF, EF, EF, EF, EF, EW, _, _, _],
+  [_, _, _, EW, EW, EF, EF, EF, EF, EF, EF, EW, EW, _, _, _],
+  [_, _, _, EW, EW, EW, EF, EF, EF, EW, ES, ES, EW, _, _, _],
+  [_, _, _, EW, EW, EW, EW, EW, EW, EW, ES, ER, EW, _, _, _],
+  [_, _, _, EW, EW, EW, EW, EW, EW, EW, ES, ES, EW, _, _, _],
+  [_, _, _, EW, EW, EW, EW, EW, EW, EW, EW, EW, EW, _, _, _],
+  [_, _, _, EW, EW, EW, EW, EW, EW, EW, EW, EW, EW, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+];
+
+// Монета — brass coin with emblem, chunky Soviet feel
+const CG = "#ddbb44"; // coin gold
+const CD = "#bb9922"; // coin dark rim
+const CE = "#ccaa33"; // coin emblem detail
+export const monetaCoinSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, CD, CD, CD, CD, _, _, _, _, _, _],
+  [_, _, _, _, _, CD, CG, CG, CG, CG, CD, _, _, _, _, _],
+  [_, _, _, _, CD, CG, CG, CE, CE, CG, CG, CD, _, _, _, _],
+  [_, _, _, _, CD, CG, CE, CG, CG, CE, CG, CD, _, _, _, _],
+  [_, _, _, _, CD, CG, CE, CG, CG, CE, CG, CD, _, _, _, _],
+  [_, _, _, _, CD, CG, CG, CE, CE, CG, CG, CD, _, _, _, _],
+  [_, _, _, _, _, CD, CG, CG, CG, CG, CD, _, _, _, _, _],
+  [_, _, _, _, _, _, CD, CD, CD, CD, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+];
+
 // --- Sprite drawing utility ---
 
 export function drawSprite(
@@ -1996,9 +2255,12 @@ const itemSpriteMap: Record<string, SpriteData> = {
   corn_reveal: cornRevealSprite,
   lentil_reveal: lentilRevealSprite,
   chickpea_reveal: chickpeaRevealSprite,
-  tushyonka_reveal: tushyonkaRevealSprite,
-  sgushchyonka_reveal: sgushchyonkaRevealSprite,
-  shproty_reveal: shprotyRevealSprite,
+  grechka_reveal: grechkaRevealSprite,
+  myod_reveal: myodRevealSprite,
+  limon_reveal: limonRevealSprite,
+  morkov_reveal: morkovRevealSprite,
+  fasol_reveal: fasolRevealSprite,
+  varenye_reveal: varenyeRevealSprite,
   ananas_reveal: ananasRevealSprite,
   sunflower_seeds: sunflowerSeedsSprite,
   moloko_carton: molokoCartonSprite,
@@ -2033,6 +2295,11 @@ const itemSpriteMap: Record<string, SpriteData> = {
   ukrop_bunch: ukropBunchSprite,
   tvorog_tub: tvorogTubSprite,
   sosiski_pack: sosiskiPackSprite,
+  // Belarus items (L11+)
+  aspirin_box: aspirinBoxSprite,
+  pirog_slice: pirogSliceSprite,
+  konvert_envelope: konvertEnvelopeSprite,
+  moneta_coin: monetaCoinSprite,
   // Ethiopia items
   buna_bag: bunaBagSprite,
   wetet_jug: wetetJugSprite,

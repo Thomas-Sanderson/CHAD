@@ -218,6 +218,144 @@ export const level9RevealLines: RevealLine[] = [
   },
 ];
 
+// === Level 10 reveal lines — The Shop Names ===
+export const level10RevealLines: RevealLine[] = [
+  {
+    vocabWordId: "ryba_shops",
+    correct:
+      "РЫБА. Fish. You've known this since level three. But now you found it in РЫБНАЯ. Connection made.",
+    wrong:
+      "You missed РЫБА? Fish. You've collected this word four times. FOUR. Where did it go.",
+  },
+  {
+    vocabWordId: "rybnaya",
+    correct:
+      "РЫБНАЯ! Fish shop! You read the sign and walked in the right door. I'm... actually proud.",
+    wrong:
+      "You couldn't find РЫБНАЯ? The FISH SHOP. It has a fish on the sign. It smells like fish.",
+  },
+  {
+    vocabWordId: "hleb_shops",
+    correct:
+      "ХЛЕБ. Bread. Old friend. You found it where it belongs — in ПЕКАРНЯ.",
+    wrong:
+      "No ХЛЕБ? Bread. You've bought this word three times already. How.",
+  },
+  {
+    vocabWordId: "pekarnya",
+    correct:
+      "ПЕКАРНЯ. The bakery. You found bread in the bread store. Slow clap. But you earned it.",
+    wrong:
+      "No ХЛЕБ from ПЕКАРНЯ? The bakery. Where they bake bread. It's in the name, Chad.",
+  },
+  {
+    vocabWordId: "maslo_shops",
+    correct:
+      "МАСЛО. Butter. You remembered. And you found it in МОЛОЧНАЯ. The dairy. See the pattern?",
+    wrong:
+      "You forgot МАСЛО? Butter. Yellow slab. You literally bought this in level three.",
+  },
+  {
+    vocabWordId: "molochnaya",
+    correct:
+      "МОЛОЧНАЯ! The dairy. МОЛОКО's home. You're making connections now. This is how language works.",
+    wrong:
+      "You missed МОЛОЧНАЯ? Dairy shop. МОЛОКО → МОЛОЧНАЯ. The pattern is right there.",
+  },
+];
+
+// === Level 11 reveal lines — The Far Side ===
+export const level11RevealLines: RevealLine[] = [
+  {
+    vocabWordId: "sosiski_farside",
+    correct:
+      "СОСИСКИ. Little sausages. You remembered from last level. And you found them in МЯСНАЯ.",
+    wrong:
+      "No СОСИСКИ? You just learned this word. Thin sausages. In the butcher shop. Come on.",
+  },
+  {
+    vocabWordId: "myasnaya",
+    correct:
+      "МЯСНАЯ! The butcher. You found sausages in the meat shop. The system works.",
+    wrong:
+      "No СОСИСКИ from МЯСНАЯ? The butcher shop. Red sign. Meat smell. How.",
+  },
+  {
+    vocabWordId: "sveokla_farside",
+    correct:
+      "СВЁКЛА. Beetroot. Still purple. Still staining. But you found it in ОВОЩНАЯ.",
+    wrong:
+      "You missed СВЁКЛА? Purple root. You learned this two levels ago. It stains EVERYTHING.",
+  },
+  {
+    vocabWordId: "ovoshchnaya",
+    correct:
+      "ОВОЩНАЯ! The produce shop. СВЁКЛА from the vegetable store. Full circle.",
+    wrong:
+      "You couldn't find ОВОЩНАЯ? It's where vegetables live. You've bought vegetables six times.",
+  },
+  {
+    vocabWordId: "aspirin_farside",
+    correct:
+      "АСПИРИН. Aspirin. You found medicine in the pharmacy. Revolutionary.",
+    wrong:
+      "No АСПИРИН? Aspirin. White box. Green cross. It was on the shelf, Chad.",
+  },
+  {
+    vocabWordId: "apteka",
+    correct:
+      "АПТЕКА. The pharmacy. You've walked past it for nine levels. Finally went inside. Progress.",
+    wrong:
+      "You missed АПТЕКА? The pharmacy. Green cross. You've seen it since level three. LEVEL THREE.",
+  },
+];
+
+// === Level 12 reveal lines — The Full Map ===
+export const level12RevealLines: RevealLine[] = [
+  {
+    vocabWordId: "pirozhok",
+    correct:
+      "ПИРОЖОК. A pastry. You ordered food in a foreign city. Look at you.",
+    wrong:
+      "No ПИРОЖОК? It's a pastry. Golden. Baked. They sell them at the cafe. The КАФЕ.",
+  },
+  {
+    vocabWordId: "kafe",
+    correct:
+      "КАФЕ. The cafe. You went in and ordered like a real person. Who even are you anymore.",
+    wrong:
+      "You couldn't find КАФЕ? The cafe. You've walked past it every single level. It serves food.",
+  },
+  {
+    vocabWordId: "konvert",
+    correct:
+      "КОНВЕРТ. Envelope. You picked up mail. In Russian. Anya would be... less annoyed than usual.",
+    wrong:
+      "No КОНВЕРТ? Envelope. White. Sealed. At the post office. It was right there.",
+  },
+  {
+    vocabWordId: "pochta",
+    correct:
+      "ПОЧТА. The post office. Blue sign. You found it. Bureaucracy conquered.",
+    wrong:
+      "No КОНВЕРТ from ПОЧТА? Post office. Blue sign. Letters. Stamps. Bureaucracy.",
+  },
+  {
+    vocabWordId: "moneta",
+    correct:
+      "МОНЕТА. A coin. From the bank. You know this city now.",
+    wrong:
+      "No МОНЕТА? Coin. Heavy. Brass. From the jar on the counter at БАНК.",
+  },
+  {
+    vocabWordId: "bank",
+    correct:
+      "БАНК. It sounds the same in English. You got the coin. Full circle.",
+    wrong:
+      "You missed БАНК? It's BANK. It sounds the SAME. This was the easy one, Chad.",
+  },
+];
+
 export const level4RevealLines: RevealLine[] = [
   {
     vocabWordId: "konfeta",

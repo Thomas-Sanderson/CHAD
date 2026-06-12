@@ -3,6 +3,7 @@ export interface VocabWord {
   script: string;
   translation: string;
   matchesItemId: string | null; // null for meta-words like "produkty"
+  category?: "item" | "location"; // default: "item"
   pronunciation?: string; // phonetic hint, e.g. "smeh-TAH-nah"
   ipa?: string; // IPA transcription, e.g. "/smʲɪˈtanə/"
   hint?: string; // funny contextual clue for briefing screen (never the translation)
@@ -154,7 +155,7 @@ export interface LevelSegment {
   doors: DoorDef[];
   bounds: { width: number; height: number };
   shopkeeper?: ShopKeeperDef;
-  shelfType?: "wood" | "metal";
+  shelfType?: "wood" | "metal" | "glass";
   landmarks?: LandmarkDef[];
   streetSigns?: StreetSignDef[];
   streetCorridors?: StreetCorridor[];
@@ -190,6 +191,7 @@ export const STREET_SIGN_PRONUNCIATION: Record<string, { pronunciation: string; 
   // Avenue names
   "ПР. НЕЗАВИСИМОСТИ": { pronunciation: "pr. nyeh-zah-VEE-see-mah-stee", ipa: "/pr. nʲɪzɐˈvʲisʲɪməsʲtʲɪ/" },
   "ПР. ПОБЕДИТЕЛЕЙ":   { pronunciation: "pr. pah-byeh-DEE-tyeh-lyey",    ipa: "/pr. pəbʲɪˈdʲitʲɪlʲej/" },
+  "ПР. ОКТЯБРЬСКИЙ":   { pronunciation: "pr. ahk-TYAH-brskee",            ipa: "/pr. ɐkˈtʲabrʲskʲɪj/" },
   "ПР. ПАРТИЗАНСКИЙ":  { pronunciation: "pr. par-tee-ZAHN-skee",         ipa: "/pr. pərtʲɪˈzanskʲɪj/" },
-  "ПР. МАШЕРОВА":      { pronunciation: "pr. mah-SHEH-rah-vah",          ipa: "/pr. mɐˈʂerəvə/" },
+  "ПР. ОКТЯБРЯ":       { pronunciation: "pr. ahk-tyah-BRYAH",            ipa: "/pr. ɐkˈtʲabrʲa/" },
 };

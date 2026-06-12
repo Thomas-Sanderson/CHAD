@@ -19,6 +19,7 @@ import {
   exitSignSprite,
   shelfWoodSprite,
   shelfMetalSprite,
+  shelfGlassSprite,
   counterSprite,
   landmarkSprites,
   shopFacadeSprites,
@@ -408,6 +409,8 @@ export function renderFrame(
       // Shelf sprite based on segment type
       const shelfSpr = currentSegment?.shelfType === "metal"
         ? (env.shelfMetalSprite ?? shelfMetalSprite)
+        : currentSegment?.shelfType === "glass"
+        ? shelfGlassSprite
         : (env.shelfWoodSprite ?? shelfWoodSprite);
       const tileW = (shelfSpr[0]?.length ?? 32) * 2;
       for (let tx = 0; tx < p.width; tx += tileW) {
