@@ -31,9 +31,21 @@ import {
   catSiamNodSprite,
   catTabbySprite,
   catTabbyNodSprite,
+  winterGroundTile,
 } from "./sprites";
 import type { TimeOfDay } from "./sky";
 import { getSkyPhase, renderSky, renderGroundTint, renderSceneBrightness, renderWarmthOverlay } from "./sky";
+import type { Season } from "../types/skin";
+import { getApartmentSprite, APARTMENT_SCALE, getTreeSprite } from "./seasonalSprites";
+import {
+  renderSeasonalSky,
+  renderSeasonalTrees,
+  renderSeasonalFlowers,
+  renderGroundOverlay,
+  renderBuildingSnow,
+  renderParticles,
+  renderFootprints,
+} from "./seasonal";
 
 const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 450;
@@ -213,7 +225,8 @@ export function renderFrame(
   itemDefs: Map<string, CollectibleItem>,
   env: SkinEnvironment,
   hud?: HudData,
-  timeOfDay?: TimeOfDay
+  timeOfDay?: TimeOfDay,
+  season?: Season,
 ): void {
   // Resolve current segment
   let currentSegment: LevelSegment | null = null;
@@ -276,68 +289,76 @@ export function renderFrame(
     }
   } else {
     // Sky — fills the entire canvas; ground tiles and corridor walls paint over it
-    const skyPhase = timeOfDay ? getSkyPhase(timeOfDay, env.latitude) : null;
-    if (skyPhase) {
-      renderSky(ctx, skyPhase, CANVAS_WIDTH, CANVAS_HEIGHT, camX);
+    if (season) {
+      renderSeasonalSky(ctx, season, CANVAS_WIDTH, CANVAS_HEIGHT);
     } else {
-      ctx.fillStyle = env.skyColor;
-      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      const skyPhase = timeOfDay ? getSkyPhase(timeOfDay, env.latitude) : null;
+      if (skyPhase) {
+        renderSky(ctx, skyPhase, CANVAS_WIDTH, CANVAS_HEIGHT, camX);
+      } else {
+        ctx.fillStyle = env.skyColor;
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      }
     }
 
     // Ground tiles — render all isGround platforms, or platform[0] as fallback
     const groundPlatforms = activePlatforms.filter(p => p.isGround);
     const groundTargets = groundPlatforms.length > 0 ? groundPlatforms : (activePlatforms[0] ? [activePlatforms[0]] : []);
 
-    // Background scenery — small houses and trees set back along avenues
+    // Background scenery — seasonal trees or procedural houses/trees
     if (groundTargets.length > 0) {
       const uniqueYs = [...new Set(groundTargets.map(gp => gp.y))];
-      ctx.globalAlpha = 0.4;
-      for (const aveY of uniqueYs) {
-        const baseY = aveY - camY;
-        // Seeded placement: deterministic per avenue Y so scenery doesn't shift
-        const seed = aveY * 137;
-        for (let i = 0; i < 12; i++) {
-          const hash = ((seed + i * 271) * 16807) % 2147483647;
-          const wx = (hash % 3000) - camX;
-          if (wx < -40 || wx > CANVAS_WIDTH + 40) continue;
-          const isTree = hash % 3 !== 0;
-          if (isTree) {
-            // Tree — small triangle crown + thin trunk, set back above avenue
-            const h = 10 + (hash % 8);
-            const ty = baseY - h - 6;
-            ctx.fillStyle = "#3a5a3a";
-            ctx.beginPath();
-            ctx.moveTo(wx, ty + h);
-            ctx.lineTo(wx + 5, ty);
-            ctx.lineTo(wx + 10, ty + h);
-            ctx.fill();
-            ctx.fillStyle = "#4a3a2a";
-            ctx.fillRect(wx + 4, ty + h, 3, 5);
-          } else {
-            // House — rectangle with pitched roof, bottom on ground
-            const hw = 20 + (hash % 8);
-            const hh = 14 + (hash % 6);
-            const hy = baseY - hh;
-            ctx.fillStyle = "#8a7a6a";
-            ctx.fillRect(wx, hy, hw, hh);
-            // Roof
-            ctx.fillStyle = "#6a5a4a";
-            ctx.beginPath();
-            ctx.moveTo(wx - 2, hy);
-            ctx.lineTo(wx + hw / 2, hy - 8);
-            ctx.lineTo(wx + hw + 2, hy);
-            ctx.fill();
-            // Windows
-            ctx.fillStyle = "#aaccdd";
-            ctx.fillRect(wx + 4, hy + 4, 5, 4);
-            if (hw > 22) ctx.fillRect(wx + hw - 9, hy + 4, 5, 4);
-            // Door
-            ctx.fillStyle = "#5a4a3a";
-            ctx.fillRect(wx + hw / 2 - 2, hy + hh - 6, 5, 6);
+      if (season) {
+        renderSeasonalTrees(ctx, season, uniqueYs, camX, camY, CANVAS_WIDTH);
+      } else {
+        ctx.globalAlpha = 0.4;
+        for (const aveY of uniqueYs) {
+          const baseY = aveY - camY;
+          // Seeded placement: deterministic per avenue Y so scenery doesn't shift
+          const seed = aveY * 137;
+          for (let i = 0; i < 12; i++) {
+            const hash = ((seed + i * 271) * 16807) % 2147483647;
+            const wx = (hash % 3000) - camX;
+            if (wx < -40 || wx > CANVAS_WIDTH + 40) continue;
+            const isTree = hash % 3 !== 0;
+            if (isTree) {
+              // Tree — small triangle crown + thin trunk, set back above avenue
+              const h = 10 + (hash % 8);
+              const ty = baseY - h - 6;
+              ctx.fillStyle = "#3a5a3a";
+              ctx.beginPath();
+              ctx.moveTo(wx, ty + h);
+              ctx.lineTo(wx + 5, ty);
+              ctx.lineTo(wx + 10, ty + h);
+              ctx.fill();
+              ctx.fillStyle = "#4a3a2a";
+              ctx.fillRect(wx + 4, ty + h, 3, 5);
+            } else {
+              // House — rectangle with pitched roof, bottom on ground
+              const hw = 20 + (hash % 8);
+              const hh = 14 + (hash % 6);
+              const hy = baseY - hh;
+              ctx.fillStyle = "#8a7a6a";
+              ctx.fillRect(wx, hy, hw, hh);
+              // Roof
+              ctx.fillStyle = "#6a5a4a";
+              ctx.beginPath();
+              ctx.moveTo(wx - 2, hy);
+              ctx.lineTo(wx + hw / 2, hy - 8);
+              ctx.lineTo(wx + hw + 2, hy);
+              ctx.fill();
+              // Windows
+              ctx.fillStyle = "#aaccdd";
+              ctx.fillRect(wx + 4, hy + 4, 5, 4);
+              if (hw > 22) ctx.fillRect(wx + hw - 9, hy + 4, 5, 4);
+              // Door
+              ctx.fillStyle = "#5a4a3a";
+              ctx.fillRect(wx + hw / 2 - 2, hy + hh - 6, 5, 6);
+            }
           }
         }
+        ctx.globalAlpha = 1;
       }
-      ctx.globalAlpha = 1;
     }
 
     // Road surface — continuous asphalt strip at each avenue Y (bridges gaps)
@@ -381,10 +402,11 @@ export function renderFrame(
     for (const gp of groundTargets) {
       const gpScreenY = gp.y - camY;
       if (gpScreenY > CANVAS_HEIGHT + 32 || gpScreenY + 32 < -32) continue;
+      const tileSprite = season === "winter" ? winterGroundTile : env.groundTile;
       const groundStartX = Math.floor(camX / 32) * 32;
       for (let tx = groundStartX; tx < camX + CANVAS_WIDTH + 32; tx += 32) {
         if (tx >= gp.x && tx < gp.x + gp.width) {
-          drawSprite(ctx, env.groundTile, tx - camX, gpScreenY, 2);
+          drawSprite(ctx, tileSprite, tx - camX, gpScreenY, 2);
         }
       }
     }
@@ -394,6 +416,35 @@ export function renderFrame(
   const corridors = currentSegment?.streetCorridors;
   if (corridors?.length && !isInterior) {
     drawStreetCorridors(ctx, corridors, camX, camY);
+  }
+
+  // --- Apartment buildings (between corridors and platforms) ---
+  if (currentSegment?.buildings && !isInterior) {
+    for (const bld of currentSegment.buildings) {
+      const sprite = getApartmentSprite(bld.type, bld.stories, bld.variant);
+      const scale = APARTMENT_SCALE;
+      const sprW = (sprite[0]?.length ?? 8) * scale;
+      const sprH = sprite.length * scale;
+      const bx = bld.x - sprW / 2 - camX;
+      const by = bld.y - sprH - camY;
+      if (bx + sprW < -10 || bx > CANVAS_WIDTH + 10) continue;
+      if (by + sprH < -10 || by > CANVAS_HEIGHT + 10) continue;
+      drawSprite(ctx, sprite, bx, by, scale);
+    }
+  }
+
+  // --- Explicit segment trees (green gaps between building clusters) ---
+  if (season && currentSegment?.trees?.length && !isInterior) {
+    ctx.globalAlpha = 0.75;
+    for (const t of currentSegment.trees) {
+      const tree = getTreeSprite(t.variant, season);
+      const treeH = tree.length * 2;
+      const tx = t.x - camX;
+      const ty = t.y - camY - treeH;
+      if (tx < -40 || tx > CANVAS_WIDTH + 40) continue;
+      drawSprite(ctx, tree, tx, ty, 2);
+    }
+    ctx.globalAlpha = 1;
   }
 
   // --- Platforms ---
@@ -456,10 +507,23 @@ export function renderFrame(
     }
   }
 
+  // --- Seasonal ground overlay (puddles/leaves/snow on road surface) ---
+  if (season && !isInterior) {
+    const groundPlatformsForSeason = activePlatforms.filter(p => p.isGround);
+    const seasonAveYs = [...new Set(groundPlatformsForSeason.map(gp => gp.y))];
+    renderGroundOverlay(ctx, season, seasonAveYs, camX, camY, CANVAS_WIDTH);
+    renderSeasonalFlowers(ctx, season, seasonAveYs, camX, camY, CANVAS_WIDTH);
+  }
+
+  // --- Footprints (winter only, on ground) ---
+  if (season === "winter" && state.footprints.length > 0 && !isInterior) {
+    renderFootprints(ctx, state.footprints, camX, camY);
+  }
+
   // --- Doors (with building facades in street, door frames in interior) ---
   if (currentSegment?.doors.length) {
     for (const door of currentSegment.doors) {
-      renderDoor(ctx, door, state, env, currentSegment.type, camX, camY);
+      renderDoor(ctx, door, state, env, currentSegment.type, camX, camY, season);
     }
   }
 
@@ -664,6 +728,27 @@ export function renderFrame(
       for (let i = 0; i < plateLines.length; i++) {
         ctx.fillText(plateLines[i]!, plateX + 6, sy + 12 + i * lineH);
       }
+
+      // Snow on sign top (winter only)
+      if (season === "winter") {
+        ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+        ctx.fillRect(plateX, sy - 2, plateW, 2);
+        ctx.fillRect(plateX + plateW - 6, sy - 3, 6, 1);
+      }
+    }
+  }
+
+  // --- Building snow accents (winter only) ---
+  if (season === "winter" && !isInterior && currentSegment?.buildings) {
+    for (const bld of currentSegment.buildings) {
+      const sprite = getApartmentSprite(bld.type, bld.stories, bld.variant);
+      const scale = APARTMENT_SCALE;
+      const sprW = (sprite[0]?.length ?? 8) * scale;
+      const sprH = sprite.length * scale;
+      const bx = bld.x - sprW / 2 - camX;
+      const by = bld.y - sprH - camY;
+      if (bx + sprW < -10 || bx > CANVAS_WIDTH + 10) continue;
+      renderBuildingSnow(ctx, bx, by, sprW);
     }
   }
 
@@ -845,6 +930,12 @@ export function renderFrame(
       // blink frame — skip drawing sprite
     } else {
       drawSprite(ctx, env.npcSprite, sx, by, 2, flipH);
+      // Snow dusting on headscarf (winter only)
+      if (season === "winter" && env.npcSprite.length >= 20) {
+        ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+        ctx.fillRect(sx + 10, by, 8, 2);
+        ctx.fillRect(sx + 8, by + 2, 12, 2);
+      }
     }
     if (b.scoldingText && b.scoldingUntil > state.elapsed) {
       ctx.fillStyle = "#FF0000";
@@ -930,12 +1021,17 @@ export function renderFrame(
   }
 
   // --- Sky overlays (outdoor only, before HUD) ---
-  if (!isInterior && timeOfDay) {
+  if (!isInterior && timeOfDay && !season) {
     const skyPhase = getSkyPhase(timeOfDay, env.latitude);
     const groundY = (activePlatforms[0]?.y ?? CANVAS_HEIGHT - 40) - camY;
     renderGroundTint(ctx, skyPhase, groundY, CANVAS_WIDTH, CANVAS_HEIGHT);
     renderSceneBrightness(ctx, skyPhase, CANVAS_WIDTH, CANVAS_HEIGHT);
     renderWarmthOverlay(ctx, skyPhase, CANVAS_WIDTH, CANVAS_HEIGHT);
+  }
+
+  // --- Seasonal particles (falling leaves / snow) ---
+  if (!isInterior && state.particles.length > 0) {
+    renderParticles(ctx, state.particles, camX, camY);
   }
 
   // --- HUD ---
@@ -1138,7 +1234,8 @@ function renderDoor(
   env: SkinEnvironment,
   segmentType: "street" | "interior",
   camX: number,
-  camY: number
+  camY: number,
+  season?: Season,
 ): void {
   const dx = door.x - camX;
   const dy = door.y - camY;
@@ -1151,6 +1248,13 @@ function renderDoor(
     const facadeW = (facade[0]?.length ?? 24) * facadeScale;
     const facadeH = facade.length * facadeScale;
     drawSprite(ctx, facade, dx + door.width / 2 - facadeW / 2, dy + door.height - facadeH, facadeScale);
+
+    // Snow on awning (winter only) — awnings are rows 5-7 of 24×24 facades at facadeScale
+    if (season === "winter") {
+      const awningY = dy + door.height - facadeH + 5 * facadeScale;
+      ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+      ctx.fillRect(dx + door.width / 2 - facadeW / 2, awningY - 2, facadeW, 3);
+    }
 
     // Sign text above facade
     if (door.label) {

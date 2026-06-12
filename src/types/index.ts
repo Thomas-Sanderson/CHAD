@@ -37,10 +37,12 @@ export type {
   ShoutResponse,
   DoorTransition,
   ShopConvoState,
+  Particle,
 } from "./engine";
 
 export type {
   LevelConfig,
   SkinEnvironment,
   SkinConfig,
+  Season,
 } from "./skin";

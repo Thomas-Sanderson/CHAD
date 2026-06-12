@@ -24,6 +24,8 @@ import {
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./renderer";
 import { generateRooftopPlatforms } from "./rooftops";
 import { shopFacadeSprites, landmarkSprites } from "./sprites";
+import type { Season } from "../types/skin";
+import { updateParticles, updateFootprints } from "./seasonal";
 
 const MARSHRUTKA_WIDTH = 80;
 const MARSHRUTKA_HEIGHT = 40;
@@ -51,7 +53,7 @@ const DEFAULT_SCOLDINGS = [
   "ИДИ ОТСЮДА!",
 ];
 
-export function createGameRunState(level: LevelData, scoldings?: string[], headBounceCurse?: string, pointPhrase?: string): GameRunState {
+export function createGameRunState(level: LevelData, scoldings?: string[], headBounceCurse?: string, pointPhrase?: string, season?: Season): GameRunState {
   const _scoldings = scoldings ?? DEFAULT_SCOLDINGS;
   const _curse = headBounceCurse ?? "блять!";
   const _pointPhrase = pointPhrase ?? "пожалуйста";
@@ -187,6 +189,11 @@ export function createGameRunState(level: LevelData, scoldings?: string[], headB
       facingLeft: false, jumpedDuring: false, startedAt: 0,
     },
     catTimeJumps: 0,
+    // Seasonal system
+    particles: [],
+    footprints: [],
+    lastFootprintX: 0,
+    season,
   };
 }
 
@@ -773,6 +780,20 @@ export function updateGameState(
     maxCamY
   ));
   state.camera.y += (targetCamY - state.camera.y) * camLerp;
+
+  // Seasonal particles (falling leaves / snow)
+  updateParticles(state.particles, dt, state.season, state.camera.x, state.camera.y, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  // Winter footprints
+  if (state.season === "winter") {
+    const groundPlats = activePlatforms.filter(p => p.isGround);
+    state.lastFootprintX = updateFootprints(
+      state.footprints, dt, state.season,
+      state.player.position.x, state.player.position.y + state.player.height,
+      state.player.onGround,
+      state.babushkas, state.lastFootprintX, groundPlats,
+    );
+  }
 }
 
 function respawnPlayer(state: GameRunState): void {

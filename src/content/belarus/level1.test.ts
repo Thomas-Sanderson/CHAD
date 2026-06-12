@@ -4,6 +4,7 @@ import { ethiopiaSkin } from "../ethiopia/skin";
 import { italySkin } from "../italy/skin";
 import type { SkinConfig } from "../../types/skin";
 import type { LevelSegment, StreetSignDef, StreetCorridor } from "../../types/content";
+import { getApartmentSprite, APARTMENT_SCALE } from "../../engine/seasonalSprites";
 
 // --- Overlap detection helpers ---
 // Replicates the renderer's sign mounting logic to compute actual visual bounds.
@@ -13,7 +14,8 @@ const PLATE_PAD = 12; // ctx.measureText(line).width + 12 in renderer
 const DOOR_FACADE_HALF_W = 48; // 24px sprite × scale 4 = 96px, half = 48
 const LANDMARK_HALF_W = 48;    // 20-24px sprite × scale 4 = 80-96px, half ≤ 48
 
-interface Span { label: string; left: number; right: number; aveY: number }
+type SpanKind = "sign" | "door" | "landmark" | "building";
+interface Span { label: string; left: number; right: number; aveY: number; kind: SpanKind }
 
 /** Mirrors the renderer's corridor-binding for a sign. */
 function signMount(sign: StreetSignDef, corridors: StreetCorridor[]) {
@@ -120,7 +122,7 @@ function collectStreetSpans(seg: LevelSegment): Span[] {
           right = left + pw;
         }
       }
-      spans.push({ label: `sign "${labels}"`, left, right, aveY: group[0]!.aveY });
+      spans.push({ label: `sign "${labels}"`, left, right, aveY: group[0]!.aveY, kind: "sign" });
     }
   }
 
@@ -134,6 +136,7 @@ function collectStreetSpans(seg: LevelSegment): Span[] {
         left: cx - DOOR_FACADE_HALF_W,
         right: cx + DOOR_FACADE_HALF_W,
         aveY: door.y + door.height,
+        kind: "door",
       });
     }
   }
@@ -147,6 +150,22 @@ function collectStreetSpans(seg: LevelSegment): Span[] {
         left: lm.x - LANDMARK_HALF_W,
         right: lm.x + LANDMARK_HALF_W,
         aveY: groundY,
+        kind: "landmark",
+      });
+    }
+  }
+
+  // Apartment buildings
+  if (seg.buildings) {
+    for (const bld of seg.buildings) {
+      const sprite = getApartmentSprite(bld.type, bld.stories, bld.variant);
+      const halfW = ((sprite[0]?.length ?? 8) * APARTMENT_SCALE) / 2;
+      spans.push({
+        label: `building ${bld.type}${bld.stories ?? ""}@${bld.x}`,
+        left: bld.x - halfW,
+        right: bld.x + halfW,
+        aveY: bld.y,
+        kind: "building",
       });
     }
   }
@@ -154,12 +173,17 @@ function collectStreetSpans(seg: LevelSegment): Span[] {
   return spans;
 }
 
-/** Check if two spans on the same avenue overlap horizontally. */
+/** Check if two spans on the same avenue overlap horizontally.
+ *  Skips: building-building (clusters are intentionally touching)
+ *         building-sign (buildings can exist at intersections) */
 function findOverlaps(spans: Span[], aveTolerance = 200): string[] {
   const errors: string[] = [];
   for (let i = 0; i < spans.length; i++) {
     for (let j = i + 1; j < spans.length; j++) {
       const a = spans[i]!, b = spans[j]!;
+      // Buildings may touch each other (clusters) and overlap with signs (intersections)
+      if (a.kind === "building" && b.kind === "building") continue;
+      if ((a.kind === "building" && b.kind === "sign") || (a.kind === "sign" && b.kind === "building")) continue;
       if (Math.abs(a.aveY - b.aveY) > aveTolerance) continue;
       const overlap = Math.min(a.right, b.right) - Math.max(a.left, b.left);
       if (overlap > 0) {
@@ -285,7 +309,7 @@ for (const skin of allSkins) {
           expect(decoys.length).toBeGreaterThanOrEqual(3);
         });
 
-        it("signs, doors, and landmarks do not overlap in street segments", () => {
+        it("signs, doors, landmarks, and buildings do not overlap in street segments", () => {
           const segments = level.levelData.segments;
           if (!segments) return; // flat levels don't have segments
           for (const seg of segments) {

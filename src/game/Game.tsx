@@ -484,6 +484,7 @@ export function Game() {
             mentorName={currentSkin.mentorName}
             mentorAvatar={currentSkin.mentorAvatar}
             mentorColor={currentSkin.mentorColor}
+            season={currentLevel.season}
           />
         );
       case "GATE":

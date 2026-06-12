@@ -356,6 +356,51 @@ export const level12RevealLines: RevealLine[] = [
   },
 ];
 
+export const level13RevealLines: RevealLine[] = [
+  {
+    vocabWordId: "buket",
+    correct:
+      "БУКЕТ. A bouquet. You brought me flowers. In spring. You're learning. Both the language and the culture.",
+    wrong:
+      "No БУКЕТ? Flowers, Chad. It's spring. Everything is blooming. Except your brain, apparently.",
+  },
+  {
+    vocabWordId: "tsvetochnaya",
+    correct:
+      "ЦВЕТОЧНАЯ. The flower shop. You went in and everything. Like a real person buying flowers.",
+    wrong:
+      "ЦВЕТОЧНАЯ. Flower shop. The place with all the flowers in the window. You literally walked past it.",
+  },
+  {
+    vocabWordId: "gazeta",
+    correct:
+      "ГАЗЕТА. A newspaper. You can't read it, but you bought it. That's... something.",
+    wrong:
+      "No ГАЗЕТА? Newspaper. Black ink on grey paper. The man at the kiosk had them in a stack.",
+  },
+  {
+    vocabWordId: "kiosk",
+    correct:
+      "КИОСК. The kiosk. Metal box. Grumpy man. You survived the interaction.",
+    wrong:
+      "КИОСК. The kiosk. It was right there on the corner. The man was right there. He was waiting.",
+  },
+  {
+    vocabWordId: "bulka",
+    correct:
+      "БУЛКА. A bread bun. Still warm. The whole apartment building will smell like it. Perfect.",
+    wrong:
+      "No БУЛКА? Bread bun. Warm. Golden. The bakery was RIGHT THERE. How did you miss the smell?",
+  },
+  {
+    vocabWordId: "khlebozavod",
+    correct:
+      "ХЛЕБОЗАВОД. Bread factory outlet. You found it. The warm bread place. Good job.",
+    wrong:
+      "ХЛЕБОЗАВОД. Bread factory. Warm bread. The smell that fills the whole street. You missed it.",
+  },
+];
+
 export const level4RevealLines: RevealLine[] = [
   {
     vocabWordId: "konfeta",

@@ -145,6 +145,20 @@ export interface StreetSignDef {
   y: number;
 }
 
+export interface BuildingDef {
+  x: number;        // world X of building center
+  y: number;        // world Y of building ground (bottom)
+  type: "narrow" | "wide";
+  stories?: number; // 2-3 for narrow, 1-2 for wide; defaults per type
+  variant?: number; // 0-2, picks sprite variant
+}
+
+export interface TreePlacement {
+  x: number;
+  y: number;          // avenue ground Y (tree draws above this)
+  variant: 0 | 1 | 2; // 0=birch, 1=linden, 2=ornamental
+}
+
 export interface LevelSegment {
   id: string;
   type: "street" | "interior";
@@ -159,6 +173,8 @@ export interface LevelSegment {
   landmarks?: LandmarkDef[];
   streetSigns?: StreetSignDef[];
   streetCorridors?: StreetCorridor[];
+  buildings?: BuildingDef[];
+  trees?: TreePlacement[];
 }
 
 export interface LevelData {

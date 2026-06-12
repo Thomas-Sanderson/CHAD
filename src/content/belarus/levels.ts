@@ -1,8 +1,8 @@
 import type { LevelConfig } from "../../types/skin";
-import { level1VocabPack, level2VocabPack, level3VocabPack, level4VocabPack, level5VocabPack, level6VocabPack, level7VocabPack, level8VocabPack, level9VocabPack, level10VocabPack, level11VocabPack, level12VocabPack } from "./vocabPack";
-import { level1Briefing, level2Briefing, level3Briefing, level4Briefing, level5Briefing, level6Briefing, level7Briefing, level8Briefing, level9Briefing, level10Briefing, level11Briefing, level12Briefing } from "./briefing";
-import { level1Items, level2Items, level3Items, level4Items, level5Items, level6Items, level7Items, level8Items, level9Items, level10Items, level11Items, level12Items } from "./items";
-import { level1RevealLines, level2RevealLines, level3RevealLines, level4RevealLines, level5RevealLines, level6RevealLines, level7RevealLines, level8RevealLines, level9RevealLines, level10RevealLines, level11RevealLines, level12RevealLines } from "./revealLines";
+import { level1VocabPack, level2VocabPack, level3VocabPack, level4VocabPack, level5VocabPack, level6VocabPack, level7VocabPack, level8VocabPack, level9VocabPack, level10VocabPack, level11VocabPack, level12VocabPack, level13VocabPack } from "./vocabPack";
+import { level1Briefing, level2Briefing, level3Briefing, level4Briefing, level5Briefing, level6Briefing, level7Briefing, level8Briefing, level9Briefing, level10Briefing, level11Briefing, level12Briefing, level13Briefing } from "./briefing";
+import { level1Items, level2Items, level3Items, level4Items, level5Items, level6Items, level7Items, level8Items, level9Items, level10Items, level11Items, level12Items, level13Items } from "./items";
+import { level1RevealLines, level2RevealLines, level3RevealLines, level4RevealLines, level5RevealLines, level6RevealLines, level7RevealLines, level8RevealLines, level9RevealLines, level10RevealLines, level11RevealLines, level12RevealLines, level13RevealLines } from "./revealLines";
 import { level1Data } from "./level1";
 import { level2Data } from "./level2";
 import { level3Data } from "./level3";
@@ -15,6 +15,7 @@ import { level9Data } from "./level9";
 import { level10Data } from "./level10";
 import { level11Data } from "./level11";
 import { level12Data } from "./level12";
+import { level13Data } from "./level13";
 
 export const allLevels: LevelConfig[] = [
   {
@@ -124,6 +125,7 @@ export const allLevels: LevelConfig[] = [
     gateFailText: "Ты потерялся.",
     gateFailQuiet: true,
     timeOfDay: "evening",
+    season: "spring",
   },
   {
     id: "the-shop-names",
@@ -136,6 +138,7 @@ export const allLevels: LevelConfig[] = [
     gateFailText: "ГДЕ ПОКУПКИ?!",
     gateFailQuiet: false,
     timeOfDay: "morning",
+    season: "summer",
   },
   {
     id: "the-far-side",
@@ -148,6 +151,7 @@ export const allLevels: LevelConfig[] = [
     gateFailText: "ДАЛЬШЕ.",
     gateFailQuiet: true,
     timeOfDay: "afternoon",
+    season: "autumn",
   },
   {
     id: "the-full-map",
@@ -160,5 +164,18 @@ export const allLevels: LevelConfig[] = [
     gateFailText: "Ты знаешь этот ГОРОД.",
     gateFailQuiet: true,
     timeOfDay: "evening",
+    season: "winter",
+  },
+  {
+    id: "spring-city",
+    name: "Spring City",
+    vocabPack: level13VocabPack,
+    briefing: level13Briefing,
+    items: level13Items,
+    revealLines: level13RevealLines,
+    levelData: level13Data,
+    gateFailText: "ВЕСНА ЖДЁТ.",
+    gateFailQuiet: true,
+    season: "spring",
   },
 ];

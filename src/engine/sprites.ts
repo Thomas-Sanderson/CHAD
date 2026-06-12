@@ -302,6 +302,32 @@ export const potatoSprite: SpriteData = [
 
 // --- ENVIRONMENT TILES ---
 
+// Snow palette
+const SN = "#eeeeff"; // snow white
+const SF = "#ddddee"; // snow shadow
+const XD = "#ccccdd"; // snow dark (cobblestone peek-through)
+const SI = "#dde4ee"; // snow ice
+
+// Winter ground tile (16×16 logical, drawn at 2x = 32×32)
+export const winterGroundTile: SpriteData = [
+  [SN, SF, SN, SN, SF, SN, SN, SN, SN, SN, SF, SN, SN, SF, SN, SN],
+  [SF, SN, SN, SF, SN, SN, SF, SN, SN, SF, SN, SN, SN, SN, SF, SN],
+  [SN, SN, SF, SN, SN, SI, SN, SN, SF, SN, SN, SI, SN, SN, SN, SF],
+  [SF, SN, SN, SN, SN, SN, SN, SF, SN, SN, SN, SN, SF, SN, SN, SN],
+  [SN, SF, SN, SN, SF, SN, SN, SN, SN, SF, SN, SN, SN, SN, SF, SN],
+  [SN, SN, SN, SF, SN, SN, SN, SN, SF, SN, SN, SN, SF, SN, SN, SN],
+  [SF, SN, SN, SN, SN, XD, SN, SN, SN, SN, SN, SF, SN, SN, SN, SF],
+  [SN, SN, SF, SN, SN, SN, SF, SN, SN, XD, SN, SN, SN, SF, SN, SN],
+  [SN, SF, SN, SN, SN, SN, SN, SN, SF, SN, SN, SN, SN, SN, SF, SN],
+  [SF, SN, SN, XD, SN, SF, SN, SN, SN, SN, SF, SN, XD, SN, SN, SN],
+  [SN, SN, SF, SN, SN, SN, SN, SF, SN, SN, SN, SN, SN, SN, SF, SN],
+  [SN, SF, SN, SN, SF, SN, SN, SN, SN, SF, SN, SF, SN, SN, SN, SF],
+  [SF, SN, SN, SN, SN, SN, SF, SN, SF, SN, SN, SN, SN, SF, SN, SN],
+  [SN, SN, SF, SF, SN, SN, SN, SN, SN, SN, XD, SN, SF, SN, SN, SF],
+  [SF, SF, SN, SN, SN, SF, SF, SN, SF, SF, SN, SN, SN, SN, SF, SF],
+  [XD, SF, SF, SN, SF, XD, SF, SF, XD, SF, SF, SN, SF, SF, XD, SF],
+];
+
 // Ground tile (16×16 logical, drawn at 2x = 32×32)
 export const groundTile: SpriteData = [
   [GB, _, GB, _, _, GB, _, _, _, GB, _, _, GB, _, _, GB],
@@ -666,6 +692,84 @@ export const shopBankSprite: SpriteData = buildLandmark(24, 24, [
   [13, 14, 1, 1, "#ccbb88"],  // handle
 ]);
 
+// ХЛЕБОЗАВОД — Bread factory outlet (industrial: chimney, rolling shutter, flour-dusted)
+export const shopBreadFactorySprite: SpriteData = buildLandmark(24, 24, [
+  // Chimney stack (left side, above main roof)
+  [2, 0, 3, 4, "#777766"],    // chimney brick
+  [2, 0, 3, 1, "#666655"],    // chimney cap
+  [3, 0, 1, 1, "#ccccbb"],    // smoke wisp
+  // Corrugated metal roof
+  [0, 3, 24, 2, "#887766"],   // metal roof
+  [0, 3, 24, 1, "#776655"],   // roof dark edge
+  // Body
+  [0, 5, 24, 19, "#ddd8c8"],  // tan industrial wall
+  [0, 5, 24, 1, "#ccc8b8"],   // cornice
+  // Factory sign plate (ochre)
+  [3, 6, 18, 3, "#aa8844"],   // sign
+  [4, 7, 16, 1, "#997733"],   // sign inner
+  // Rolling shutter door (wide, industrial — key feature)
+  [2, 10, 12, 14, "#888888"], // shutter frame
+  [3, 11, 10, 12, "#999999"], // shutter body
+  [3, 13, 10, 1, "#777777"],  // slat
+  [3, 16, 10, 1, "#777777"],  // slat
+  [3, 19, 10, 1, "#777777"],  // slat
+  [3, 22, 10, 1, "#777777"],  // slat
+  // Small office window
+  [16, 10, 5, 5, "#ccc8b8"],  // frame
+  [17, 11, 3, 3, "#c8d4e0"],  // glass
+  // Personnel door
+  [17, 18, 4, 6, "#6b5544"],  // side door
+  [18, 19, 2, 4, "#5a4433"],  // door inner
+  [19, 21, 1, 1, "#ccaa55"],  // handle
+  // Flour-dusted base
+  [0, 22, 24, 2, "#e8e0d0"],  // dusty base
+]);
+
+// ЦВЕТОЧНАЯ — Flower shop (pink awning, display window with flowers)
+export const shopFlowerSprite: SpriteData = buildLandmark(24, 24, [
+  [0, 2, 24, 2, "#cc5588"],   // pink sign plate
+  [1, 2, 22, 1, "#bb4477"],   // sign inner
+  [0, 4, 24, 20, "#f0e8e0"],  // cream plaster body
+  [0, 4, 24, 1, "#e8ddd4"],   // cornice
+  [0, 5, 24, 3, "#cc5588"],   // pink awning
+  [0, 5, 4, 3, "#bb4477"],    // awning dark
+  [8, 5, 4, 3, "#bb4477"],
+  [16, 5, 4, 3, "#bb4477"],
+  [2, 10, 10, 7, "#d8e8d0"],  // display window (greenish tint)
+  [3, 11, 8, 5, "#e8f0e0"],   // glass
+  [4, 12, 2, 2, "#ff6b9d"],   // pink flower
+  [7, 12, 2, 2, "#ffcc44"],   // yellow flower
+  [5, 14, 2, 2, "#cc55cc"],   // purple flower
+  [8, 14, 1, 2, "#449944"],   // stem
+  [4, 14, 1, 2, "#449944"],   // stem
+  [15, 10, 6, 14, "#996677"], // door
+  [16, 11, 4, 12, "#885566"], // door inner
+  [19, 16, 1, 1, "#ccaa88"],  // handle
+  [16, 12, 3, 3, "#d8e8d0"],  // door window
+]);
+
+// КИОСК — Newspaper kiosk (compact booth, sliding window, rack)
+export const shopKioskSprite: SpriteData = buildLandmark(24, 24, [
+  [0, 2, 24, 2, "#445566"],   // dark blue-gray sign plate
+  [1, 2, 22, 1, "#334455"],   // sign inner
+  [0, 4, 24, 20, "#889999"],  // metal/gray body
+  [0, 4, 24, 1, "#778888"],   // cornice
+  [0, 5, 24, 2, "#445566"],   // dark header strip
+  [2, 8, 12, 6, "#aabbcc"],   // sliding window frame
+  [3, 9, 10, 4, "#c8d4e0"],   // glass
+  [8, 8, 1, 6, "#8899aa"],    // window divider
+  [2, 14, 12, 2, "#778888"],  // counter ledge
+  [3, 16, 3, 6, "#eeddcc"],   // newspaper stack 1
+  [3, 15, 3, 1, DG],          // headline text
+  [7, 16, 3, 6, "#eeddcc"],   // newspaper stack 2
+  [7, 15, 3, 1, DG],          // headline text
+  [11, 17, 3, 5, "#eeddcc"],  // magazine
+  [11, 16, 3, 1, "#cc4444"],  // magazine header (red)
+  [17, 8, 4, 16, "#556666"],  // side door
+  [18, 9, 2, 14, "#445555"],  // door inner
+  [19, 15, 1, 1, "#ccccdd"],  // handle
+]);
+
 // Shop facade lookup by door label
 export const shopFacadeSprites: Record<string, SpriteData> = {
   "МОЛОЧНАЯ": shopDairySprite,
@@ -679,11 +783,21 @@ export const shopFacadeSprites: Record<string, SpriteData> = {
   "КАФЕ": shopCafeSprite,
   "ПОЧТА": shopPostSprite,
   "БАНК": shopBankSprite,
+  "ХЛЕБОЗАВОД": shopBreadFactorySprite,
+  "ЦВЕТОЧНАЯ": shopFlowerSprite,
+  "КИОСК": shopKioskSprite,
   // Italy shops
   "SALUMERIA": macelleriaSpriteIT,
   "PANETTERIA": panetteriaSpriteIT,
   "FRUTTIVENDOLO": fruttivendoloSpriteIT,
 };
+
+// Sprites with decorative elements above the main roof.
+// Maps sprite → row where the walkable roof starts (overrides firstVisibleRow).
+export const spriteRoofOverrides = new Map<SpriteData, number>();
+spriteRoofOverrides.set(shopPharmacySprite, 4);       // cross is rows 0-1, sign rows 2-3
+spriteRoofOverrides.set(shopBreadFactorySprite, 3);   // chimney is rows 0-2
+spriteRoofOverrides.set(shopPostSprite, 2);            // envelope icon is rows 0-1
 
 // --- ITEM SPRITES (all 16×13 logical, drawn at 2x = 32×26) ---
 
@@ -1673,6 +1787,9 @@ export const landmarkSprites: Record<string, SpriteData> = {
   "БИБЛИОТЕКА": landmarkBiblioteka,
 };
 
+// Landmark roof overrides (must be after landmark definitions)
+spriteRoofOverrides.set(landmarkPark, 6);              // tree canopy rows 3-5, arch at row 6
+
 // --- APARTMENT BLOCK SPRITE ---
 // Small Soviet apartment building for bare street sign intersections.
 // 12×22 logical, drawn at scale 4 = 48×88 display.
@@ -2193,6 +2310,76 @@ export const monetaCoinSprite: SpriteData = [
   [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
 ];
 
+// --- Belarus items (L13) ---
+
+// Букет — wrapped spring bouquet with ribbon
+export const buketFlowersSprite: SpriteData = [
+  [_, _, _, _, _, _, _, GN, GN, _, _, _, _, _, _, _],
+  [_, _, _, _, _, GN, PF, GN, YF, GN, _, _, _, _, _, _],
+  [_, _, _, _, GN, PF, PF, YF, YF, PF, GN, _, _, _, _, _],
+  [_, _, _, GN, PF, YF, PF, PF, YF, PF, YF, GN, _, _, _, _],
+  [_, _, _, GN, YF, PF, YF, YF, PF, YF, PF, GN, _, _, _, _],
+  [_, _, _, _, GN, GN, GN, GN, GN, GN, GN, _, _, _, _, _],
+  [_, _, _, _, _, WH, WH, WH, WH, WH, _, _, _, _, _, _],
+  [_, _, _, _, WH, WH, WH, WH, WH, WH, WH, _, _, _, _, _],
+  [_, _, _, _, WH, WE, WH, WH, WH, WE, WH, _, _, _, _, _],
+  [_, _, _, _, _, WH, PF, WH, PF, WH, _, _, _, _, _, _],
+  [_, _, _, _, _, _, WH, WH, WH, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, GN, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, GN, _, _, _, _, _, _, _, _],
+];
+
+// Газета — folded Soviet newspaper
+export const gazetaPaperSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, WE, WE, WE, WE, WE, WE, WE, WE, WE, WE, _, _, _],
+  [_, _, _, WE, DG, DG, DG, DG, DG, DG, DG, DG, WE, _, _, _],
+  [_, _, _, WE, WE, WE, WE, WE, WE, WE, WE, WE, WE, _, _, _],
+  [_, _, _, WE, DG, DG, DG, WE, DG, DG, DG, WE, WE, _, _, _],
+  [_, _, _, WE, DG, DG, WE, WE, DG, DG, WE, WE, WE, _, _, _],
+  [_, _, _, LG, LG, LG, LG, LG, LG, LG, LG, LG, LG, _, _, _],
+  [_, _, _, WE, DG, DG, DG, DG, WE, DG, DG, WE, WE, _, _, _],
+  [_, _, _, WE, DG, DG, WE, WE, WE, DG, DG, DG, WE, _, _, _],
+  [_, _, _, WE, DG, DG, DG, WE, DG, DG, WE, WE, WE, _, _, _],
+  [_, _, _, WE, WE, WE, WE, WE, WE, WE, WE, WE, WE, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+];
+
+// Булка — golden bread roll with scoring
+export const bulkaBunSprite: SpriteData = [
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, LN, LN, LN, LN, _, _, _, _, _, _],
+  [_, _, _, _, _, LN, LN, LN, LN, LN, LN, _, _, _, _, _],
+  [_, _, _, _, LN, LN, BN, LN, BN, LN, LN, LN, _, _, _, _],
+  [_, _, _, LN, LN, LN, LN, BN, LN, BN, LN, LN, LN, _, _, _],
+  [_, _, _, OG, LN, LN, BN, LN, LN, LN, BN, LN, OG, _, _, _],
+  [_, _, _, OG, OG, LN, LN, LN, LN, LN, LN, OG, OG, _, _, _],
+  [_, _, _, _, OG, OG, LN, LN, LN, LN, OG, OG, _, _, _, _],
+  [_, _, _, _, _, BN, OG, OG, OG, OG, BN, _, _, _, _, _],
+  [_, _, _, _, _, _, BN, BN, BN, BN, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+];
+
+// Редиска — round red radish with green leaf top
+export const rediskaRevealSprite: SpriteData = [
+  [_, _, _, _, _, _, _, GN, GN, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, GN, DK, GN, GN, _, _, _, _, _, _],
+  [_, _, _, _, _, GN, GN, GN, DK, GN, _, _, _, _, _, _],
+  [_, _, _, _, _, _, RD, RD, RD, _, _, _, _, _, _, _],
+  [_, _, _, _, _, RD, RD, RD, RD, RD, _, _, _, _, _, _],
+  [_, _, _, _, RD, RD, DR, RD, RD, RD, RD, _, _, _, _, _],
+  [_, _, _, _, RD, RD, RD, RD, RD, DR, RD, _, _, _, _, _],
+  [_, _, _, _, RD, RD, RD, RD, RD, RD, RD, _, _, _, _, _],
+  [_, _, _, _, _, RD, RD, RD, RD, RD, _, _, _, _, _, _],
+  [_, _, _, _, _, _, RD, WH, RD, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, WH, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, WH, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+];
+
 // --- Sprite drawing utility ---
 
 export function drawSprite(
@@ -2295,11 +2482,16 @@ const itemSpriteMap: Record<string, SpriteData> = {
   ukrop_bunch: ukropBunchSprite,
   tvorog_tub: tvorogTubSprite,
   sosiski_pack: sosiskiPackSprite,
-  // Belarus items (L11+)
+  // Belarus items (L11-12)
   aspirin_box: aspirinBoxSprite,
   pirog_slice: pirogSliceSprite,
   konvert_envelope: konvertEnvelopeSprite,
   moneta_coin: monetaCoinSprite,
+  // Belarus items (L13)
+  buket_flowers: buketFlowersSprite,
+  gazeta_paper: gazetaPaperSprite,
+  bulka_bun: bulkaBunSprite,
+  rediska_reveal: rediskaRevealSprite,
   // Ethiopia items
   buna_bag: bunaBagSprite,
   wetet_jug: wetetJugSprite,

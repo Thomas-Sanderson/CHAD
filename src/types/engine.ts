@@ -1,6 +1,22 @@
 import type { PlatformDef } from "./content";
+import type { Season } from "./skin";
 
 export type Phase = "BRIEFING" | "RUN" | "GATE" | "SORTING" | "DECODE" | "REVEAL";
+
+export interface Particle {
+  x: number; y: number;
+  vx: number; vy: number;
+  color: string;
+  life: number;    // seconds remaining
+  size: number;    // 1 or 2 px
+}
+
+export interface Footprint {
+  x: number;
+  y: number;
+  age: number;        // seconds since placed
+  side: "left" | "right";
+}
 
 export interface Vec2 {
   x: number;
@@ -152,6 +168,11 @@ export interface GameRunState {
     startedAt: number;  // elapsed when cat appeared
   };
   catTimeJumps: number; // lifetime count of successful coyote jumps (for achievement)
+  // Seasonal system
+  particles: Particle[];
+  footprints: Footprint[];
+  lastFootprintX: number;
+  season?: Season;
 }
 
 export interface InputState {

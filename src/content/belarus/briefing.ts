@@ -483,6 +483,66 @@ export const level12Briefing: BriefingScript = {
   ],
 };
 
+export const level13Briefing: BriefingScript = {
+  levelId: "spring-city",
+  messages: [
+    {
+      id: "l13-msg-1",
+      sender: "mentor",
+      text: "It's ВЕСНА. The snow is melting. Everything smells like mud.",
+      vocabWordIds: ["vesna"],
+    },
+    {
+      id: "l13-msg-2",
+      sender: "mentor",
+      text: "I need a БУКЕТ. Not dead ones. Real ones, with color.",
+      vocabWordIds: ["buket"],
+    },
+    {
+      id: "l13-msg-2b",
+      sender: "mentor",
+      text: "ЦВЕТОЧНАЯ. The flower shop. It's somewhere on the avenue. Find it.",
+      vocabWordIds: ["tsvetochnaya"],
+    },
+    {
+      id: "l13-msg-3",
+      sender: "mentor",
+      text: "Also a ГАЗЕТА. I want to see what lies they're printing this week.",
+      vocabWordIds: ["gazeta"],
+    },
+    {
+      id: "l13-msg-3b",
+      sender: "mentor",
+      text: "КИОСК. The little metal box on the corner. Man inside. Never smiles.",
+      vocabWordIds: ["kiosk"],
+    },
+    {
+      id: "l13-msg-4",
+      sender: "mentor",
+      text: "And one more thing. A БУЛКА from the new bakery. Warm. Golden.",
+      vocabWordIds: ["bulka"],
+    },
+    {
+      id: "l13-msg-4b",
+      sender: "mentor",
+      text: "ХЛЕБОЗАВОД. Bread factory outlet. Follow the smell.",
+      vocabWordIds: ["khlebozavod"],
+    },
+    {
+      id: "l13-msg-5",
+      sender: "chad",
+      text: "I know where everything is now",
+      vocabWordIds: [],
+    },
+    {
+      id: "l13-msg-6",
+      sender: "mentor",
+      text: "Good. Because the buildings have settled. This is the real map now.",
+      vocabWordIds: [],
+    },
+  ],
+};
+
 export const level4Briefing: BriefingScript = {
   levelId: "the-apology",
   messages: [

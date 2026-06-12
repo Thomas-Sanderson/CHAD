@@ -1,5 +1,7 @@
 import type { LevelSegment, PlatformDef } from "../types/content";
 import type { SpriteData } from "./sprites";
+import { spriteRoofOverrides } from "./sprites";
+import { getApartmentSprite, APARTMENT_SCALE } from "./seasonalSprites";
 
 const WALL_THICKNESS = 48;
 const FACADE_SCALE = 4;
@@ -12,6 +14,11 @@ function firstVisibleRow(sprite: SpriteData): number {
     if (sprite[r]!.some(px => px !== null)) return r;
   }
   return 0;
+}
+
+/** Roof row accounting for decorative elements (crosses, chimneys) above the main roof. */
+function effectiveRoofRow(sprite: SpriteData): number {
+  return spriteRoofOverrides.get(sprite) ?? firstVisibleRow(sprite);
 }
 
 /**
@@ -60,7 +67,7 @@ export function generateRooftopPlatforms(
     const facadeH = facade.length * FACADE_SCALE;
     const facadeX = door.x + door.width / 2 - facadeW / 2;
     const facadeTopY = door.y + door.height - facadeH;
-    const roofOffset = firstVisibleRow(facade) * FACADE_SCALE;
+    const roofOffset = effectiveRoofRow(facade) * FACADE_SCALE;
 
     platforms.push({
       x: facadeX,
@@ -84,11 +91,30 @@ export function generateRooftopPlatforms(
       const sprW = (sprite[0]?.length ?? 20) * LANDMARK_SCALE;
       const sprH = sprite.length * LANDMARK_SCALE;
       const spriteTopY = lm.y ?? (groundY - sprH);
-      const roofOffset = firstVisibleRow(sprite) * LANDMARK_SCALE;
+      const roofOffset = effectiveRoofRow(sprite) * LANDMARK_SCALE;
 
       platforms.push({
         x: lm.x - sprW / 2,
         y: spriteTopY + roofOffset,
+        width: sprW,
+        height: PLATFORM_HEIGHT,
+        passThrough: true,
+      });
+    }
+  }
+
+  // 4. Apartment building rooftops
+  if (segment.buildings) {
+    for (const bld of segment.buildings) {
+      const sprite = getApartmentSprite(bld.type, bld.stories, bld.variant);
+      const scale = APARTMENT_SCALE;
+      const sprW = (sprite[0]?.length ?? 8) * scale;
+      const sprH = sprite.length * scale;
+      const roofOffset = firstVisibleRow(sprite) * scale;
+
+      platforms.push({
+        x: bld.x - sprW / 2,
+        y: bld.y - sprH + roofOffset,
         width: sprW,
         height: PLATFORM_HEIGHT,
         passThrough: true,

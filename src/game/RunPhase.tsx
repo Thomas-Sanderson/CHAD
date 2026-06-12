@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState, useMemo } from "react";
-import type { LevelData, GameRunState, InputState, SkinEnvironment, VocabWord } from "../types";
+import type { LevelData, GameRunState, InputState, SkinEnvironment, VocabWord, Season } from "../types";
 import type { TimeOfDay } from "../engine/sky";
 import type { BriefingScript, CollectibleItem, ConvoPhrase, StreetSignDef, VocabPack } from "../types/content";
 import { computeDirection, findNearestCorridor, buildAvenueData } from "../engine/directions";
@@ -41,6 +41,7 @@ interface Props {
   mentorName?: string;
   mentorAvatar?: string;
   mentorColor?: string;
+  season?: Season;
 }
 
 export function RunPhase({
@@ -48,6 +49,7 @@ export function RunPhase({
   onHeartLost, hearts, maxHearts, checkGateResult,
   learnedWords = [], vocabWords = [], timeOfDay,
   briefing, vocabPack, mentorName, mentorAvatar, mentorColor,
+  season,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<GameRunState | null>(null);
@@ -93,7 +95,7 @@ export function RunPhase({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const gameState = createGameRunState(level, environment.scoldings, environment.headBounceCurse, environment.pointPhrase);
+    const gameState = createGameRunState(level, environment.scoldings, environment.headBounceCurse, environment.pointPhrase, season);
     stateRef.current = gameState;
     prevHitCountRef.current = 0;
 
@@ -131,7 +133,7 @@ export function RunPhase({
           hearts: heartsRef.current,
           maxHearts: maxHeartsRef.current,
         };
-        renderFrame(ctx, gameState, level, itemDefs, environment, hud, timeOfDay);
+        renderFrame(ctx, gameState, level, itemDefs, environment, hud, timeOfDay, season);
         if (gameState.flagProgress >= 1) {
           flagAnimatingRef.current = false;
           onGateReachedRef.current(gameState);
@@ -217,7 +219,7 @@ export function RunPhase({
         hearts: heartsRef.current,
         maxHearts: maxHeartsRef.current,
       };
-      renderFrame(ctx, gameState, level, itemDefs, environment, hud, timeOfDay);
+      renderFrame(ctx, gameState, level, itemDefs, environment, hud, timeOfDay, season);
 
       // Gate reached — check if passed for flag animation
       if (gameState.reachedGate) {
@@ -245,7 +247,7 @@ export function RunPhase({
       cleanupTouch();
       stopAllBusAudio();
     };
-  }, [level, itemDefs, environment, timeOfDay]);
+  }, [level, itemDefs, environment, timeOfDay, season]);
 
   useEffect(() => {
     const cleanup = initAndRun();

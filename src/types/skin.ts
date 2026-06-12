@@ -2,6 +2,8 @@ import type { VocabPack, BriefingScript, RevealLine, LevelData, CollectibleItem 
 import type { SpriteData } from "../engine/sprites";
 import type { TimeOfDay } from "../engine/sky";
 
+export type Season = "spring" | "summer" | "autumn" | "winter";
+
 export interface LevelConfig {
   id: string;
   name: string;
@@ -13,6 +15,7 @@ export interface LevelConfig {
   gateFailText: string;
   gateFailQuiet: boolean;
   timeOfDay?: TimeOfDay;
+  season?: Season;
 }
 
 export interface SkinEnvironment {

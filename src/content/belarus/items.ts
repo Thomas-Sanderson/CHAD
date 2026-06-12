@@ -943,3 +943,84 @@ export const level12Items: CollectibleItem[] = [
     ],
   },
 ];
+
+// === Level 13 items ===
+export const level13Items: CollectibleItem[] = [
+  // Targets — inside new shops
+  {
+    id: "buket_flowers",
+    name: "Bouquet",
+    script: "БУКЕТ",
+    description: "A wrapped bouquet of spring flowers. Smells nice.",
+    isDecoy: false,
+    color: "#ff88aa",
+    pronunciation: "boo-KYET",
+  },
+  {
+    id: "gazeta_paper",
+    name: "Newspaper",
+    script: "ГАЗЕТА",
+    description: "A folded newspaper with bold Cyrillic headlines.",
+    isDecoy: false,
+    color: "#e8e8e8",
+    pronunciation: "gah-ZYEH-tah",
+  },
+  {
+    id: "bulka_bun",
+    name: "Bread Bun",
+    script: "БУЛКА",
+    description: "A golden-brown bread roll, still warm.",
+    isDecoy: false,
+    color: "#ddaa44",
+    pronunciation: "BOOL-kah",
+  },
+  // Decoys
+  {
+    id: "vodka_bottle",
+    name: "Tall Frosted Bottle",
+    script: "ВОДКА",
+    description: "A frosted bottle with a red stripe label.",
+    isDecoy: true,
+    color: "#eeeeee",
+  },
+  {
+    id: "pickle_jar",
+    name: "Pickle Jar",
+    script: "ОГУРЦЫ",
+    description: "A jar of pickled cucumbers.",
+    isDecoy: true,
+    color: "#4CAF50",
+  },
+  {
+    id: "kolbasa_ring",
+    name: "Sausage Ring",
+    script: "КОЛБАСА",
+    description: "A ring of dried sausage.",
+    isDecoy: true,
+    color: "#991111",
+  },
+  {
+    id: "sunflower_seeds",
+    name: "Seed Bag",
+    script: "СЕМЕЧКИ",
+    description: "A rustling bag of sunflower seeds.",
+    isDecoy: true,
+    color: "#FFC107",
+  },
+  {
+    id: "mystery_can",
+    name: "Mystery Can",
+    script: "РЕДИСКА",
+    description: "A dented grey tin. The label fell off. Something scratched in marker...",
+    isDecoy: true,
+    color: "#9E9E9E",
+    revealName: "Radish",
+    revealSpriteId: "rediska_reveal",
+    pronunciation: "ryeh-DEES-kah",
+    hints: [
+      "Red on the outside. White on the inside. Small and crunchy.",
+      "Goes in spring salads. People eat them with salt.",
+      "The little root vegetable. Peppery. Not a beet.",
+    ],
+  },
+];
