@@ -113,12 +113,12 @@ export function AudioControls() {
 const styles: Record<string, React.CSSProperties> = {
   wrapper: {
     position: "fixed",
-    top: 8,
-    right: 8,
+    bottom: 8,
+    left: 8,
     zIndex: 9999,
     display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-end",
+    flexDirection: "column-reverse",
+    alignItems: "flex-start",
   },
   iconButton: {
     width: 28,
@@ -134,7 +134,7 @@ const styles: Record<string, React.CSSProperties> = {
     WebkitTapHighlightColor: "transparent",
   },
   panel: {
-    marginTop: 4,
+    marginBottom: 4,
     background: "#1a1a2e",
     borderRadius: 8,
     padding: "8px 10px",
